@@ -1,11 +1,15 @@
 <!DOCTYPE html>
-
 <html lang="de">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<title>Stadt Land Fluss</title>
+<title>Stadt Land Fluss – Echtzeit</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+
+<!-- Firebase App und Realtime Database SDKs einbinden -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
 <style>
   :root {
     --cream: #faf6ef;
@@ -15,252 +19,135 @@
     --sage: #5c7a5a;
     --mist: #e8e2d9;
     --paper: #f2ece2;
+    --danger: #e03e1a;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--cream);
-    color: var(--ink);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+  body { background: var(--cream); color: var(--ink); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
   body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      radial-gradient(circle at 20% 20%, rgba(201,74,42,0.06) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(92,122,90,0.07) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(circle at 20% 20%, rgba(201,74,42,0.06) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(92,122,90,0.07) 0%, transparent 50%);
   }
-  .screen {
-    position: relative;
-    z-index: 1;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 28px 20px 60px;
-    animation: fadeIn 0.35s ease;
-  }
+  .screen { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 28px 20px 60px; animation: fadeIn 0.35s ease; }
   .screen.hidden { display: none; }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .game-header { text-align: center; margin-bottom: 32px; }
-  .game-title {
-    font-family: 'Fraunces', serif;
-    font-size: clamp(2.6rem, 10vw, 4.5rem);
-    font-weight: 900;
-    line-height: 0.95;
-    color: var(--ink);
-    letter-spacing: -2px;
-  }
-  .game-title span { color: var(--rust); font-style: italic; }
-  .game-sub {
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--rust);
-    margin-top: 10px;
-    font-weight: 600;
-  }
-  .card {
-    background: var(--paper);
-    border: 1.5px solid var(--mist);
-    border-radius: 20px;
-    padding: 24px 22px;
-    width: 100%;
-    max-width: 440px;
-    box-shadow: 0 4px 24px rgba(26,22,18,0.07);
-  }
-  .card-title {
-    font-family: 'Fraunces', serif;
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin-bottom: 18px;
-    color: var(--ink);
-  }
-  .label {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--rust);
-    margin-bottom: 7px;
-    margin-top: 16px;
-    display: block;
-  }
-  .label:first-child { margin-top: 0; }
-  input[type=text], input[type=password] {
-    width: 100%;
-    background: var(--cream);
-    border: 1.5px solid var(--mist);
-    border-radius: 10px;
-    padding: 13px 15px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 16px;
-    color: var(--ink);
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    -webkit-appearance: none;
-  }
-  input[type=text]:focus, input[type=password]:focus {
-    border-color: var(--rust);
-    box-shadow: 0 0 0 3px rgba(201,74,42,0.12);
-  }
-  input::placeholder { color: rgba(26,22,18,0.3); }
-  .btn {
-    width: 100%;
-    padding: 14px 20px;
-    border-radius: 12px;
-    border: none;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 600;
-    font-size: 15px;
-    cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s;
-    margin-top: 12px;
-  }
-  .btn:active { transform: scale(0.98); }
-  .btn-primary { background: var(--rust); color: white; box-shadow: 0 3px 14px rgba(201,74,42,0.3); }
-  .btn-secondary { background: var(--mist); color: var(--ink); border: 1.5px solid rgba(26,22,18,0.1); }
-  .btn-green { background: var(--sage); color: white; }
-  .btn-sm { width: auto; padding: 7px 14px; font-size: 13px; margin-top: 0; border-radius: 8px; }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-.pw-toggle {
-display: flex; align-items: center; gap: 10px;
-margin-top: 14px; cursor: pointer; user-select: none;
-}
-.pw-toggle input[type=checkbox] {
-width: 18px; height: 18px; accent-color: var(–rust);
-cursor: pointer; flex-shrink: 0;
-}
+.game-header { text-align: center; margin-bottom: 32px; }
+.game-title { font-family: 'Fraunces', serif; font-size: clamp(2.6rem,10vw,4.5rem); font-weight: 900; line-height: 0.95; color: var(--ink); letter-spacing: -2px; }
+.game-title span { color: var(--rust); font-style: italic; }
+.game-sub { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--rust); margin-top: 10px; font-weight: 600; }
+
+.card { background: var(--paper); border: 1.5px solid var(--mist); border-radius: 20px; padding: 24px 22px; width: 100%; max-width: 440px; box-shadow: 0 4px 24px rgba(26,22,18,0.07); }
+.card-title { font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 18px; color: var(--ink); }
+
+.label { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--rust); margin-bottom: 7px; margin-top: 16px; display: block; }
+.label:first-child { margin-top: 0; }
+
+input[type=text], input[type=password] { width: 100%; background: var(--cream); border: 1.5px solid var(--mist); border-radius: 10px; padding: 13px 15px; font-family: 'DM Sans', sans-serif; font-size: 16px; color: var(--ink); outline: none; transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; }
+input[type=text]:focus, input[type=password]:focus { border-color: var(--rust); box-shadow: 0 0 0 3px rgba(201,74,42,0.12); }
+input::placeholder { color: rgba(26,22,18,0.3); }
+
+.btn { width: 100%; padding: 14px 20px; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 15px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; margin-top: 12px; }
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--rust); color: white; box-shadow: 0 3px 14px rgba(201,74,42,0.3); }
+.btn-secondary { background: var(--mist); color: var(--ink); border: 1.5px solid rgba(26,22,18,0.1); }
+.btn-sm { width: auto; padding: 7px 14px; font-size: 13px; margin-top: 0; border-radius: 8px; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.pw-toggle { display: flex; align-items: center; gap: 10px; margin-top: 14px; cursor: pointer; user-select: none; }
+.pw-toggle input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--rust); cursor: pointer; flex-shrink: 0; }
 .pw-toggle span { font-size: 13px; color: rgba(26,22,18,0.6); font-weight: 500; }
 
-.room-code-display {
-text-align: center; background: var(–ink); color: var(–cream);
-border-radius: 14px; padding: 18px; margin-bottom: 18px;
-}
-.room-code-display .code {
-font-family: ‘Fraunces’, serif; font-size: 2.6rem; font-weight: 900;
-letter-spacing: 8px; color: var(–gold); line-height: 1;
-}
-.room-code-display .code-hint {
-font-size: 11px; color: rgba(250,246,239,0.45);
-margin-top: 5px; letter-spacing: 1px; text-transform: uppercase;
-}
-.players-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-.player-chip {
-display: inline-flex; align-items: center; gap: 6px;
-background: var(–cream); border: 1.5px solid var(–mist);
-border-radius: 30px; padding: 6px 14px; font-size: 13px; font-weight: 500;
-}
-.player-chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(–sage); flex-shrink: 0; }
+.timer-options { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.timer-btn { flex: 1; min-width: 60px; padding: 10px 8px; border-radius: 10px; border: 1.5px solid var(--mist); background: var(--cream); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; color: var(--ink); transition: all 0.15s; }
+.timer-btn.active { background: var(--rust); color: white; border-color: var(--rust); box-shadow: 0 2px 10px rgba(201,74,42,0.3); }
 
-.cat-item {
-display: flex; align-items: center; justify-content: space-between;
-background: var(–cream); border: 1.5px solid var(–mist);
-border-radius: 10px; padding: 8px 12px; margin-bottom: 6px;
-font-size: 14px; font-weight: 500;
-}
-.cat-remove {
-background: none; border: none; cursor: pointer;
-color: rgba(26,22,18,0.3); font-size: 16px; padding: 0 4px;
-line-height: 1; transition: color 0.15s;
-}
-.cat-remove:hover { color: var(–rust); }
+.room-code-display { text-align: center; background: var(--ink); color: var(--cream); border-radius: 14px; padding: 18px; margin-bottom: 18px; }
+.room-code-display .code { font-family: 'Fraunces', serif; font-size: 2.6rem; font-weight: 900; letter-spacing: 8px; color: var(--gold); line-height: 1; }
+.room-code-display .code-hint { font-size: 11px; color: rgba(250,246,239,0.45); margin-top: 5px; letter-spacing: 1px; text-transform: uppercase; }
+
+.players-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.player-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--cream); border: 1.5px solid var(--mist); border-radius: 30px; padding: 6px 14px; font-size: 13px; font-weight: 500; }
+.player-chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sage); flex-shrink: 0; }
+
+.cat-item { display: flex; align-items: center; justify-content: space-between; background: var(--cream); border: 1.5px solid var(--mist); border-radius: 10px; padding: 8px 12px; margin-bottom: 6px; font-size: 14px; font-weight: 500; }
+.cat-remove { background: none; border: none; cursor: pointer; color: rgba(26,22,18,0.3); font-size: 16px; padding: 0 4px; line-height: 1; }
+.cat-remove:hover { color: var(--rust); }
 .cat-add-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
 .cat-add-row input { flex: 1; margin: 0; }
 .cats-readonly { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.cat-tag {
-background: var(–cream); border: 1.5px solid var(–mist);
-border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 600; color: var(–ink);
-}
+.cat-tag { background: var(--cream); border: 1.5px solid var(--mist); border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 600; color: var(--ink); }
 
-.letter-stage { text-align: center; margin: 8px 0 22px; }
-.big-letter {
-font-family: ‘Fraunces’, serif;
-font-size: clamp(7rem, 28vw, 11rem);
-font-weight: 900; font-style: italic; color: var(–rust);
-line-height: 0.9; text-shadow: 6px 6px 0 rgba(201,74,42,0.1);
-animation: letterPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-@keyframes letterPop {
-from { transform: scale(0.4) rotate(-8deg); opacity: 0; }
-to { transform: scale(1) rotate(0); opacity: 1; }
-}
-.round-badge {
-display: inline-block; background: var(–ink); color: var(–cream);
-border-radius: 20px; padding: 4px 14px;
-font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;
-}
+.letter-stage { text-align: center; margin: 8px 0 16px; }
+.big-letter { font-family: 'Fraunces', serif; font-size: clamp(6rem,24vw,10rem); font-weight: 900; font-style: italic; color: var(--rust); line-height: 0.9; text-shadow: 6px 6px 0 rgba(201,74,42,0.1); animation: letterPop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes letterPop { from { transform: scale(0.4) rotate(-8deg); opacity:0; } to { transform: scale(1) rotate(0); opacity:1; } }
+.round-badge { display: inline-block; background: var(--ink); color: var(--cream); border-radius: 20px; padding: 4px 14px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+
+.timer-ring-wrap { display: flex; justify-content: center; margin-bottom: 12px; }
+.timer-ring { position: relative; width: 72px; height: 72px; }
+.timer-ring svg { transform: rotate(-90deg); }
+.timer-ring .ring-bg { fill: none; stroke: var(--mist); stroke-width: 5; }
+.timer-ring .ring-bar { fill: none; stroke: var(--sage); stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 0.5s linear, stroke 0.3s; }
+.timer-ring .ring-bar.urgent { stroke: var(--rust); animation: urgentPulse 0.5s infinite alternate; }
+@keyframes urgentPulse { from { stroke: var(--rust); } to { stroke: #ff6b4a; } }
+.timer-ring .ring-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 700; color: var(--ink); }
+
+.buzzer-wrap { width: 100%; max-width: 440px; margin-bottom: 14px; }
+.buzzer-btn { width: 100%; padding: 18px; border-radius: 16px; border: none; background: linear-gradient(135deg, #c94a2a, #e05a35); color: white; font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; box-shadow: 0 6px 24px rgba(201,74,42,0.45); animation: buzzerPulse 2s infinite; }
+@keyframes buzzerPulse { 0%,100%{box-shadow:0 6px 24px rgba(201,74,42,0.45);} 50%{box-shadow:0 8px 32px rgba(201,74,42,0.6);} }
+.buzzer-btn:disabled { background: var(--mist); color: rgba(26,22,18,0.4); box-shadow: none; animation: none; cursor: not-allowed; }
+.buzzer-fired { text-align: center; background: var(--ink); color: var(--cream); border-radius: 16px; padding: 14px; margin-bottom: 14px; font-size: 14px; font-weight: 600; width: 100%; max-width: 440px; }
+
 .answer-form { width: 100%; max-width: 440px; }
-.answer-field {
-background: var(–paper); border: 1.5px solid var(–mist);
-border-radius: 14px; padding: 12px 16px; margin-bottom: 8px;
-display: flex; align-items: center; gap: 12px;
-}
-.answer-field .cat-name {
-font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
-text-transform: uppercase; color: var(–rust); min-width: 58px; flex-shrink: 0;
-}
-.answer-field input {
-flex: 1; background: transparent; border: none;
-border-bottom: 1.5px solid var(–mist); border-radius: 0;
-padding: 4px 2px; font-size: 15px; color: var(–ink); outline: none; box-shadow: none;
-}
-.answer-field input:focus { border-bottom-color: var(–rust); }
+.answer-field { background: var(--paper); border: 1.5px solid var(--mist); border-radius: 14px; padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+.answer-field .cat-name { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--rust); min-width: 58px; flex-shrink: 0; }
+.answer-field input { flex: 1; background: transparent; border: none; border-bottom: 1.5px solid var(--mist); padding: 4px 2px; font-size: 15px; color: var(--ink); outline: none; }
+.answer-field input:focus { border-bottom-color: var(--rust); }
 
-.waiting-box { text-align: center; padding: 28px 20px; }
-.waiting-box .big-icon { font-size: 3.5rem; margin-bottom: 10px; }
-.waiting-box .wait-title { font-family: ‘Fraunces’, serif; font-size: 1.4rem; font-weight: 700; margin-bottom: 6px; }
-.wait-progress { margin-top: 18px; background: var(–mist); border-radius: 20px; height: 6px; overflow: hidden; }
-.wait-progress-bar { height: 100%; background: var(–sage); border-radius: 20px; transition: width 0.4s; }
+.waiting-box { text-align: center; padding: 24px 20px; }
+.waiting-box .big-icon { font-size: 3rem; margin-bottom: 10px; }
+.waiting-box .wait-title { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 700; margin-bottom: 6px; }
+.wait-progress { margin-top: 16px; background: var(--mist); border-radius: 20px; height: 6px; overflow: hidden; }
+.wait-progress-bar { height: 100%; background: var(--sage); border-radius: 20px; transition: width 0.4s; }
 .wait-count { font-size: 12px; color: rgba(26,22,18,0.4); margin-top: 8px; }
 
-.result-card {
-background: var(–paper); border: 1.5px solid var(–mist);
-border-radius: 16px; padding: 16px 18px 12px; margin-bottom: 10px;
-width: 100%; max-width: 440px;
-}
-.result-player-name {
-font-family: ‘Fraunces’, serif; font-size: 1.05rem; font-weight: 700;
-margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
-}
-.result-row {
-display: flex; justify-content: space-between; align-items: baseline;
-padding: 5px 0; border-bottom: 1px solid var(–mist);
-}
+.result-card { background: var(--paper); border: 1.5px solid var(--mist); border-radius: 16px; padding: 16px 18px 12px; margin-bottom: 10px; width: 100%; max-width: 440px; }
+.result-player-name { font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+.result-score-badge { background: var(--ink); color: var(--gold); border-radius: 20px; padding: 3px 12px; font-size: 13px; font-weight: 700; }
+.result-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--mist); }
 .result-row:last-child { border-bottom: none; }
 .result-cat { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: rgba(26,22,18,0.35); }
 .result-val { font-size: 14px; font-weight: 600; }
-.result-empty { color: rgba(26,22,18,0.2); font-style: italic; font-weight: 400; }
+.result-empty { color: rgba(26,22,18,0.2); font-style: italic; }
 
-.error-msg { color: var(–rust); font-size: 13px; margin-top: 8px; text-align: center; font-weight: 500; }
+.scoreboard { width: 100%; max-width: 440px; margin-bottom: 16px; }
+.score-row { display: flex; align-items: center; justify-content: space-between; background: var(--paper); border: 1.5px solid var(--mist); border-radius: 12px; padding: 10px 16px; margin-bottom: 8px; }
+.score-row.score-top { border-color: var(--gold); background: #fffbf0; }
+.score-rank { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 900; color: rgba(26,22,18,0.2); width: 28px; }
+.score-rank.gold { color: var(--gold); }
+.score-name { flex: 1; font-weight: 600; font-size: 14px; }
+.score-pts { font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; color: var(--rust); }
+.score-delta { font-size: 12px; color: var(--sage); font-weight: 600; margin-left: 6px; }
+
+.error-msg { color: var(--rust); font-size: 13px; margin-top: 8px; text-align: center; font-weight: 500; }
 .hint { font-size: 12px; color: rgba(26,22,18,0.38); text-align: center; margin-top: 8px; line-height: 1.5; }
-.divider { border: none; border-top: 1.5px solid var(–mist); margin: 16px 0; }
+.divider { border: none; border-top: 1.5px solid var(--mist); margin: 16px 0; }
 .results-scroll { width: 100%; max-width: 440px; }
-.status-dot {
-width: 8px; height: 8px; border-radius: 50%;
-display: inline-block; margin-right: 6px;
-background: var(–sage); animation: pulse 1.5s infinite;
-}
+.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; background: var(--sage); animation: pulse 1.5s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
-</style>
 
+.confetti-piece { position: fixed; width: 10px; height: 10px; top: -10px; border-radius: 2px; animation: confettiFall linear forwards; pointer-events: none; z-index: 999; }
+@keyframes confettiFall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+.section-header { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: rgba(26,22,18,0.4); margin: 20px 0 10px; width: 100%; max-width: 440px; }
+</style>
 </head>
 <body>
 
-<!-- JOIN -->
-
+<!-- JOIN SCREEN -->
 <div id="screen-join" class="screen">
   <div class="game-header">
     <div class="game-title">Stadt<br/><span>Land</span><br/>Fluss</div>
-    <div class="game-sub">Multiplayer • Familie</div>
+    <div class="game-sub">Echtzeit Multiplayer</div>
   </div>
   <div class="card">
     <div class="card-title">Mitspielen 👋</div>
@@ -273,20 +160,29 @@ background: var(–sage); animation: pulse 1.5s infinite;
       <input type="password" id="input-pw-join" placeholder="Passwort eingeben…"/>
     </div>
     <div id="join-error" class="error-msg" style="display:none"></div>
-    <button class="btn btn-primary" onclick="checkRoom()">Weiter →</button>
+    <button type="button" class="btn btn-primary" onclick="checkRoom()">Weiter →</button>
     <p class="hint">Alle geben denselben Raum-Code ein.<br/>Wer zuerst beitritt, wird Host.</p>
   </div>
 </div>
 
-<!-- HOST SETUP -->
-
+<!-- HOST SETUP SCREEN -->
 <div id="screen-setup" class="screen hidden">
   <div class="game-header">
     <div class="game-title" style="font-size:2.2rem">Raum einrichten</div>
     <div class="game-sub">Nur du als Host siehst das</div>
   </div>
   <div class="card">
-    <div class="card-title">🔒 Passwort (optional)</div>
+    <div class="card-title">⏱ Timer</div>
+    <p style="font-size:12px;color:rgba(26,22,18,0.45);margin-bottom:10px">Wie lange hat jeder Zeit zum Antworten?</p>
+    <div class="timer-options">
+      <button type="button" class="timer-btn" onclick="selectTimer(0)" id="tbtn-0">Kein</button>
+      <button type="button" class="timer-btn" onclick="selectTimer(30)" id="tbtn-30">30s</button>
+      <button type="button" class="timer-btn active" onclick="selectTimer(60)" id="tbtn-60">60s</button>
+      <button type="button" class="timer-btn" onclick="selectTimer(90)" id="tbtn-90">90s</button>
+      <button type="button" class="timer-btn" onclick="selectTimer(120)" id="tbtn-120">2min</button>
+    </div>
+    <hr class="divider"/>
+    <div class="card-title" style="margin-bottom:0">🔒 Passwort (optional)</div>
     <label class="pw-toggle">
       <input type="checkbox" id="pw-enable" onchange="togglePwSetup()"/>
       <span>Passwort für die Lobby setzen</span>
@@ -296,19 +192,17 @@ background: var(–sage); animation: pulse 1.5s infinite;
     </div>
     <hr class="divider"/>
     <div class="card-title" style="margin-bottom:4px">🗂 Kategorien</div>
-    <p style="font-size:12px;color:rgba(26,22,18,0.45);margin-bottom:12px">Standardkategorien voreingestellt. Passe sie an.</p>
     <div id="setup-cats-list"></div>
     <div class="cat-add-row">
       <input type="text" id="setup-cat-input" placeholder="Neue Kategorie…" maxlength="20" onkeydown="if(event.key==='Enter')addSetupCat()"/>
-      <button class="btn btn-secondary btn-sm" onclick="addSetupCat()">+ Hinzufügen</button>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="addSetupCat()">+ Hinzufügen</button>
     </div>
     <div id="setup-error" class="error-msg" style="display:none"></div>
-    <button class="btn btn-primary" style="margin-top:20px" onclick="createRoom()">Raum erstellen 🚀</button>
+    <button type="button" class="btn btn-primary" style="margin-top:20px" onclick="createRoom()">Raum erstellen 🚀</button>
   </div>
 </div>
 
-<!-- LOBBY -->
-
+<!-- LOBBY SCREEN -->
 <div id="screen-lobby" class="screen hidden">
   <div class="game-header">
     <div class="game-title" style="font-size:2.8rem">Lobby</div>
@@ -329,375 +223,386 @@ background: var(–sage); animation: pulse 1.5s infinite;
   </div>
 </div>
 
-<!-- PLAYING -->
-
+<!-- PLAYING SCREEN -->
 <div id="screen-playing" class="screen hidden">
   <div class="letter-stage">
     <div class="round-badge" id="round-badge">Runde 1</div>
     <div class="big-letter" id="big-letter">A</div>
   </div>
+  <div id="timer-ring-container"></div>
+  <div id="buzzer-container"></div>
   <div id="playing-content"></div>
 </div>
 
-<!-- RESULTS -->
-
+<!-- RESULTS SCREEN -->
 <div id="screen-results" class="screen hidden">
-  <div class="game-header" style="margin-bottom:18px">
-    <div class="game-title" style="font-size:2.2rem">Auswertung</div>
+  <div class="game-header" style="margin-bottom:16px">
+    <div class="game-title" style="font-size:2rem">Auswertung</div>
     <div class="game-sub" id="results-sub">Runde 1 • Buchstabe A</div>
   </div>
+  <div class="section-header">🏆 Gesamtpunkte</div>
+  <div class="scoreboard" id="scoreboard"></div>
+  <div class="section-header">📋 Antworten dieser Runde</div>
   <div class="results-scroll" id="results-container"></div>
-  <div style="width:100%;max-width:440px;margin-top:6px" id="results-actions"></div>
+  <div style="width:100%;max-width:440px;margin-top:8px" id="results-actions"></div>
 </div>
 
 <script>
-const DB_URL = "https://stadt-land-fluss-9c63b-default-rtdb.europe-west1.firebasedatabase.app";
+// Firebase Konfiguration initialisieren
+const firebaseConfig = { databaseURL: "https://stadt-land-fluss-9c63b-default-rtdb.europe-west1.firebasedatabase.app" };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
 const DEFAULT_CATS = ["Stadt","Land","Fluss","Tier","Beruf","Pflanze"];
 const LETTERS = "ABCDEFGHIKLMNOPRSTW".split("");
-const POLL_MS = 2500;
+const POINTS = { unique: 10, shared: 5, empty: 0 };
 
 let myName = "", myRoom = "", isHost = false;
-let pollTimer = null, lastPhase = "", lastRound = 0;
+let timerInterval = null, roomRef = null;
+let currentPhase = "", currentRound = 0;
 let submitted = false;
 let setupCats = [...DEFAULT_CATS];
+let selectedTimer = 60;
 let pendingRoomData = null;
-
-async function fbGet(path) {
-  try {
-    const r = await fetch(`${DB_URL}/${path}.json`);
-    if (!r.ok) return null;
-    return await r.json();
-  } catch { return null; }
-}
-async function fbSet(path, data) {
-  await fetch(`${DB_URL}/${path}.json`, { method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify(data) });
-}
-async function fbPatch(path, data) {
-  await fetch(`${DB_URL}/${path}.json`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify(data) });
-}
-
-function roomPath() { return `rooms/${myRoom}`; }
-function answersPath(round) { return `answers/${myRoom}_${round}`; }
-function randomLetter() { return LETTERS[Math.floor(Math.random()*LETTERS.length)]; }
 
 function show(id) {
   ["join","setup","lobby","playing","results"].forEach(s =>
-    document.getElementById(`screen-${s}`).classList.toggle("hidden", s !== id)
+    document.getElementById(`screen-${s}`).classList.toggle("hidden", s!==id)
   );
 }
 function showError(elId, msg) {
   const el = document.getElementById(elId);
-  el.textContent = msg; el.style.display = msg ? "block" : "none";
+  el.textContent = msg; el.style.display = msg?"block":"none";
 }
 
 // ── JOIN ──────────────────────────────────────────────────────────────────────
 async function checkRoom() {
-  const name = document.getElementById("input-name").value.trim();
+  let nameRaw = document.getElementById("input-name").value.trim();
+  const name = nameRaw.replace(/[.#$\[\]]/g, ""); // Firebase-kompatibel machen
   const room = document.getElementById("input-room").value.trim().toUpperCase();
-  if (!name) { showError("join-error","Bitte deinen Namen eingeben."); return; }
-  if (!room) { showError("join-error","Bitte einen Raum-Code eingeben."); return; }
-  showError("join-error","");
+  
+  if (!name) { showError("join-error","Bitte Namen eingeben."); return; }
+  if (!room) { showError("join-error","Bitte Raum-Code eingeben."); return; }
+  showError("join-error","Lädt...");
 
   myName = name; myRoom = room;
-  isHost = false; submitted = false; lastPhase = ""; lastRound = 0;
-  if (pollTimer) clearInterval(pollTimer);
 
-  const data = await fbGet(roomPath());
+  const snapshot = await db.ref(`rooms/${myRoom}`).once('value');
+  const data = snapshot.val();
+  showError("join-error","");
 
   if (!data) {
-    // New room → setup screen
     isHost = true;
     setupCats = [...DEFAULT_CATS];
     renderSetupCats();
     show("setup");
   } else {
-    // Existing room
     pendingRoomData = data;
     if (data.password) {
       document.getElementById("pw-join-area").style.display = "block";
-      showError("join-error","🔒 Dieser Raum ist passwortgeschützt.");
-      // Replace button handler
+      showError("join-error","🔒 Passwortgeschützt.");
       const btn = document.querySelector('#screen-join .btn-primary');
-      btn.textContent = "Beitreten →";
-      btn.onclick = joinWithPassword;
+      btn.textContent = "Beitreten →"; btn.onclick = joinWithPassword;
     } else {
-      await joinExisting(data);
+      await joinExisting();
     }
   }
 }
 
 async function joinWithPassword() {
   const pw = document.getElementById("input-pw-join").value;
-  if (!pw) { showError("join-error","Bitte Passwort eingeben."); return; }
-  if (pw !== pendingRoomData.password) { showError("join-error","Falsches Passwort. Versuch es nochmal."); return; }
+  if (pw !== pendingRoomData.password) { showError("join-error","Falsches Passwort."); return; }
   showError("join-error","");
-  await joinExisting(pendingRoomData);
+  await joinExisting();
 }
 
-async function joinExisting(data) {
+async function joinExisting() {
+  roomRef = db.ref(`rooms/${myRoom}`);
+  const snap = await roomRef.once('value');
+  const data = snap.val();
   if (data.host === myName) isHost = true;
-  await fbPatch(`${roomPath()}/players`, {[myName]: true});
-  const fresh = await fbGet(roomPath());
-  lastPhase = "lobby";
-  renderLobby(fresh);
-  show("lobby");
-  startPolling();
+  
+  await roomRef.child(`players/${myName}`).set(true);
+  startEchtzeitListener();
 }
 
 // ── SETUP ─────────────────────────────────────────────────────────────────────
+function selectTimer(secs) {
+  selectedTimer = secs;
+  document.querySelectorAll(".timer-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById(`tbtn-${secs}`).classList.add("active");
+}
 function togglePwSetup() {
-  const on = document.getElementById("pw-enable").checked;
-  document.getElementById("pw-setup-field").style.display = on ? "block" : "none";
+  document.getElementById("pw-setup-field").style.display = document.getElementById("pw-enable").checked ? "block" : "none";
 }
-
 function renderSetupCats() {
-  document.getElementById("setup-cats-list").innerHTML = setupCats.map((c,i) => `
-    <div class="cat-item">
-      <span>${c}</span>
-      <button class="cat-remove" onclick="removeSetupCat(${i})">✕</button>
-    </div>`).join("");
+  document.getElementById("setup-cats-list").innerHTML = setupCats.map((c,i) =>
+    `<div class="cat-item"><span>${c}</span><button type="button" class="cat-remove" onclick="removeSetupCat(${i})">✕</button></div>`
+  ).join("");
 }
-
-function removeSetupCat(i) {
-  setupCats.splice(i,1);
-  renderSetupCats();
-}
-
+function removeSetupCat(i) { setupCats.splice(i,1); renderSetupCats(); }
 function addSetupCat() {
   const inp = document.getElementById("setup-cat-input");
   const val = inp.value.trim();
   if (!val || setupCats.includes(val)) { inp.value=""; return; }
-  setupCats.push(val);
-  inp.value = "";
-  renderSetupCats();
+  setupCats.push(val); inp.value=""; renderSetupCats();
 }
-
 async function createRoom() {
   if (setupCats.length < 1) { showError("setup-error","Mindestens eine Kategorie nötig."); return; }
   const pwOn = document.getElementById("pw-enable").checked;
   const pw = pwOn ? document.getElementById("input-pw-setup").value.trim() : null;
-  if (pwOn && !pw) { showError("setup-error","Bitte ein Passwort eingeben."); return; }
-  showError("setup-error","");
-
+  
   const data = {
-    players: {[myName]: true},
-    host: myName,
-    phase: "lobby",
-    round: 0,
-    letter: "",
-    categories: setupCats,
-    password: pw || null
+    players: {[myName]: true}, host: myName, phase: "lobby",
+    round: 0, letter: "", categories: setupCats,
+    password: pw||null, timerSecs: selectedTimer, scores: {[myName]: 0}
   };
-  await fbSet(roomPath(), data);
-  lastPhase = "lobby";
-  renderLobby(data);
-  show("lobby");
-  startPolling();
+  
+  roomRef = db.ref(`rooms/${myRoom}`);
+  await roomRef.set(data);
+  startEchtzeitListener();
 }
 
-// ── LOBBY ─────────────────────────────────────────────────────────────────────
+// ── ECHTZEIT-LISTENER (Der Kern des Multiplayers) ───────────────────────────
+function startEchtzeitListener() {
+  roomRef.on('value', async (snapshot) => {
+    const data = snapshot.val();
+    if (!data) return;
+
+    currentPhase = data.phase;
+    currentRound = data.round;
+
+    if (currentPhase === "lobby") {
+      if (timerInterval) clearInterval(timerInterval);
+      submitted = false;
+      show("lobby");
+      renderLobby(data);
+    } 
+    else if (currentPhase === "playing") {
+      show("playing");
+      renderPlaying(data);
+    } 
+    else if (currentPhase === "results") {
+      if (timerInterval) clearInterval(timerInterval);
+      show("results");
+      await renderResults(data);
+    }
+  });
+}
+
+// ── LOBBY AREA ────────────────────────────────────────────────────────────────
 function renderLobby(data) {
-  if (!data) return;
   const cats = data.categories || DEFAULT_CATS;
   document.getElementById("display-roomcode").textContent = myRoom;
-  document.getElementById("display-pw-hint").textContent = data.password ? "🔒 Passwortgeschützt" : "Teile diesen Code mit deiner Familie";
-
-  const players = Object.keys(data.players || {});
+  document.getElementById("display-pw-hint").textContent = data.password ? "🔒 Passwortgeschützt" : "Teile den Code live mit Mitspielern";
+  
+  const players = Object.keys(data.players||{});
   document.getElementById("player-count").textContent = players.length;
-  document.getElementById("players-list").innerHTML = players.map(p =>
-    `<div class="player-chip"><div class="dot"></div>${p}${p===data.host?' 👑':''}</div>`
-  ).join("");
+  document.getElementById("players-list").innerHTML = players.map(p => {
+    const pts = (data.scores||{})[p] || 0;
+    return `<div class="player-chip"><div class="dot"></div>${p}${p===data.host?' 👑':''} <span style="color:var(--rust);font-weight:700;font-size:12px">${pts}P</span></div>`;
+  }).join("");
 
   const catsArea = document.getElementById("lobby-cats-area");
   if (myName === data.host) {
-    catsArea.innerHTML = `
-      <div id="lobby-cats-list"></div>
-      <div class="cat-add-row" style="margin-top:8px">
-        <input type="text" id="lobby-cat-input" placeholder="Neue Kategorie…" maxlength="20" onkeydown="if(event.key==='Enter')addLobbyCat()"/>
-        <button class="btn btn-secondary btn-sm" onclick="addLobbyCat()">+ Hinzufügen</button>
-      </div>`;
-    renderLobbyCatList(cats);
+    catsArea.innerHTML = `<div id="lobby-cats-list"></div>
+      <div class="cat-add-row"><input type="text" id="lobby-cat-input" placeholder="Neue Kategorie…" maxlength="20" onkeydown="if(event.key==='Enter')addLobbyCat()"/><button type="button" class="btn btn-secondary btn-sm" onclick="addLobbyCat()">+ Hinzufügen</button></div>`;
+    document.getElementById("lobby-cats-list").innerHTML = cats.map((c,i) => `<div class="cat-item"><span>${c}</span><button type="button" class="cat-remove" onclick="removeLobbyCat(${i})">✕</button></div>`).join("");
   } else {
     catsArea.innerHTML = `<div class="cats-readonly">${cats.map(c=>`<div class="cat-tag">${c}</div>`).join("")}</div>`;
   }
 
+  const timerLabel = data.timerSecs ? `⏱ ${data.timerSecs}s pro Runde` : "⏱ Kein Timer";
   document.getElementById("lobby-host-area").innerHTML = myName === data.host
-    ? `<button class="btn btn-primary" onclick="startRound()">🎲 Runde starten</button>`
-    : `<div style="text-align:center;padding:12px;color:rgba(26,22,18,0.4);font-size:14px"><span class="status-dot"></span>Warte auf den Host…</div>`;
-}
-
-function renderLobbyCatList(cats) {
-  const list = document.getElementById("lobby-cats-list");
-  if (!list) return;
-  list.innerHTML = cats.map((c,i) => `
-    <div class="cat-item">
-      <span>${c}</span>
-      <button class="cat-remove" onclick="removeLobbyCat(${i})">✕</button>
-    </div>`).join("");
+    ? `<div style="font-size:12px;color:rgba(26,22,18,0.45);text-align:center;margin-bottom:10px">${timerLabel}</div><button type="button" class="btn btn-primary" onclick="startRound()">🎲 Runde starten</button>`
+    : `<div style="text-align:center;color:rgba(26,22,18,0.4);font-size:14px"><span class="status-dot"></span>${timerLabel}. Warte auf Host…</div>`;
 }
 
 async function removeLobbyCat(i) {
-  const data = await fbGet(roomPath());
-  const cats = data.categories || DEFAULT_CATS;
+  const snap = await roomRef.once('value');
+  const cats = snap.val().categories;
   if (cats.length <= 1) return;
   cats.splice(i,1);
-  await fbPatch(roomPath(), { categories: cats });
+  await roomRef.child('categories').set(cats);
 }
-
 async function addLobbyCat() {
   const inp = document.getElementById("lobby-cat-input");
-  const val = inp.value.trim();
-  if (!val) return;
-  const data = await fbGet(roomPath());
-  const cats = data.categories || DEFAULT_CATS;
-  if (!cats.includes(val)) { cats.push(val); await fbPatch(roomPath(), { categories: cats }); }
-  inp.value = "";
+  const val = inp.value.trim(); if(!val) return;
+  const snap = await roomRef.once('value');
+  const cats = snap.val().categories || [];
+  if (!cats.includes(val)) { cats.push(val); await roomRef.child('categories').set(cats); }
+  inp.value="";
 }
 
-// ── ROUND ─────────────────────────────────────────────────────────────────────
+// ── SPIELRUNDE ────────────────────────────────────────────────────────────────
 async function startRound() {
-  const data = await fbGet(roomPath());
-  const letter = randomLetter();
-  const newRound = (data.round || 0) + 1;
-  await fbPatch(roomPath(), { phase:"playing", letter, round:newRound });
+  const snap = await roomRef.once('value');
+  const data = snap.val();
+  const letter = LETTERS[Math.floor(Math.random()*LETTERS.length)];
+  const nextR = (data.round||0)+1;
+  const endTime = data.timerSecs ? Date.now() + data.timerSecs*1000 : null;
+  
+  // Runden-Antwort-Zweig für alle leeren
+  await db.ref(`answers/${myRoom}_${nextR}`).remove();
+  await roomRef.patch({ phase:"playing", letter, round:nextR, endTime, buzzer:null });
 }
 
-// ── PLAYING ───────────────────────────────────────────────────────────────────
 function renderPlaying(data) {
-  const cats = data.categories || DEFAULT_CATS;
+  const cats = data.categories||DEFAULT_CATS;
   document.getElementById("round-badge").textContent = `Runde ${data.round}`;
+  
   const letterEl = document.getElementById("big-letter");
   if (letterEl.textContent !== data.letter) {
     letterEl.textContent = data.letter;
-    letterEl.style.animation = "none";
-    setTimeout(() => letterEl.style.animation = "", 10);
+    startTimerUI(data.endTime, data.timerSecs);
   }
-  if (submitted) { renderWaiting(data); return; }
-  document.getElementById("playing-content").innerHTML = `
-    <div class="answer-form">
-      ${cats.map(cat => `
-        <div class="answer-field">
-          <span class="cat-name">${cat}</span>
-          <input type="text" id="ans-${cat.replace(/\s+/g,'_')}" placeholder="${cat} mit ${data.letter}…"/>
-        </div>`).join("")}
-      <button class="btn btn-primary" onclick="submitAnswers()" style="margin-top:12px">📩 Abschicken</button>
+
+  // Buzzer-Verhalten steuern
+  const buzzerEl = document.getElementById("buzzer-container");
+  if (data.buzzer) {
+    buzzerEl.innerHTML = `<div class="buzzer-fired">🔔 ${data.buzzer} hat gestoppt! 5s Restzeit!</div>`;
+    document.querySelectorAll(".answer-field input").forEach(i => i.disabled = true);
+  } else {
+    buzzerEl.innerHTML = submitted ? '' : `<div class="buzzer-wrap"><button type="button" class="buzzer-btn" onclick="fireBuzzer()">🔔 STOPP!</button></div>`;
+  }
+
+  const content = document.getElementById("playing-content");
+  if (submitted) {
+    content.innerHTML = `<div class="card waiting-box"><div class="big-icon">✅</div><div class="wait-title">Abgeschickt!</div><p style="font-size:13px;color:rgba(26,22,18,0.5)">Warte, bis die Runde endet...</p></div>`;
+    return;
+  }
+
+  if (!document.getElementById("answer-form")) {
+    content.innerHTML = `<div class="answer-form" id="answer-form">
+      ${cats.map(cat => `<div class="answer-field"><span class="cat-name">${cat}</span><input type="text" id="ans-${cat.replace(/\s+/g,'_')}" placeholder="${cat} mit ${data.letter}…" ${data.buzzer?'disabled':''}/></div>`).join("")}
+      <button type="button" class="btn btn-primary" onclick="submitAnswers()" style="margin-top:12px">📩 Fertig</button>
     </div>`;
+  }
+}
+
+function startTimerUI(endTime, totalSecs) {
+  if (timerInterval) clearInterval(timerInterval);
+  const container = document.getElementById("timer-ring-container");
+  if (!endTime) { container.innerHTML = ""; return; }
+
+  const r = 30, circ = 2 * Math.PI * r;
+  timerInterval = setInterval(() => {
+    const remaining = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+    const progress = remaining / totalSecs;
+    
+    container.innerHTML = `<div class="timer-ring-wrap"><div class="timer-ring"><svg width="72" height="72"><circle class="ring-bg" cx="36" cy="36" r="${r}"/><circle class="ring-bar ${remaining<=10?'urgent':''}" cx="36" cy="36" r="${r}" stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-progress)}"/></svg><div class="ring-label">${remaining}</div></div></div>`;
+    
+    if (remaining <= 0) {
+      clearInterval(timerInterval);
+      if (!submitted) submitAnswers();
+    }
+  }, 500);
+}
+
+async function fireBuzzer() {
+  await roomRef.patch({ buzzer: myName });
+  setTimeout(async () => {
+    const snap = await roomRef.once('value');
+    if (snap.val().phase === "playing") {
+      await roomRef.patch({ phase: "results" });
+    }
+  }, 5000); // 5 Sekunden Countdown nach Buzzer-Druck
 }
 
 async function submitAnswers() {
-  const data = await fbGet(roomPath());
-  const cats = data.categories || DEFAULT_CATS;
+  if (submitted) return;
+  const snap = await roomRef.once('value');
+  const cats = snap.val().categories;
   const myAnswers = {};
+  
   cats.forEach(cat => {
     const el = document.getElementById(`ans-${cat.replace(/\s+/g,'_')}`);
     myAnswers[cat] = el ? el.value.trim() : "";
   });
-  const existing = await fbGet(answersPath(data.round)) || {};
-  existing[myName] = myAnswers;
-  await fbSet(answersPath(data.round), existing);
+
+  await db.ref(`answers/${myRoom}_${currentRound}/${myName}`).set(myAnswers);
   submitted = true;
-  renderWaiting(data);
-  if (Object.keys(existing).length >= Object.keys(data.players||{}).length) {
-    await fbPatch(roomPath(), { phase:"results" });
+  
+  // Prüfen ob alle da sind
+  const ansSnap = await db.ref(`answers/${myRoom}_${currentRound}`).once('value');
+  const totalPlayers = Object.keys(snap.val().players || {}).length;
+  const totalAnswers = Object.keys(ansSnap.val() || {}).length;
+
+  if (totalAnswers >= totalPlayers) {
+    await roomRef.patch({ phase: "results" });
   }
 }
 
-function renderWaiting(data) {
-  document.getElementById("playing-content").innerHTML = `
-    <div class="card waiting-box" style="max-width:440px;width:100%">
-      <div class="big-icon">✅</div>
-      <div class="wait-title">Abgeschickt!</div>
-      <p style="font-size:13px;color:rgba(26,22,18,0.5)">Warte auf die anderen Spieler…</p>
-      <div class="wait-progress" style="margin-top:16px">
-        <div class="wait-progress-bar" id="wait-bar" style="width:0%"></div>
-      </div>
-      <div class="wait-count" id="wait-count">Lädt…</div>
-      ${myName===data.host ? `<button class="btn btn-secondary" onclick="forceResults()" style="margin-top:14px;font-size:13px">Auswertung erzwingen</button>` : ''}
-    </div>`;
-  updateWaitProgress(data);
-}
-
-async function updateWaitProgress(data) {
-  const ans = await fbGet(answersPath(data.round)) || {};
-  const total = Object.keys(data.players||{}).length;
-  const done = Object.keys(ans).length;
-  const bar = document.getElementById("wait-bar");
-  const count = document.getElementById("wait-count");
-  if (bar) bar.style.width = `${(done/total)*100}%`;
-  if (count) count.textContent = `${done} von ${total} haben abgeschickt`;
-}
-
-async function forceResults() {
-  await fbPatch(roomPath(), { phase:"results" });
-}
-
-// ── RESULTS ───────────────────────────────────────────────────────────────────
+// ── AUSWERTUNG ────────────────────────────────────────────────────────────────
 async function renderResults(data) {
-  const cats = data.categories || DEFAULT_CATS;
+  const cats = data.categories||DEFAULT_CATS;
   document.getElementById("results-sub").textContent = `Runde ${data.round} • Buchstabe ${data.letter}`;
-  const ans = await fbGet(answersPath(data.round)) || {};
+  
+  const ansSnap = await db.ref(`answers/${myRoom}_${data.round}`).once('value');
+  const ans = ansSnap.val() || {};
   const players = Object.keys(data.players||{});
+
+  // Punkte berechnen
+  const roundPts = calcScores(cats, ans, players);
+  const totalScores = {...(data.scores||{})};
+  
+  if (myName === data.host) {
+    players.forEach(p => { totalScores[p] = (totalScores[p]||0) + (roundPts[p]||0); });
+    await roomRef.child('scores').set(totalScores);
+  }
+
+  const sorted = [...players].sort((a,b) => (totalScores[b]||0)-(totalScores[a]||0));
+  document.getElementById("scoreboard").innerHTML = sorted.map((p,i) => `
+    <div class="score-row ${i===0?'score-top':''}">
+      <div class="score-rank ${i===0?'gold':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
+      <div class="score-name">${p}</div>
+      <div class="score-pts">${totalScores[p]||0}P <span class="score-delta">+${roundPts[p]||0}</span></div>
+    </div>`).join("");
+
+  if (sorted[0] && (totalScores[sorted[0]]||0) > 0) fireConfetti();
+
   document.getElementById("results-container").innerHTML = players.map(p => {
-    const a = ans[p] || {};
-    return `
-      <div class="result-card">
-        <div class="result-player-name">
-          ${p} ${p===data.host?'👑':''}
-          ${!ans[p]?'<span style="font-size:11px;color:rgba(26,22,18,0.3)">nicht abg.</span>':''}
-        </div>
-        ${cats.map(cat=>`
-          <div class="result-row">
-            <span class="result-cat">${cat}</span>
-            <span class="result-val">${a[cat]||'<span class="result-empty">—</span>'}</span>
-          </div>`).join("")}
-      </div>`;
+    const a = ans[p]||{};
+    return `<div class="result-card"><div class="result-player-name"><span>${p}</span><span class="result-score-badge">+${roundPts[p]||0}P</span></div>
+        ${cats.map(cat=>`<div class="result-row"><span class="result-cat">${cat}</span><span class="result-val">${a[cat]||'<span class="result-empty">—</span>'}</span></div>`).join("")}</div>`;
   }).join("");
 
   document.getElementById("results-actions").innerHTML = myName === data.host
-    ? `<button class="btn btn-primary" onclick="nextRound()">🔄 Neue Runde</button>`
-    : `<div style="text-align:center;padding:12px;color:rgba(26,22,18,0.4);font-size:14px"><span class="status-dot"></span>Warte auf den Host für neue Runde…</div>`;
+    ? `<button type="button" class="btn btn-primary" onclick="nextRound()">🔄 Neue Runde</button><button type="button" class="btn btn-secondary" onclick="resetGame()">🏁 Zurücksetzen</button>`
+    : `<div style="text-align:center;color:rgba(26,22,18,0.4);font-size:14px"><span class="status-dot"></span>Warte auf Host für neue Runde…</div>`;
 }
 
-async function nextRound() {
-  await fbPatch(roomPath(), { phase:"lobby" });
-  submitted = false;
+function calcScores(cats, ans, players) {
+  const roundPts = {};
+  players.forEach(p => roundPts[p] = 0);
+  cats.forEach(cat => {
+    const answers = players.map(p => ((ans[p]||{})[cat]||"").trim().toLowerCase());
+    players.forEach((p, i) => {
+      const val = answers[i];
+      if (!val) return;
+      const count = answers.filter(a => a === val).length;
+      roundPts[p] += count === 1 ? POINTS.unique : POINTS.shared;
+    });
+  });
+  return roundPts;
 }
 
-// ── POLLING ───────────────────────────────────────────────────────────────────
-function startPolling() {
-  if (pollTimer) clearInterval(pollTimer);
-  pollTimer = setInterval(pollState, POLL_MS);
-  pollState();
+async function nextRound() { await roomRef.patch({ phase:"lobby", buzzer:null }); }
+async function resetGame() {
+  const snap = await roomRef.once('value');
+  const scores = {}; Object.keys(snap.val().players||{}).forEach(p => scores[p]=0);
+  await roomRef.patch({ phase:"lobby", scores, round:0, buzzer:null });
 }
 
-async function pollState() {
-  const data = await fbGet(roomPath());
-  if (!data) return;
-
-  if (data.phase === "lobby") {
-    if (lastPhase !== "lobby") { show("lobby"); lastPhase = "lobby"; submitted = false; }
-    renderLobby(data);
-  } else if (data.phase === "playing") {
-    if (lastPhase !== "playing" || lastRound !== data.round) {
-      show("playing"); submitted = false; lastPhase = "playing"; lastRound = data.round;
-    }
-    renderPlaying(data);
-    if (submitted) updateWaitProgress(data);
-  } else if (data.phase === "results") {
-    if (lastPhase !== "results" || lastRound !== data.round) {
-      show("results"); lastPhase = "results"; lastRound = data.round;
-      await renderResults(data);
-    }
+function fireConfetti() {
+  for (let i=0;i<40;i++) {
+    const el = document.createElement("div"); el.className = "confetti-piece";
+    el.style.cssText = `left:${Math.random()*100}vw; background:${["#c94a2a","#d4a017","#5c7a5a"][Math.floor(Math.random()*3)]}; width:8px; height:8px; animation-duration:${2+Math.random()*2}s;`;
+    document.body.appendChild(el); setTimeout(()=>el.remove(), 3000);
   }
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
-document.getElementById("input-room").addEventListener("input", e => {
-  e.target.value = e.target.value.toUpperCase();
-});
-document.getElementById("input-room").addEventListener("keydown", e => { if(e.key==="Enter") checkRoom(); });
-document.getElementById("input-name").addEventListener("keydown", e => { if(e.key==="Enter") document.getElementById("input-room").focus(); });
+document.getElementById("input-room").addEventListener("input", e => { e.target.value = e.target.value.toUpperCase(); });
 </script>
-
 </body>
 </html>
