@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <title>Stadt Land Fluss – Echtes Echtzeit P2P</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght=0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
 
 <!-- PeerJS für direkte Browser-zu-Browser Verbindung ohne Datenbank -->
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
@@ -167,15 +167,14 @@ const LETTERS = "ABCDEFGHIKLMNOPRSTW".split("");
 let myName = "", myRoom = "";
 let isHost = false;
 let peer = null;
-let connections = []; // Host-Only: Liste der Mitspieler-Verbindungen
-let hostConn = null;  // Client-Only: Verbindung zum Host
+let connections = []; 
+let hostConn = null;  
 
-// Globaler Status (wird vom Host diktiert)
 let gameState = {
   players: [],
   categories: [...DEFAULT_CATS],
   scores: {},
-  phase: "lobby", // lobby, playing, collecting, results
+  phase: "lobby", 
   round: 0,
   letter: "",
   buzzer: null,
@@ -184,6 +183,27 @@ let gameState = {
 
 let submitted = false;
 let countdownInterval = null;
+
+// GEMEINSAME ICE-SERVER KONFIGURATION (Inklusive funktionierender globaler TURN-Relays)
+const PEER_CONFIG = {
+  config: {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:global.stun.twilio.com:3478' },
+      // Freie, öffentliche TURN-Server zur Umgehung strikter Firewalls/Router-Sperren
+      {
+        urls: 'turn:openrelay.metered.ca:443',
+        username: 'openrelayproject',
+        credential: 'openrelayproject'
+      },
+      {
+        urls: 'turn:openrelay.metered.ca:80',
+        username: 'openrelayproject',
+        credential: 'openrelayproject'
+      }
+    ]
+  }
+};
 
 function show(id) {
   ["join", "lobby", "playing", "results"].forEach(s =>
@@ -197,23 +217,22 @@ function updateError(msg) {
   el.style.display = msg ? "block" : "none";
 }
 
-// ── P2P INITIALISIERUNG (KOMPLETT ÜBERARBEITET) ───────────────────
+// ── P2P INITIALISIERUNG ──────────────────────────────────────────
 function initP2P() {
   myName = document.getElementById("input-name").value.trim();
   myRoom = document.getElementById("input-room").value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
 
   if (!myName || !myRoom) {
-    updateError("Bitte gib einen Namen und Raum-Code ein (nur Buchstaben/Zahlen).");
+    updateError("Bitte gib einen Namen und Raum-Code ein.");
     return;
   }
   updateError("Verbinde mit dem P2P-Netzwerk...");
   document.getElementById("btn-connect").disabled = true;
 
-  // 1. VERSUCH: Wir probieren, Host zu werden (Raum erstellen)
-  let tempHostPeer = new Peer(`SLF-ROOM-${myRoom}`);
+  // 1. VERSUCH: Als Host mit festem Raum-Namen registrieren
+  let tempHostPeer = new Peer(`SLF-ROOM-${myRoom}`, PEER_CONFIG);
 
   tempHostPeer.on('open', (id) => {
-    // Es gab noch keinen Host -> Wir sind jetzt der Host!
     isHost = true;
     peer = tempHostPeer;
     gameState.players = [myName];
@@ -233,35 +252,34 @@ function initP2P() {
   });
 
   tempHostPeer.on('error', (err) => {
-    // Fehler 'unavailable-id' bedeutet: Die ID ist vergeben, der Raum existiert!
     if (err.type === 'unavailable-id') {
+      // Raum-ID besetzt -> Raum existiert -> Als Client beitreten
       joinAsClient();
     } else {
-      updateError("Netzwerkfehler: " + err.type);
+      updateError("Netzwerkfehler: " + err.type + ". Bitte versuche es noch einmal.");
       document.getElementById("btn-connect").disabled = false;
     }
   });
 }
 
 function joinAsClient() {
-  // 2. VERSUCH: Wir erstellen einen "normalen" Peer ohne eigene feste ID
-  let clientPeer = new Peer(); 
+  // Client erstellt anonymen Peer mit TURN-Konfiguration
+  let clientPeer = new Peer(PEER_CONFIG); 
 
   clientPeer.on('open', () => {
     peer = clientPeer;
     isHost = false;
     
-    // Direkt mit dem Host verbinden
     hostConn = peer.connect(`SLF-ROOM-${myRoom}`, { reliable: true });
     
-    // WICHTIG: Timeout, falls die Firewall/NAT die P2P-Verbindung schluckt
+    // Sicherheits-Timeout (Falls Server oder Verbindung hängen)
     let connTimeout = setTimeout(() => {
-      updateError("Die Verbindung zum Raum-Host wurde blockiert (z.B. durch eine restriktive WLAN-Firewall).");
+      updateError("Verbindung fehlgeschlagen. Der Host ist offline oder die Verbindung wird komplett blockiert.");
       document.getElementById("btn-connect").disabled = false;
-    }, 8000);
+    }, 10000);
 
     const setupHostConn = () => {
-      clearTimeout(connTimeout); // Verbindung hat geklappt! Timeout abbrechen.
+      clearTimeout(connTimeout); 
       hostConn.send({ type: "JOIN", name: myName });
     };
 
@@ -276,22 +294,22 @@ function joinAsClient() {
     });
 
     hostConn.on('close', () => {
-      alert("Verbindung zum Raum (Host) verloren.");
+      alert("Verbindung zum Raum verloren.");
       location.reload();
     });
   });
 
   clientPeer.on('error', (err) => {
-    updateError("Client-Netzwerkfehler: " + err.type);
+    updateError("Client-Verbindungsfehler: " + err.type);
     document.getElementById("btn-connect").disabled = false;
   });
 }
 
-// ── HOST LOGIK: DATEN VON CLIENTS EMPFANGEN ──────────────────────
+// ── HOST LOGIK ───────────────────────────────────────────────────
 function handleIncomingDataFromClient(conn) {
   conn.on('data', (data) => {
     if (data.type === "JOIN") {
-      conn.playerName = data.name; // Namen an Connection binden für Active-Check
+      conn.playerName = data.name; 
       if (!gameState.players.includes(data.name)) {
         gameState.players.push(data.name);
         gameState.scores[data.name] = 0;
@@ -314,7 +332,7 @@ function handleIncomingDataFromClient(conn) {
 
   conn.on('close', () => {
     connections = connections.filter(c => c !== conn);
-    checkRoundEnd(); // Falls ein Spieler abhaut, Runden-Ende neu bewerten
+    checkRoundEnd(); 
     broadcastState();
   });
 }
@@ -327,11 +345,9 @@ function broadcastState() {
   syncPhaseUI();
 }
 
-// ── SPIELABLAUF STEUERUNG (HOST) ─────────────────────────────────
 function checkRoundEnd() {
-  if (!isHost || gameState.phase !== "playing" && gameState.phase !== "collecting") return;
+  if (!isHost || (gameState.phase !== "playing" && gameState.phase !== "collecting")) return;
   
-  // Nur aktive/verbundene Spieler in die Bewertung einbeziehen, damit das Spiel nicht festhängt
   const activeNames = [myName, ...connections.filter(c => c.open).map(c => c.playerName).filter(n => n)];
   const allSubmitted = activeNames.every(name => gameState.roundAnswers[name]);
   
@@ -351,19 +367,14 @@ function startBuzzerCountdown() {
   if (!isHost) return;
   setTimeout(() => {
     if (gameState.phase === "playing") {
-      // Phase Collecting erzwingt einen Auto-Submit bei allen Clients
       gameState.phase = "collecting";
       broadcastState();
-      
-      // Nach 2,5s Kulanzzeit für Netzwerk-Lags werden Runden auf jeden Fall beendet
-      setTimeout(() => {
-        finishRound();
-      }, 2500);
+      setTimeout(() => { finishRound(); }, 2500);
     }
   }, 5000);
 }
 
-// ── UI SYNCHRONISATION ───────────────────────────────────────────
+// ── UI WARTESCHLEIFEN & SYNCHRONISATION ──────────────────────────
 function syncPhaseUI() {
   if (gameState.phase === "lobby") {
     submitted = false;
@@ -374,7 +385,7 @@ function syncPhaseUI() {
     show("playing");
     renderPlaying();
   } else if (gameState.phase === "collecting") {
-    if (!submitted) submitAnswers(); // Auto-Submit durch Buzzer-Timeout
+    if (!submitted) submitAnswers(); 
     show("playing");
     document.getElementById("playing-content").innerHTML = `<div class="card waiting-box" style="color:var(--rust)">⌛ Zeit abgelaufen! Antworten werden übertragen...</div>`;
   } else if (gameState.phase === "results") {
@@ -383,7 +394,7 @@ function syncPhaseUI() {
   }
 }
 
-// ── LOBBY RENDER ─────────────────────────────────────────────────
+// ── RENDER FUNKTIONEN ────────────────────────────────────────────
 function renderLobby() {
   document.getElementById("display-roomcode").textContent = myRoom;
   
@@ -435,7 +446,6 @@ function startRound() {
   broadcastState();
 }
 
-// ── SPIEL RENDER & EINGABE ───────────────────────────────────────
 function renderPlaying() {
   document.getElementById("round-badge").textContent = `Runde ${gameState.round}`;
   document.getElementById("big-letter").textContent = gameState.letter;
@@ -504,18 +514,17 @@ function submitAnswers() {
     gameState.roundAnswers[myName] = ans;
     checkRoundEnd();
     broadcastState();
-    if(gameState.phase === "playing") renderPlaying(); // Aktualisiere UI auf "Warten..."
+    if(gameState.phase === "playing") renderPlaying(); 
   } else {
     hostConn.send({ type: "SUBMIT", name: myName, answers: ans });
     renderPlaying();
   }
 }
 
-// ── AUSWERTUNG & PUNKTE ──────────────────────────────────────────
+// ── PUNKTEBERECHNUNG ─────────────────────────────────────────────
 function calculateScores() {
   if (!isHost) return;
   
-  // Sicherstellen, dass auch nicht-abgegebene Spieler ein leeres Objekt haben
   gameState.players.forEach(p => {
     if (!gameState.roundAnswers[p]) gameState.roundAnswers[p] = {};
   });
@@ -523,9 +532,8 @@ function calculateScores() {
   gameState.categories.forEach(cat => {
     const catAnswers = gameState.players.map(p => {
       let val = (gameState.roundAnswers[p][cat] || "").trim().toLowerCase();
-      // Prüfen, ob das Wort mit dem richtigen Buchstaben beginnt!
       if (val && !val.startsWith(gameState.letter.toLowerCase())) {
-        val = ""; // Ungültig -> wird wie leer gewertet
+        val = ""; 
       }
       return val;
     });
