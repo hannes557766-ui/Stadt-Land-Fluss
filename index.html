@@ -197,10 +197,9 @@ function updateError(msg) {
   el.style.display = msg ? "block" : "none";
 }
 
-// ── P2P INITIALISIERUNG ──────────────────────────────────────────
+// ── P2P INITIALISIERUNG (KOMPLETT ÜBERARBEITET) ───────────────────
 function initP2P() {
   myName = document.getElementById("input-name").value.trim();
-  // Sonderzeichen & Leerzeichen aus Raum-Code entfernen, da dies PeerJS oft crasht
   myRoom = document.getElementById("input-room").value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
 
   if (!myName || !myRoom) {
@@ -210,21 +209,13 @@ function initP2P() {
   updateError("Verbinde mit dem P2P-Netzwerk...");
   document.getElementById("btn-connect").disabled = true;
 
-  // Stabile STUN Server für bessere NAT-Überwindung
-  const peerOptions = {
-    config: {
-      iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:global.stun.twilio.com:3478' }
-      ]
-    }
-  };
+  // 1. VERSUCH: Wir probieren, Host zu werden (Raum erstellen)
+  let tempHostPeer = new Peer(`SLF-ROOM-${myRoom}`);
 
-  // Versuch 1: Als Host registrieren
-  peer = new Peer(`SLF-ROOM-${myRoom}`, peerOptions);
-
-  peer.on('open', (id) => {
+  tempHostPeer.on('open', (id) => {
+    // Es gab noch keinen Host -> Wir sind jetzt der Host!
     isHost = true;
+    peer = tempHostPeer;
     gameState.players = [myName];
     gameState.scores[myName] = 0;
     
@@ -233,7 +224,6 @@ function initP2P() {
         if (!connections.includes(conn)) connections.push(conn);
         handleIncomingDataFromClient(conn);
       };
-      // Verhindert den bekannten PeerJS Race-Condition Bug bei Connections
       if (conn.open) setupConn();
       else conn.on('open', setupConn);
     });
@@ -242,46 +232,58 @@ function initP2P() {
     renderLobby();
   });
 
-  peer.on('error', (err) => {
+  tempHostPeer.on('error', (err) => {
+    // Fehler 'unavailable-id' bedeutet: Die ID ist vergeben, der Raum existiert!
     if (err.type === 'unavailable-id') {
-      // Versuch 2: Raum existiert bereits -> Als Client beitreten
-      isHost = false;
-      peer.destroy(); 
-      
-      setTimeout(() => {
-        peer = new Peer(peerOptions);
-        peer.on('open', () => {
-          hostConn = peer.connect(`SLF-ROOM-${myRoom}`, { reliable: true });
-          
-          const setupHostConn = () => {
-            hostConn.send({ type: "JOIN", name: myName });
-          };
-
-          if (hostConn.open) setupHostConn();
-          else hostConn.on('open', setupHostConn);
-
-          hostConn.on('data', (data) => {
-            if (data.type === "STATE_UPDATE") {
-              gameState = data.state;
-              syncPhaseUI();
-            }
-          });
-
-          hostConn.on('close', () => {
-            alert("Verbindung zum Raum (Host) verloren.");
-            location.reload();
-          });
-        });
-
-        peer.on('error', () => {
-          updateError("Verbindung zum Netzwerk fehlgeschlagen.");
-          document.getElementById("btn-connect").disabled = false;
-        });
-      }, 500); // Kurz warten für sauberen Port-Release
+      joinAsClient();
     } else {
       updateError("Netzwerkfehler: " + err.type);
       document.getElementById("btn-connect").disabled = false;
     }
+  });
+}
+
+function joinAsClient() {
+  // 2. VERSUCH: Wir erstellen einen "normalen" Peer ohne eigene feste ID
+  let clientPeer = new Peer(); 
+
+  clientPeer.on('open', () => {
+    peer = clientPeer;
+    isHost = false;
+    
+    // Direkt mit dem Host verbinden
+    hostConn = peer.connect(`SLF-ROOM-${myRoom}`, { reliable: true });
+    
+    // WICHTIG: Timeout, falls die Firewall/NAT die P2P-Verbindung schluckt
+    let connTimeout = setTimeout(() => {
+      updateError("Die Verbindung zum Raum-Host wurde blockiert (z.B. durch eine restriktive WLAN-Firewall).");
+      document.getElementById("btn-connect").disabled = false;
+    }, 8000);
+
+    const setupHostConn = () => {
+      clearTimeout(connTimeout); // Verbindung hat geklappt! Timeout abbrechen.
+      hostConn.send({ type: "JOIN", name: myName });
+    };
+
+    if (hostConn.open) setupHostConn();
+    else hostConn.on('open', setupHostConn);
+
+    hostConn.on('data', (data) => {
+      if (data.type === "STATE_UPDATE") {
+        gameState = data.state;
+        syncPhaseUI();
+      }
+    });
+
+    hostConn.on('close', () => {
+      alert("Verbindung zum Raum (Host) verloren.");
+      location.reload();
+    });
+  });
+
+  clientPeer.on('error', (err) => {
+    updateError("Client-Netzwerkfehler: " + err.type);
+    document.getElementById("btn-connect").disabled = false;
   });
 }
 
@@ -452,7 +454,6 @@ function renderPlaying() {
     return;
   }
 
-  // Felder rendern, falls noch nicht submitted
   if (!content.querySelector(".answer-form")) {
     content.innerHTML = `<div class="answer-form">
       ${gameState.categories.map(cat => `
@@ -520,7 +521,6 @@ function calculateScores() {
   });
 
   gameState.categories.forEach(cat => {
-    // Antworten aller Spieler für DIESE Kategorie holen & validieren
     const catAnswers = gameState.players.map(p => {
       let val = (gameState.roundAnswers[p][cat] || "").trim().toLowerCase();
       // Prüfen, ob das Wort mit dem richtigen Buchstaben beginnt!
@@ -532,18 +532,17 @@ function calculateScores() {
     
     gameState.players.forEach((p, i) => {
       const val = catAnswers[i];
-      if (!val) return; // 0 Punkte bei leerer oder falscher Antwort
+      if (!val) return;
 
       const totalValidWords = catAnswers.filter(v => v !== "").length;
       const exactMatches = catAnswers.filter(v => v === val).length;
 
-      // Klassische Stadt-Land-Fluss Regeln:
       if (totalValidWords === 1) {
-        gameState.scores[p] += 20; // Alleine ein gültiges Wort in der Kategorie
+        gameState.scores[p] += 20; 
       } else if (exactMatches === 1) {
-        gameState.scores[p] += 10; // Eigenes gültiges Wort (niemand hat dasselbe)
+        gameState.scores[p] += 10;
       } else {
-        gameState.scores[p] += 5;  // Jemand anderes hat genau das gleiche Wort
+        gameState.scores[p] += 5;
       }
     });
   });
@@ -552,7 +551,6 @@ function calculateScores() {
 function renderResults() {
   document.getElementById("results-sub").textContent = `Runde ${gameState.round} • Buchstabe ${gameState.letter}`;
   
-  // Rangliste sortieren
   const sorted = [...gameState.players].sort((a,b) => gameState.scores[b] - gameState.scores[a]);
   document.getElementById("scoreboard").innerHTML = sorted.map((p, i) => `
     <div class="score-row ${i===0?'score-top':''}">
@@ -561,7 +559,6 @@ function renderResults() {
     </div>
   `).join("");
 
-  // Alle Antworten auflisten (Mit Validierungs-Hinweis, wenn falscher Buchstabe)
   document.getElementById("results-container").innerHTML = gameState.players.map(p => {
     const pAns = gameState.roundAnswers[p] || {};
     return `
@@ -596,7 +593,6 @@ function nextRoundLobby() {
   broadcastState();
 }
 
-// Kleines QoL-Feature: Raum-Codes direkt im Input großschreiben und Leerzeichen blocken
 document.getElementById("input-room").addEventListener("input", e => { 
   e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); 
 });
