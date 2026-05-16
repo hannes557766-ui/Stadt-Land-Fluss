@@ -4,428 +4,553 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Stadt Land Fluss</title>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght=500;700&family=Nunito:wght=400;600;700;800&family=Permanent+Marker&display=swap" rel="stylesheet"/>
+  <!-- Tausch von Caveat gegen Nunito für maximale Lesbarkeit -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Special+Elite&family=Permanent+Marker&display=swap" rel="stylesheet"/>
   <style>
     /* ══════════════════════════════════════════
-       CLEAN DESIGN 3.0
-       Aufgeräumt · Lesbar · Modern
+       SCHULHEFT-BRUTALISM 2.0 (Optimiert)
+       Realistisches Papier · Tinte · Struktur
     ══════════════════════════════════════════ */
     :root {
-      /* Saubere, moderne Farben */
-      --bg:         #f1f5f9;
-      --card-bg:    #ffffff;
-      --text-main:  #1e293b;
-      --text-muted: #64748b;
-      --primary:    #3b82f6; /* Modernes Blau */
-      --primary-hover:#2563eb;
-      --danger:     #ef4444; /* Klares Rot */
-      --success:    #10b981; /* Klares Grün */
-      --border:     #e2e8f0;
-      --highlight:  #fef08a;
-      
-      /* Variablen-Mapping für das bestehende JS */
-      --paper:      var(--bg);
-      --paper2:     var(--card-bg);
-      --ink:        var(--text-main);
-      --pencil:     var(--text-muted);
-      --red:        var(--danger);
-      --green:      var(--success);
-      --blue:       var(--primary);
-      --stamp:      var(--danger);
+      --paper:    #f9f6f0;
+      --paper2:   #f2eee3;
+      --grid:     rgba(130, 160, 200, 0.22);
+      --margin:   rgba(220, 100, 100, 0.5);
+      --ink:      #23211e;
+      --red:      #d92020;
+      --blue:     #1d4ed8;
+      --pencil:   #6b645c;
+      --stamp:    #991b1b;
+      --green:    #166534;
+      --tape:     rgba(252, 243, 184, 0.85);
+      --highlight:#fef08a;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
 
     body {
-      background-color: var(--bg);
-      color: var(--text-main);
-      font-family: 'Nunito', sans-serif; /* Lesbare Standardschrift */
+      background-color: var(--paper);
+      background-image:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 24px 24px;
+      color: var(--ink);
+      font-family: 'Nunito', sans-serif; /* Clean & lesbar */
+      font-weight: 400;
       min-height: 100vh;
       overflow-x: hidden;
-      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Zentraler Container */
+    /* Rote Randlinie links */
+    body::before {
+      content: '';
+      position: fixed;
+      left: clamp(30px, 8vw, 60px);
+      top: 0; bottom: 0;
+      width: 2px;
+      background: var(--margin);
+      z-index: 0;
+      pointer-events: none;
+      mix-blend-mode: multiply;
+    }
+
+    /* Perforations-Loch-Linie */
+    body::after {
+      content: '';
+      position: fixed;
+      left: clamp(10px, 3vw, 24px);
+      top: 0; bottom: 0;
+      width: 0;
+      border-left: 2px dashed rgba(0,0,0,0.08);
+      z-index: 0;
+      pointer-events: none;
+    }
+
     .screen {
       position: relative; z-index: 1;
       min-height: 100vh;
       display: flex; flex-direction: column; align-items: center;
-      padding: 60px 20px 100px 20px;
-      animation: fadeIn 0.3s ease-out;
+      padding: 40px 20px 100px clamp(40px, 10vw, 80px);
+      animation: pageFlip 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
     .screen.hidden { display: none; }
 
-    @keyframes fadeIn {
+    @keyframes pageFlip {
       from { opacity: 0; transform: translateY(10px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* Kopfbereich (Header) */
     .game-header {
-      width: 100%; max-width: 500px;
-      margin-bottom: 30px;
-      text-align: center;
+      width: 100%; max-width: 480px;
+      margin-bottom: 35px;
+      position: relative;
     }
 
     .game-title {
       font-family: 'Permanent Marker', cursive;
-      font-size: clamp(2.5rem, 8vw, 4rem);
-      line-height: 1.1;
-      color: var(--text-main);
+      font-size: clamp(2.8rem, 11vw, 4.8rem);
+      line-height: 0.95;
+      color: var(--ink);
+      letter-spacing: -1px;
+      transform: rotate(-1.5deg);
+      display: inline-block;
+      mix-blend-mode: multiply;
+      text-shadow: 2px 2px 0px rgba(0,0,0,0.03);
     }
-    .game-title .slash { color: var(--primary); }
+    .game-title .slash { color: var(--red); }
 
     .game-sub {
-      font-weight: 700;
-      font-size: 0.9rem;
-      letter-spacing: 2px;
+      font-family: 'Special Elite', monospace;
+      font-size: 11px;
+      letter-spacing: 3px;
       text-transform: uppercase;
-      color: var(--text-muted);
-      margin-top: 8px;
+      color: var(--red);
+      margin-top: 12px;
+      padding-left: 4px;
+      font-weight: bold;
+      mix-blend-mode: multiply;
     }
 
-    /* Section Labels */
+    .tape-strip {
+      position: absolute;
+      top: -15px; left: -10px;
+      width: 80px; height: 24px;
+      background: var(--tape);
+      transform: rotate(-3deg);
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.08);
+      backdrop-filter: blur(1px);
+      z-index: 10;
+      border-left: 2px dotted rgba(0,0,0,0.05);
+      border-right: 2px dotted rgba(0,0,0,0.05);
+    }
+
     .section-label {
-      font-weight: 800;
-      font-size: 0.85rem;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin: 30px 0 10px;
-      width: 100%; max-width: 500px;
-      border-bottom: 2px solid var(--border);
+      font-family: 'Special Elite', monospace;
+      font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--pencil); margin: 35px 0 15px;
+      width: 100%; max-width: 480px;
+      border-bottom: 1.5px dashed rgba(107, 100, 92, 0.3);
       padding-bottom: 6px;
+      mix-blend-mode: multiply;
     }
 
-    /* Moderne Cards statt zackiger Blöcke */
+    /* Aufgeräumterer, leicht unperfekter Rahmen */
     .block {
-      background: var(--card-bg);
-      border-radius: 16px;
-      width: 100%; max-width: 500px;
-      padding: 30px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
-      border: 1px solid var(--border);
+      background: var(--paper2);
+      border: 2.5px solid var(--ink);
+      border-radius: 6px 12px 6px 12px / 12px 6px 12px 6px;
+      width: 100%; max-width: 480px;
+      padding: 28px 24px;
+      position: relative;
+      box-shadow: 4px 4px 0px rgba(35, 33, 30, 0.05);
     }
 
     .block-title {
+      font-family: 'Permanent Marker', cursive;
       font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--text-main);
+      color: var(--ink);
       margin-bottom: 24px;
+      transform: rotate(-0.5deg);
+      display: inline-block;
+      mix-blend-mode: multiply;
     }
 
-    /* Eingabefelder Clean */
+    /* Strukturierte Eingabefelder */
     input[type=text], input[type=number] {
       width: 100%;
-      background: #f8fafc;
-      border: 2px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 16px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid rgba(35, 33, 30, 0.25);
+      padding: 8px 4px;
       font-family: 'Nunito', sans-serif;
-      font-size: 1.1rem;
+      font-size: 20px;
       font-weight: 600;
-      color: var(--text-main);
+      color: var(--blue);
       outline: none;
-      transition: all 0.2s;
+      transition: border-color 0.2s, background-color 0.2s;
+      -webkit-appearance: none;
+      mix-blend-mode: multiply;
     }
     input[type=text]::placeholder, input[type=number]::placeholder {
-      color: #94a3b8;
+      color: rgba(107, 100, 92, 0.4);
       font-weight: 400;
+      font-size: 18px;
     }
     input[type=text]:focus, input[type=number]:focus {
-      border-color: var(--primary);
-      background: #fff;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+      border-bottom: 2.5px solid var(--blue);
+      background: rgba(29, 78, 216, 0.02);
     }
 
-    /* Labels für Inputs */
     .field-label {
-      font-size: 0.85rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-muted);
-      margin-bottom: 8px; margin-top: 20px; display: block;
+      font-family: 'Special Elite', monospace;
+      font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--red); margin-bottom: 6px; margin-top: 20px; display: block;
+      font-weight: bold;
     }
     .field-label:first-child { margin-top: 0; }
 
-    /* Moderne Buttons */
+    /* Knöpfe mit klarer Struktur */
     .btn {
       width: 100%; padding: 14px 20px;
-      border: none;
-      border-radius: 10px;
-      background: var(--text-main); color: #fff;
-      font-family: 'Nunito', sans-serif;
-      font-size: 1.1rem; font-weight: 800;
+      border: 2.5px solid var(--ink);
+      border-radius: 30px;
+      background: var(--ink); color: var(--paper);
+      font-family: 'Permanent Marker', cursive;
+      font-size: 1.15rem; letter-spacing: 1px;
       cursor: pointer;
       margin-top: 24px;
-      transition: all 0.2s;
-      display: inline-flex; justify-content: center; align-items: center; gap: 8px;
+      transition: transform 0.1s, box-shadow 0.1s, background-color 0.2s;
+      position: relative;
+      box-shadow: 4px 4px 0 var(--red);
     }
-    .btn:hover { background: #0f172a; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    .btn:active { transform: translateY(0); }
+    .btn:hover { background: #1a1917; }
+    .btn:active {
+      transform: translate(3px, 3px);
+      box-shadow: 1px 1px 0 var(--red);
+    }
     
     .btn-outline {
-      background: transparent; color: var(--text-main);
-      border: 2px solid var(--border);
-      margin-top: 0;
+      background: transparent; color: var(--ink);
+      box-shadow: 3px 3px 0 var(--pencil);
     }
-    .btn-outline:hover { background: #f8fafc; border-color: #cbd5e1; }
+    .btn-outline:hover { background: rgba(0,0,0,0.04); }
+    .btn-outline:active { box-shadow: 1px 1px 0 var(--pencil); }
     
-    .btn-red { background: var(--danger); color: white; }
-    .btn-red:hover { background: #dc2626; }
+    .btn-red {
+      background: var(--red); border-color: var(--stamp);
+      box-shadow: 4px 4px 0 var(--ink);
+    }
+    .btn-red:hover { background: #c21a1a; }
+    .btn-red:active { box-shadow: 1px 1px 0 var(--ink); }
 
-    .btn-green { background: var(--success); color: white; }
-    .btn-green:hover { background: #059669; }
+    .btn-green {
+      background: var(--green); border-color: #0f4523;
+      box-shadow: 4px 4px 0 var(--ink);
+    }
+    .btn-green:hover { background: #115229; }
+    .btn-green:active { box-shadow: 1px 1px 0 var(--ink); }
 
-    .btn-sm { width: auto; padding: 10px 16px; font-size: 1rem; }
+    .btn-sm {
+      width: auto; padding: 6px 16px; font-size: 0.95rem;
+      margin-top: 0; box-shadow: 2px 2px 0 var(--pencil);
+      border-radius: 20px;
+    }
 
-    /* Code-Box Lobby */
     .code-box {
-      background: #f8fafc;
-      border: 2px solid var(--border);
+      background: var(--ink); color: var(--paper);
       padding: 20px; margin-bottom: 24px;
-      text-align: center;
-      border-radius: 12px;
       position: relative;
+      border-radius: 6px;
     }
     .code-box::before {
       content: 'RAUM-CODE';
-      font-size: 0.75rem; font-weight: 800; letter-spacing: 2px;
-      color: var(--text-muted); display: block; margin-bottom: 4px;
+      font-family: 'Special Elite', monospace;
+      font-size: 10px; letter-spacing: 3px;
+      color: rgba(253,250,244,0.5);
+      display: block; margin-bottom: 6px;
     }
     .code-box .the-code {
-      font-family: 'Nunito', sans-serif; font-weight: 800;
-      font-size: 2.5rem; letter-spacing: 8px; color: var(--primary);
+      font-family: 'Permanent Marker', cursive;
+      font-size: 2.8rem;
+      letter-spacing: 8px;
+      color: var(--highlight);
+      line-height: 1;
     }
 
-    /* Host Badge */
     .host-stamp {
       position: absolute; top: 12px; right: 12px;
-      font-size: 0.7rem; font-weight: 800; letter-spacing: 1px;
-      color: #fff; background: var(--primary);
-      padding: 4px 8px; border-radius: 6px;
+      font-family: 'Special Elite', monospace;
+      font-size: 10px; letter-spacing: 2px; font-weight: bold;
+      color: var(--highlight); border: 2px solid var(--highlight);
+      padding: 3px 6px; transform: rotate(10deg);
+      border-radius: 4px;
+      opacity: 0.85;
     }
 
-    /* Spieler-Liste */
-    .players-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+    .players-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
     .player-chip {
       display: inline-flex; align-items: center; gap: 8px;
-      border: 1px solid var(--border); background: #f8fafc;
-      border-radius: 20px; padding: 6px 14px;
-      font-size: 1rem; font-weight: 600;
+      border: 2px solid var(--pencil);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 15px; font-weight: 700;
+      background: var(--paper);
+      mix-blend-mode: multiply;
     }
-    .player-chip .online-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .player-chip .online-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
     .player-chip .pts {
-      font-size: 0.85rem; color: var(--primary); font-weight: 800; margin-left: 4px;
-      background: #eff6ff; padding: 2px 6px; border-radius: 10px;
+      font-family: 'Special Elite', monospace;
+      font-size: 11px; color: var(--red); margin-left: 4px;
+      font-weight: bold;
     }
 
-    /* Kategorien im Warteraum */
     .cat-item {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 16px; background: #f8fafc; border-radius: 8px;
-      margin-bottom: 8px; font-weight: 600;
+      border-bottom: 1.5px dashed rgba(107, 100, 92, 0.2);
+      padding: 10px 4px; font-size: 17px; font-weight: 600;
     }
+    .cat-item:last-child { border-bottom: none; }
     .cat-remove {
       background: none; border: none; cursor: pointer;
-      color: var(--text-muted); font-size: 1.2rem;
-      transition: color 0.2s;
+      color: var(--red); font-size: 18px;
+      font-family: 'Permanent Marker', cursive;
     }
-    .cat-remove:hover { color: var(--danger); }
+    .cat-remove:hover { transform: scale(1.1) rotate(10deg); }
     
-    .cats-readonly { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .cats-readonly { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
     .cat-tag {
-      background: #f8fafc; border: 1px solid var(--border);
-      border-radius: 8px; padding: 6px 12px; font-weight: 600;
+      border: 2px solid var(--pencil); 
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 15px; font-weight: 600; color: var(--ink);
+      mix-blend-mode: multiply;
     }
 
-    /* Timer Presets */
     .timer-presets { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
     .timer-preset {
-      padding: 8px 16px; border: 2px solid var(--border);
-      border-radius: 8px; background: transparent; font-weight: 700;
-      color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+      padding: 6px 14px; border: 2px solid var(--pencil);
+      border-radius: 20px;
+      font-size: 15px; font-weight: 600;
+      background: transparent; color: var(--pencil);
+      cursor: pointer; transition: all 0.15s;
+      mix-blend-mode: multiply;
     }
-    .timer-preset:hover { background: #f8fafc; }
+    .timer-preset:hover { background: rgba(0,0,0,0.05); }
     .timer-preset.active {
-      background: var(--text-main); color: white; border-color: var(--text-main);
+      background: var(--red); color: var(--paper);
+      border-color: var(--red); mix-blend-mode: normal;
+      box-shadow: 2px 2px 0 var(--ink);
+      transform: translateY(-1px);
     }
 
-    /* Spielbildschirm: Der große Buchstabe */
-    .letter-stage { text-align: center; margin: 0 0 30px; width: 100%; max-width: 500px; }
+    .letter-stage {
+      text-align: center; margin: 0 0 20px;
+      width: 100%; max-width: 480px;
+    }
     .round-tag {
-      font-weight: 800; font-size: 0.9rem; letter-spacing: 2px;
-      text-transform: uppercase; color: var(--primary); margin-bottom: 8px; display: block;
+      font-family: 'Special Elite', monospace;
+      font-size: 12px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--pencil); margin-bottom: 6px; display: block;
+      mix-blend-mode: multiply;
     }
     .big-letter {
       font-family: 'Permanent Marker', cursive;
-      font-size: clamp(6rem, 20vw, 10rem);
-      color: var(--text-main); line-height: 1;
+      font-size: clamp(7rem, 28vw, 12rem);
+      color: var(--red);
+      line-height: 0.85;
+      display: inline-block;
+      transform: rotate(-2deg);
+      text-decoration: underline;
+      text-decoration-color: rgba(217, 32, 32, 0.25);
+      text-decoration-thickness: 6px;
+      text-underline-offset: 8px;
+      mix-blend-mode: multiply;
     }
 
-    /* Timer Bar */
-    .timer-wrap { width: 100%; max-width: 500px; margin-bottom: 30px; }
+    .timer-wrap { width: 100%; max-width: 480px; margin-bottom: 24px; }
     .timer-head {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 6px;
     }
-    .timer-label { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); }
-    .timer-secs { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
-    .timer-secs.urgent { color: var(--danger); }
+    .timer-label {
+      font-family: 'Special Elite', monospace; font-size: 11px;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--pencil);
+    }
+    .timer-secs {
+      font-family: 'Permanent Marker', cursive; font-size: 1.8rem;
+      color: var(--ink); line-height: 1;
+    }
+    .timer-secs.urgent { color: var(--red); animation: pulseScale 0.5s infinite alternate; }
+    @keyframes pulseScale { from { transform: scale(1); } to { transform: scale(1.05); } }
     
     .timer-track {
-      width: 100%; height: 16px; background: var(--border); border-radius: 10px; overflow: hidden;
+      width: 100%; height: 12px;
+      border: 2.5px solid var(--ink); background: var(--paper);
+      border-radius: 10px; padding: 1px;
     }
     .timer-fill {
-      height: 100%; background: var(--primary); transition: width 1s linear; border-radius: 10px;
+      height: 100%; background: var(--ink);
+      transition: width 1s linear; border-radius: 6px;
     }
-    .timer-fill.urgent { background: var(--danger); }
+    .timer-fill.urgent { background: var(--red); }
 
-    /* Buzzer */
-    .buzzer-wrap { width: 100%; max-width: 500px; margin-bottom: 30px; }
+    .buzzer-wrap { width: 100%; max-width: 480px; margin-bottom: 20px; }
     .buzzer-btn {
-      width: 100%; padding: 24px;
-      border: none; background: var(--danger); color: white;
-      border-radius: 16px; font-size: 1.5rem; font-weight: 800; text-transform: uppercase;
-      cursor: pointer; transition: all 0.1s;
-      box-shadow: 0 8px 0 #b91c1c;
+      width: 100%; padding: 20px;
+      border: 3.5px solid var(--ink); background: var(--red); color: var(--paper);
+      border-radius: 40px;
+      font-family: 'Permanent Marker', cursive; font-size: 1.8rem;
+      letter-spacing: 1px; cursor: pointer;
+      box-shadow: 6px 6px 0 var(--stamp);
+      transition: transform 0.1s, box-shadow 0.1s;
     }
-    .buzzer-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #b91c1c; }
+    .buzzer-btn:active {
+      transform: translate(4px, 4px);
+      box-shadow: 2px 2px 0 var(--stamp);
+    }
     
     .buzzer-fired {
-      width: 100%; max-width: 500px; padding: 20px;
-      background: #fef2f2; border: 2px solid #fca5a5; color: #991b1b;
-      border-radius: 12px; font-weight: 800; font-size: 1.2rem;
-      text-align: center; margin-bottom: 30px;
+      width: 100%; max-width: 480px; padding: 16px;
+      border: 2.5px solid var(--ink); background: var(--highlight); color: var(--ink);
+      border-radius: 12px;
+      font-family: 'Permanent Marker', cursive; font-size: 1.3rem;
+      text-align: center; margin-bottom: 20px;
+      box-shadow: 3px 3px 0 rgba(0,0,0,0.05);
     }
 
-    /* Antwort-Formular (Hier behalten wir das handschriftliche Feeling für die Eingabe!) */
-    .answer-form { width: 100%; max-width: 500px; }
+    /* Aufgeräumte Formular-Zeilen */
+    .answer-form { width: 100%; max-width: 480px; }
     .answer-row {
-      display: flex; flex-direction: column; gap: 4px;
+      display: flex; align-items: center; gap: 16px;
       margin-bottom: 16px;
     }
     .ans-cat {
-      font-size: 0.85rem; font-weight: 800; text-transform: uppercase;
-      color: var(--text-muted); padding-left: 4px;
-    }
-    .answer-row input {
-      font-family: 'Caveat', cursive; /* Handschrift NUR für die Lösung */
-      font-size: 1.8rem;
-      color: var(--primary);
-      padding: 8px 16px;
+      font-family: 'Special Elite', monospace; font-size: 12px;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: var(--red); width: 90px; text-align: right; flex-shrink: 0;
+      font-weight: bold; mix-blend-mode: multiply;
     }
 
-    /* Warten-Screen */
     .waiting-block {
-      width: 100%; max-width: 500px;
-      background: var(--card-bg); border-radius: 16px;
-      padding: 40px 30px; text-align: center;
-      border: 1px solid var(--border); box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      width: 100%; max-width: 480px;
+      border: 2.5px solid var(--ink); background: var(--paper2);
+      border-radius: 12px; padding: 25px; text-align: center;
     }
-    .waiting-icon { font-size: 3rem; margin-bottom: 16px; }
-    .waiting-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 16px; }
-    .wait-players { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
+    .waiting-icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .waiting-title {
+      font-family: 'Permanent Marker', cursive; font-size: 1.6rem;
+      margin-bottom: 14px; mix-blend-mode: multiply;
+    }
+    .wait-players { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
     .wait-chip {
-      padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; font-weight: 700;
-      background: #f8fafc; color: var(--text-muted); border: 1px solid var(--border);
+      padding: 4px 12px; font-size: 15px; font-weight: 600;
+      border: 2px solid var(--ink); border-radius: 20px;
     }
-    .wait-chip.done { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
+    .wait-chip.done { background: var(--green); color: var(--paper); border-color: #0f4523; }
+    .wait-chip.pending { background: transparent; color: var(--pencil); mix-blend-mode: multiply; }
 
-    /* Scoreboard */
-    .scoreboard { width: 100%; max-width: 500px; margin-bottom: 40px; }
+    /* Scoreboard Übersichtlicher */
+    .scoreboard { width: 100%; max-width: 480px; margin-bottom: 30px; }
     .score-row {
       display: flex; align-items: center; justify-content: space-between;
-      background: var(--card-bg); border: 1px solid var(--border); padding: 16px 20px;
-      margin-bottom: 8px; border-radius: 12px; font-weight: 700;
+      border: 2.5px solid var(--ink); padding: 12px 18px;
+      margin-bottom: 8px; background: var(--paper2);
+      border-radius: 30px;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.03);
     }
     .score-row.gold {
-      background: #fffbeb; border-color: #fde68a;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+      background: var(--highlight); border-color: var(--ink);
+      border-left: 6px solid var(--red);
+      box-shadow: 3px 3px 0 var(--ink);
     }
-    .score-name { font-size: 1.1rem; }
-    .score-pts { font-size: 1rem; color: var(--primary); background: #eff6ff; padding: 4px 10px; border-radius: 20px; }
+    .score-name { font-size: 17px; font-weight: 700; }
+    .score-pts {
+      font-family: 'Special Elite', monospace; font-size: 13px;
+      color: var(--red); font-weight: bold;
+    }
 
-    /* Ergebnisse */
+    /* Strukturierte Ergebnis-Karten per Grid-Layout */
     .result-card {
-      width: 100%; max-width: 500px;
-      background: var(--card-bg); border: 1px solid var(--border);
-      border-radius: 16px; padding: 24px; margin-bottom: 20px;
+      width: 100%; max-width: 480px;
+      border: 2.5px solid var(--ink); background: var(--paper2);
+      border-radius: 8px; padding: 18px 20px; margin-bottom: 16px;
+      box-shadow: 3px 3px 0 rgba(0,0,0,0.03);
     }
     .result-player {
-      font-size: 1.2rem; font-weight: 800; margin-bottom: 16px;
-      border-bottom: 2px solid var(--border); padding-bottom: 12px;
+      font-family: 'Permanent Marker', cursive; font-size: 1.3rem;
+      margin-bottom: 12px; border-bottom: 1.5px dashed var(--pencil);
+      padding-bottom: 6px; mix-blend-mode: multiply;
     }
     .result-row {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 0; border-bottom: 1px solid #f1f5f9;
+      display: grid;
+      grid-template-columns: 90px 1fr auto;
+      align-items: center; gap: 12px;
+      padding: 8px 0; border-bottom: 1px solid rgba(107, 100, 92, 0.12);
     }
-    .result-row.host-clickable { cursor: pointer; transition: background 0.2s; border-radius: 8px; padding: 12px 8px; margin: 0 -8px; }
-    .result-row.host-clickable:hover { background: #f8fafc; }
+    .result-row.host-clickable { cursor: pointer; }
+    .result-row.host-clickable:hover { background: rgba(217, 32, 32, 0.04); }
+    .result-row.rejected .result-word {
+      text-decoration: line-through; text-decoration-thickness: 2.5px;
+      text-decoration-color: var(--red); opacity: 0.5;
+    }
     .result-row:last-child { border-bottom: none; }
     
     .result-cat {
-      font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); min-width: 70px;
+      font-family: 'Special Elite', monospace; font-size: 11px;
+      color: var(--pencil); font-weight: bold;
     }
-    .result-word {
-      flex: 1; font-family: 'Caveat', cursive; font-size: 1.6rem; font-weight: 700;
-    }
-    .result-row.rejected .result-word { color: var(--text-muted) !important; text-decoration: line-through; }
+    .result-word { font-size: 16px; color: var(--blue); mix-blend-mode: multiply; font-weight: 700; }
 
-    /* Stempel -> Cleane Badges */
     .stamp {
-      font-size: 0.7rem; font-weight: 800; padding: 4px 8px; border-radius: 6px;
-      text-transform: uppercase; white-space: nowrap;
+      font-family: 'Special Elite', monospace; font-size: 10px;
+      letter-spacing: 0.5px; padding: 2px 6px; white-space: nowrap;
+      text-transform: uppercase; font-weight: bold;
+      border-radius: 3px; transform: rotate(-1deg);
+      mix-blend-mode: multiply;
     }
-    .stamp-ok { background: #ecfdf5; color: #059669; }
-    .stamp-no { background: #fef2f2; color: #dc2626; }
+    .stamp-ok { border: 1.5px solid var(--green); color: var(--green); }
+    .stamp-no { border: 1.5px dashed var(--red); color: var(--red); }
 
-    /* Banner */
     .val-banner {
-      width: 100%; max-width: 500px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a;
-      border-radius: 12px; padding: 20px; margin-bottom: 30px; text-align: center;
+      width: 100%; max-width: 480px;
+      border: 2.5px solid var(--ink); background: var(--highlight); color: var(--ink);
+      border-radius: 12px; padding: 14px 18px; margin-bottom: 24px; text-align: center;
+      box-shadow: 4px 4px 0 var(--red);
     }
-    .val-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 8px; }
-    .val-sub { font-size: 0.9rem; }
+    .val-title { font-family: 'Permanent Marker', cursive; font-size: 1.25rem; margin-bottom: 2px; }
+    .val-sub { font-family: 'Special Elite', monospace; font-size: 10.5px; opacity: 0.85; }
 
-    /* Verbindungsanzeige (Top Right) */
     .conn-indicator {
-      position: fixed; top: 16px; right: 16px;
-      background: rgba(255,255,255,0.9); backdrop-filter: blur(4px); border: 1px solid var(--border);
-      border-radius: 20px; padding: 6px 12px; z-index: 100;
-      font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      position: fixed; top: 12px; right: 12px;
+      background: var(--paper); border: 2px solid var(--ink);
+      border-radius: 20px; padding: 6px 14px; z-index: 100;
+      font-family: 'Special Elite', monospace; font-size: 10px; font-weight: bold;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.05);
     }
-    .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; }
-    .conn-dot.ok { background: var(--success); }
-    .conn-dot.sync { background: var(--primary); animation: pulse 1s infinite alternate; }
-    @keyframes pulse { from { opacity: 1; } to { opacity: 0.5; } }
+    .conn-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .conn-dot.ok { background: var(--green); border: 1px solid #0f4523; }
+    .conn-dot.sync { background: var(--highlight); border: 1px solid var(--ink); animation: blink 1s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-    /* Raus-Button (Top Left) */
     .leave-btn {
-      position: fixed; top: 16px; left: 16px; z-index: 100;
-      background: rgba(255,255,255,0.9); backdrop-filter: blur(4px); border: 1px solid var(--border);
-      border-radius: 20px; padding: 6px 12px;
-      font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 800; color: var(--danger); cursor: pointer;
-      display: none; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: background 0.2s;
+      position: fixed; top: 12px; left: 12px; z-index: 100;
+      background: var(--paper); border: 2px solid var(--ink);
+      border-radius: 20px; padding: 4px 14px;
+      font-size: 14px; font-weight: 700; color: var(--red); cursor: pointer;
+      display: none; transition: all 0.1s;
+      box-shadow: 2px 2px 0 var(--pencil);
     }
-    .leave-btn:hover { background: #fef2f2; border-color: #fca5a5; }
+    .leave-btn:hover { background: rgba(0,0,0,0.04); }
+    .leave-btn:active { transform: translate(2px,2px); box-shadow: none; }
 
     .error-msg {
-      color: var(--danger); font-size: 0.9rem; margin-top: 12px; font-weight: 700; background: #fef2f2; padding: 10px; border-radius: 8px;
+      color: var(--red); font-size: 15px; margin-top: 12px;
+      font-weight: 700; text-decoration: underline wavy var(--red);
+      text-underline-offset: 3px; mix-blend-mode: multiply;
     }
-    .hint { font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-top: 16px; }
-    
-    .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; width: 100%; }
+    .hint {
+      font-family: 'Special Elite', monospace; font-size: 11px;
+      color: var(--pencil); text-align: center; margin-top: 16px;
+      mix-blend-mode: multiply;
+    }
+    .divider {
+      border: none; border-top: 1.5px dashed rgba(107, 100, 92, 0.25);
+      margin: 20px 0; width: 100%; max-width: 480px;
+    }
     .pulse-dot {
-      display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--primary); margin-right: 8px; animation: pulse 1s infinite alternate;
+      display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green); margin-right: 8px; animation: blink 2s infinite;
     }
   </style>
 </head>
 <body>
 
-<button id="btn-leave" class="leave-btn" onclick="window.leaveRoom()">← Verlassen</button>
+<button id="btn-leave" class="leave-btn" onclick="window.leaveRoom()">← Raus</button>
 
 <div class="conn-indicator" id="conn-indicator">
   <div class="conn-dot sync" id="conn-dot"></div>
@@ -434,47 +559,43 @@
 
 <div id="screen-join" class="screen">
   <div class="game-header">
-    <div class="game-title">Stadt<span class="slash">.</span>Land<span class="slash">.</span>Fluss</div>
-    <div class="game-sub">Multiplayer Edition</div>
+    <div class="tape-strip"></div>
+    <div class="game-title">Stadt<span class="slash">/</span>Land<span class="slash">/</span>Fluss</div>
+    <div class="game-sub">Multiplayer · Klassischer Spielblock</div>
   </div>
 
   <div class="block">
     <div class="block-title">Mitspielen</div>
     <label class="field-label">Dein Name</label>
     <input type="text" id="input-name" placeholder="Wie heißt du?" maxlength="15"/>
-    
     <label class="field-label">Raum-Code</label>
     <input type="text" id="input-room" placeholder="z.B. SPIELEN" maxlength="10"/>
-    
     <div id="join-error" class="error-msg" style="display:none"></div>
-    <button type="button" class="btn" id="btn-connect" onclick="joinRoom()">Raum betreten</button>
-    <p class="hint">Tipp: Der erste Spieler im Raum wird automatisch Spielleiter.</p>
+    <button type="button" class="btn" id="btn-connect" onclick="joinRoom()">Rein da →</button>
+    <p class="hint">Erster im Raum = Spielleiter. Alle gleichen Code eingeben.</p>
   </div>
 </div>
 
 <div id="screen-lobby" class="screen hidden">
   <div class="game-header">
-    <div class="game-title" style="font-size:2.5rem;">Warteraum</div>
+    <div class="tape-strip"></div>
+    <div class="game-title" style="font-size:2.6rem;transform:rotate(-1deg)">Warteraum</div>
   </div>
 
   <div class="block">
     <div class="code-box">
       <div class="the-code" id="display-roomcode">—</div>
-      <span class="host-stamp" id="host-badge" style="display:none">SPIELLEITER</span>
+      <span class="host-stamp" id="host-badge" style="display:none">HOST</span>
     </div>
-    
-    <div class="field-label">Mitspieler</div>
+    <div class="field-label">Spieler</div>
     <div class="players-list" id="players-list"></div>
-    
     <hr class="divider"/>
     <div class="field-label">Kategorien</div>
     <div id="lobby-cats-area"></div>
-    
     <hr class="divider"/>
-    <div class="field-label">Zeitlimit pro Runde</div>
+    <div class="field-label">Rundentimer</div>
     <div id="lobby-timer-area"></div>
-    
-    <div id="lobby-host-area" style="margin-top:30px"></div>
+    <div id="lobby-host-area" style="margin-top:20px"></div>
   </div>
 </div>
 
@@ -483,27 +604,23 @@
     <span class="round-tag" id="round-badge">Runde 1</span>
     <div class="big-letter" id="big-letter">A</div>
   </div>
-  
   <div id="timer-bar-area"></div>
   <div id="buzzer-container"></div>
   <div id="playing-content"></div>
 </div>
 
 <div id="screen-results" class="screen hidden">
-  <div class="game-header" style="margin-bottom:30px">
-    <div class="game-title" style="font-size:2.5rem;">Auswertung</div>
+  <div class="game-header" style="margin-bottom:20px">
+    <div class="tape-strip"></div>
+    <div class="game-title" style="font-size:2.4rem;transform:rotate(-1deg)">Auswertung</div>
     <div class="game-sub" id="results-sub"></div>
   </div>
-  
   <div id="validation-banner-area"></div>
-  
-  <div class="section-label">Aktueller Punktestand</div>
+  <div class="section-label">Punkte gesamt</div>
   <div class="scoreboard" id="scoreboard"></div>
-  
   <div class="section-label">Antworten dieser Runde</div>
-  <div id="results-container" style="width:100%;max-width:500px"></div>
-  
-  <div style="width:100%;max-width:500px;margin-top:24px" id="results-actions"></div>
+  <div id="results-container" style="width:100%;max-width:480px"></div>
+  <div style="width:100%;max-width:480px;margin-top:16px" id="results-actions"></div>
 </div>
 
 <script type="module">
@@ -628,7 +745,7 @@ async function processStateUpdate(newState){
   if(isHost){
     const now=Date.now();
     const stale=Object.entries(gameState.players||{}).filter(([id,p])=>id!==myId&&now-(p.hb||0)>10000).map(([id])=>id);
-    if(stale.length>0){const patch={};stale.forEach(id=>patch[`players/${id}`]=null);await updateRoomData(patch);return;}
+    if(stale.length>0){const patch={};stale.forEach(id=>patch[`players/${id}`]=null);await updateRoomData({patch});return;}
   }
   
   if(gameState.phase==="playing" && prev!=="playing") {
@@ -696,7 +813,7 @@ function renderTimerBar(){
   a.innerHTML=`
     <div class="timer-wrap">
       <div class="timer-head">
-        <span class="timer-label">Restzeit</span>
+        <span class="timer-label">Zeit</span>
         <span class="timer-secs ${urgent?"urgent":""}">${ts}</span>
       </div>
       <div class="timer-track">
@@ -718,7 +835,7 @@ function renderLobby(){
     return`<div class="player-chip">
       <div class="online-dot" style="background:${online?"var(--green)":"transparent"}"></div>
       ${p.name}${id===gameState.host?" ★":""}
-      <span class="pts">${p.score||0}</span>
+      <span class="pts">${p.score||0}P</span>
     </div>`;
   }).join("");
 
@@ -728,9 +845,9 @@ function renderLobby(){
       catsArea.innerHTML=`
         <div id="lobby-cats-list"></div>
         <div style="display:flex;gap:8px;margin-top:12px;align-items:flex-end">
-          <input type="text" id="lobby-cat-input" placeholder="Kategorie hinzufügen…" maxlength="20"
+          <input type="text" id="lobby-cat-input" placeholder="Neue Kategorie…" maxlength="20"
             onkeydown="if(event.key==='Enter'){event.preventDefault();window.addCat();}"/>
-          <button type="button" class="btn btn-outline btn-sm" onclick="window.addCat()">+ Neu</button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="window.addCat()">+ Add</button>
         </div>`;
     }
     document.getElementById("lobby-cats-list").innerHTML=cats.map((c,i)=>
@@ -747,25 +864,25 @@ function renderLobby(){
     ta.innerHTML=`
       <div class="timer-presets">
         ${TIMER_PRESETS.map(t=>{
-          const lbl=t===0?"Ohne":t<60?`${t}s`:`${t/60}min`;
+          const lbl=t===0?"Kein":t<60?`${t}s`:`${t/60}min`;
           return`<button type="button" class="timer-preset ${dur===t?"active":""}" onclick="window.setTimer(${t})">${lbl}</button>`;
         }).join("")}
       </div>
       <div style="display:flex;gap:8px;align-items:flex-end;margin-top:10px">
         <input type="number" id="timer-custom-input" min="10" max="600" placeholder="Eigene Sekunden…"
-          style="max-width:200px"
+          style="max-width:180px"
           onkeydown="if(event.key==='Enter'){event.preventDefault();window.setCustomTimer();}"
           value="${!TIMER_PRESETS.includes(dur)&&dur>0?dur:''}"/>
         <button type="button" class="btn btn-outline btn-sm" onclick="window.setCustomTimer()">OK</button>
       </div>`;
   }else{
-    const lbl=dur===0?"Kein Zeitlimit":dur<60?`${dur}s`:`${Math.floor(dur/60)}:${String(dur%60).padStart(2,"0")} min`;
-    ta.innerHTML=`<div style="font-size:1.1rem; font-weight:700; color:var(--text-main); margin-top:4px;">${lbl}</div>`;
+    const lbl=dur===0?"Kein Timer":dur<60?`${dur}s`:`${Math.floor(dur/60)}:${String(dur%60).padStart(2,"0")} min`;
+    ta.innerHTML=`<div style="font-size:18px;color:var(--pencil);font-weight:600;">${lbl}</div>`;
   }
 
   document.getElementById("lobby-host-area").innerHTML=isHost
-    ?`<button type="button" class="btn btn-green" onclick="window.startRound()">Spiel starten</button>`
-    :`<div style="font-size:1rem;color:var(--text-muted); text-align:center; margin-top:20px;"><span class="pulse-dot"></span>Warte auf den Spielleiter…</div>`;
+    ?`<button type="button" class="btn btn-red" onclick="window.startRound()">Runde starten →</button>`
+    :`<div style="font-size:16px;color:var(--pencil);font-weight:600;"><span class="pulse-dot"></span>Warte auf den Spielleiter…</div>`;
 }
 
 window.setTimer=async function(s){await updateRoomData({roundDuration:s});};
@@ -800,14 +917,14 @@ function renderPlaying(){
   const cEl=document.getElementById("playing-content");
 
   if(gameState.phase==="collecting"){
-    bEl.innerHTML=`<div class="buzzer-fired">⌛ Die Zeit ist um! Antworten werden eingesammelt...</div>`;
+    bEl.innerHTML=`<div class="buzzer-fired">⌛ Zeit läuft ab — Einsammeln!</div>`;
     if(submitted)cEl.innerHTML=renderWaiting();return;
   }
   
   if(gameState.buzzer){
-    bEl.innerHTML=`<div class="buzzer-fired" id="buzzer-ticker">🔔 ${gameState.buzzer} hat STOPP gedrückt!</div>`;
+    bEl.innerHTML=`<div class="buzzer-fired" id="buzzer-ticker">🔔 ${gameState.buzzer} hat STOPP gerufen!</div>`;
   }else{
-    bEl.innerHTML=submitted?"":`<div class="buzzer-wrap"><button type="button" class="buzzer-btn" onclick="window.triggerBuzzer()">STOPP</button></div>`;
+    bEl.innerHTML=submitted?"":`<div class="buzzer-wrap"><button type="button" class="buzzer-btn" onclick="window.triggerBuzzer()">STOPP!</button></div>`;
   }
   
   if(submitted){cEl.innerHTML=renderWaiting();return;}
@@ -818,9 +935,9 @@ function renderPlaying(){
         ${cats.map(cat=>`
           <div class="answer-row">
             <span class="ans-cat">${cat}</span>
-            <input type="text" id="ans-${sanitizeId(cat)}" placeholder="${gameState.letter}..." autocomplete="off"/>
+            <input type="text" id="ans-${sanitizeId(cat)}" placeholder="${cat} mit ${gameState.letter}…" autocomplete="off"/>
           </div>`).join("")}
-        <button type="button" class="btn btn-green" style="margin-top:20px" onclick="window.submitAnswers()">Fertig! (Abgeben)</button>
+        <button type="button" class="btn btn-green" style="margin-top:14px" onclick="window.submitAnswers()">Fertig ✓</button>
       </div>`;
     cats.forEach(cat=>{
       if(localAnswers[cat]){const e=document.getElementById(`ans-${sanitizeId(cat)}`);if(e)e.value=localAnswers[cat];}
@@ -837,8 +954,8 @@ function renderWaiting(){
     `<span class="wait-chip ${ans[id]?"done":"pending"}">${ans[id]?"✓":"…"} ${p.name}</span>`).join("");
   return`<div class="waiting-block">
     <div class="waiting-icon">✅</div>
-    <div class="waiting-title">Antworten eingeloggt!</div>
-    <div style="font-size:1rem;color:var(--text-muted);margin-bottom:20px">Noch ${Math.max(0,pending)} Spieler warten…</div>
+    <div class="waiting-title">Abgegeben!</div>
+    <div style="font-size:15px;color:var(--pencil);margin-bottom:12px;font-weight:600;">Noch ${Math.max(0,pending)} Spieler…</div>
     <div class="wait-players">${chips}</div>
   </div>`;
 }
@@ -856,7 +973,7 @@ function triggerLocalBuzzerTicker() {
   localBuzzerCountdown = setInterval(async () => {
     countdown--;
     const ticker = document.getElementById("buzzer-ticker");
-    if(ticker) ticker.textContent = `🔔 ${gameState.buzzer} hat STOPP gedrückt! (${countdown}s)`;
+    if(ticker) ticker.textContent = `🔔 ${gameState.buzzer} hat STOPP gerufen! (${countdown}s)`;
     
     if(countdown <= 0) {
       clearInterval(localBuzzerCountdown);
@@ -944,19 +1061,19 @@ function renderResults(){
   const cats=objToCats(gameState.cats);
   const rejections = gameState.rejections || {};
   
-  document.getElementById("results-sub").textContent=`RUNDE ${gameState.round} · BUCHSTABE ${gameState.letter}`;
+  document.getElementById("results-sub").textContent=`Runde ${gameState.round} · Buchstabe ${gameState.letter}`;
   
   const banner=document.getElementById("validation-banner-area");
   if(banner){
     banner.innerHTML = isHost 
-      ? `<div class="val-banner"><div class="val-title">✍️ Du bist der Schiedsrichter!</div><div class="val-sub">Klicke auf eine Antwort, um sie als "falsch" zu markieren (Punkteabzug).</div></div>`
-      : `<div class="val-banner"><div class="val-title">👀 Punkte-Korrektur</div><div class="val-sub">Der Spielleiter prüft gerade alle Antworten.</div></div>`;
+      ? `<div class="val-banner"><div class="val-title">✍️ Du bist der Korrektor!</div><div class="val-sub">Klicke auf falsche Antworten in den Blöcken, um sie per Rotstift zu streichen.</div></div>`
+      : `<div class="val-banner"><div class="val-title">👀 Notenbekanntgabe</div><div class="val-sub">Der Spielleiter prüft die Antworten und zückt bei Bedarf den Rotstift.</div></div>`;
   }
   
   const sorted=Object.entries(gameState.players||{}).sort((a,b)=>(b[1].score||0)-(a[1].score||0));
   document.getElementById("scoreboard").innerHTML=sorted.map(([id,p], i)=>`
     <div class="score-row ${i===0?"gold":""}">
-      <div class="score-name">${["🥇","🥈","🥉"][i]||"  "} ${p.name}</div>
+      <div class="score-name">${["①","②","③"][i]||"  "} ${p.name}</div>
       <div class="score-pts">${p.score||0} Punkte</div>
     </div>`).join("");
     
@@ -971,20 +1088,20 @@ function renderResults(){
         
         let disp="", badge="";
         if(!word){
-          disp=`<i style="color:var(--text-muted)">—</i>`;
+          disp=`<i style="color:rgba(107, 100, 92, 0.4)">—</i>`;
         } else if(wrongLetter) {
-          disp=`<span style="color:var(--danger)">${word}</span>`;
+          disp=`<s style="color:var(--red)">${word}</s>`;
           badge=`<span class="stamp stamp-no">Falscher Buchstabe</span>`;
         } else if(isRejected) {
-          disp=`<span style="color:var(--danger)">${word}</span>`;
-          badge=`<span class="stamp stamp-no">Abgelehnt</span>`;
+          disp=`<span style="color:var(--red)">${word}</span>`;
+          badge=`<span class="stamp stamp-no">✕ GESTRICHEN</span>`;
         } else {
-          disp=`<span style="color:var(--primary)">${word}</span>`;
-          badge=`<span class="stamp stamp-ok">Gültig</span>`;
+          disp=`<span style="color:var(--blue)">${word}</span>`;
+          badge=`<span class="stamp stamp-ok">✓ OK</span>`;
         }
         
         const hostClass = isHost && word && !wrongLetter ? "host-clickable" : "";
-        const rejectedClass = (isRejected || wrongLetter) ? "rejected" : "";
+        const rejectedClass = isRejected ? "rejected" : "";
         
         return`
           <div class="result-row ${hostClass} ${rejectedClass}" onclick="window.toggleAnswerStrike('${pid}','${cat}')">
@@ -997,8 +1114,8 @@ function renderResults(){
   }).join("");
   
   document.getElementById("results-actions").innerHTML=isHost
-    ?`<button type="button" class="btn btn-primary" onclick="window.nextRound()">Nächste Runde starten</button>`
-    :`<div style="font-size:1rem;color:var(--text-muted); text-align:center;"><span class="pulse-dot"></span>Warte auf Spielleiter…</div>`;
+    ?`<button type="button" class="btn" onclick="window.nextRound()">Nächste Runde →</button>`
+    :`<div style="font-size:16px;color:var(--pencil);font-weight:600;"><span class="pulse-dot"></span>Warte auf den Spielleiter…</div>`;
 }
 
 window.nextRound=async function(){
