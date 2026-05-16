@@ -4,12 +4,11 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Stadt Land Fluss</title>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Special+Elite&family=Permanent+Marker&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght=400;600;700&family=Special+Elite&family=Permanent+Marker&display=swap" rel="stylesheet"/>
   <style>
     /* ══════════════════════════════════════════
        SCHULHEFT-BRUTALISM
        Kariertes Papier · Roter Korrekturstift
-       Keine Runden · Kein Schatten · Echtes Papier
     ══════════════════════════════════════════ */
     :root {
       --paper:    #fdfaf4;
@@ -26,10 +25,8 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { scroll-behavior: smooth; }
 
-    /* Karierter Hintergrund */
     body {
       background-color: var(--paper);
       background-image:
@@ -42,7 +39,6 @@
       overflow-x: hidden;
     }
 
-    /* Randlinie links — wie echtes Heft */
     body::before {
       content: '';
       position: fixed;
@@ -54,7 +50,6 @@
       pointer-events: none;
     }
 
-    /* Lochung */
     body::after {
       content: '';
       position: fixed;
@@ -80,7 +75,6 @@
       to   { opacity: 1; transform: translateX(0); }
     }
 
-    /* ── HEADER ── */
     .game-header {
       width: 100%; max-width: 480px;
       margin-bottom: 36px;
@@ -93,7 +87,6 @@
       line-height: .9;
       color: var(--ink);
       letter-spacing: -1px;
-      /* leicht schief wie handgeschrieben */
       transform: rotate(-1.5deg);
       display: inline-block;
     }
@@ -109,7 +102,6 @@
       padding-left: 4px;
     }
 
-    /* Klebeband-Deko oben links */
     .tape-strip {
       position: absolute;
       top: -14px; left: -10px;
@@ -119,7 +111,6 @@
       border: 1px solid rgba(200,180,80,.4);
     }
 
-    /* ── SEKTION-ÜBERSCHRIFTEN ── */
     .section-label {
       font-family: 'Special Elite', monospace;
       font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
@@ -130,16 +121,13 @@
       opacity: .7;
     }
 
-    /* ── BLOCK / KARTE ── */
     .block {
       background: var(--paper2);
       border: 2px solid var(--ink);
       width: 100%; max-width: 480px;
       padding: 20px 20px 22px;
       position: relative;
-      /* kein border-radius — das ist Papier */
     }
-    /* Ecke umgeknickt */
     .block::after {
       content: '';
       position: absolute;
@@ -159,7 +147,6 @@
       display: inline-block;
     }
 
-    /* ── INPUTS ── */
     input[type=text], input[type=number] {
       width: 100%;
       background: transparent;
@@ -187,7 +174,6 @@
     }
     .field-label:first-child { margin-top: 0; }
 
-    /* ── BUTTONS ── */
     .btn {
       width: 100%; padding: 13px 18px;
       border: 2.5px solid var(--ink);
@@ -198,7 +184,6 @@
       margin-top: 14px;
       transition: transform .1s, background .1s, color .1s;
       position: relative;
-      /* Offset-Schatten statt box-shadow — Papier-Stil */
       box-shadow: 4px 4px 0 var(--red);
     }
     .btn:active {
@@ -224,7 +209,6 @@
     }
     .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    /* ── RAUM-CODE ── */
     .code-box {
       background: var(--ink); color: var(--paper);
       padding: 16px 18px; margin-bottom: 18px;
@@ -245,7 +229,6 @@
       line-height: 1;
     }
 
-    /* Stempel "HOST" */
     .host-stamp {
       position: absolute; top: 10px; right: 14px;
       font-family: 'Special Elite', monospace;
@@ -254,7 +237,6 @@
       padding: 2px 6px; transform: rotate(8deg);
     }
 
-    /* ── SPIELER-LISTE ── */
     .players-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
     .player-chip {
       display: inline-flex; align-items: center; gap: 6px;
@@ -273,7 +255,6 @@
       font-size: 11px; color: var(--red); margin-left: 2px;
     }
 
-    /* ── KATEGORIEN ── */
     .cat-item {
       display: flex; align-items: center; justify-content: space-between;
       border-bottom: 1.5px solid rgba(90,80,64,.2);
@@ -291,7 +272,6 @@
       font-size: 15px; color: var(--pencil);
     }
 
-    /* ── TIMER-PRESETS ── */
     .timer-presets { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
     .timer-preset {
       padding: 5px 14px; border: 2px solid var(--pencil);
@@ -304,31 +284,6 @@
       border-color: var(--red);
     }
 
-    /* ── KI-VORSCHLÄGE ── */
-    .ai-suggest-btn {
-      width: 100%; padding: 9px 14px;
-      border: 2px dashed var(--blue); background: transparent;
-      font-family: 'Caveat', cursive; font-size: 17px; color: var(--blue);
-      cursor: pointer; margin-top: 12px; transition: background .12s;
-    }
-    .ai-suggest-btn:hover { background: rgba(26,79,160,.06); }
-    .ai-suggest-btn:disabled { opacity: .45; cursor: not-allowed; }
-    .ai-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
-    .ai-chip {
-      padding: 4px 12px; border: 2px dashed var(--blue);
-      font-family: 'Caveat', cursive; font-size: 16px; color: var(--blue);
-      background: transparent; cursor: pointer; transition: all .12s;
-    }
-    .ai-chip:hover { background: var(--blue); color: var(--paper); border-style: solid; }
-    .ai-chip.added { background: var(--green); color: var(--paper); border-color: var(--green); border-style: solid; cursor: default; }
-    .ai-chips-label {
-      font-family: 'Special Elite', monospace;
-      font-size: 9px; letter-spacing: 2px; color: var(--blue);
-      text-transform: uppercase; margin-top: 10px; margin-bottom: 4px;
-      display: block;
-    }
-
-    /* ── SPIELPHASE: BUCHSTABE ── */
     .letter-stage {
       text-align: center; margin: 0 0 16px;
       width: 100%; max-width: 480px;
@@ -344,15 +299,12 @@
       color: var(--red);
       line-height: .85;
       display: inline-block;
-      /* leicht schief */
       transform: rotate(-3deg);
-      /* Unterstreichung wie mit Marker */
       text-decoration: underline;
       text-decoration-color: rgba(204,34,0,.25);
       text-underline-offset: 6px;
     }
 
-    /* ── TIMER-BAR ── */
     .timer-wrap {
       width: 100%; max-width: 480px; margin-bottom: 12px;
     }
@@ -381,7 +333,6 @@
     .timer-fill.urgent { background: var(--red); animation: urgentFill .5s infinite alternate; }
     @keyframes urgentFill { from { background: var(--red); } to { background: #ff4422; } }
 
-    /* ── BUZZER ── */
     .buzzer-wrap { width: 100%; max-width: 480px; margin-bottom: 14px; }
     .buzzer-btn {
       width: 100%; padding: 22px 18px;
@@ -407,7 +358,6 @@
       to   { transform: scale(1); opacity: 1; }
     }
 
-    /* ── ANTWORT-FORMULAR ── */
     .answer-form { width: 100%; max-width: 480px; }
     .answer-row {
       display: flex; align-items: flex-end; gap: 12px;
@@ -424,13 +374,12 @@
       flex: 1; border: none; border-bottom: 2px solid var(--ink);
       background: transparent;
       font-family: 'Caveat', cursive; font-size: 22px;
-      color: var(--blue); /* Tinte wie Kugelschreiber */
+      color: var(--blue);
       outline: none; padding: 2px 2px 4px;
     }
     .answer-row input::placeholder { color: rgba(90,80,64,.3); }
     .answer-row input:focus { border-bottom-color: var(--blue); }
 
-    /* ── WARTEN ── */
     .waiting-block {
       width: 100%; max-width: 480px;
       border: 2.5px solid var(--ink); background: var(--paper2);
@@ -449,17 +398,15 @@
     .wait-chip.done { background: var(--green); color: var(--paper); border-color: var(--green); }
     .wait-chip.pending { background: transparent; color: var(--pencil); }
 
-    /* ── SCOREBOARD ── */
     .scoreboard { width: 100%; max-width: 480px; margin-bottom: 16px; }
     .score-row {
       display: flex; align-items: center; justify-content: space-between;
       border: 2px solid var(--ink); padding: 10px 14px;
-      margin-bottom: -2px; /* überlappende Rahmen wie Tabellenlinien */
+      margin-bottom: -2px;
       background: var(--paper2);
     }
     .score-row.gold {
       background: #fff8d6; border-color: #c8a000;
-      /* Rotstift-Markierung */
       border-left: 5px solid var(--red);
     }
     .score-name { font-family: 'Caveat', cursive; font-size: 20px; }
@@ -468,7 +415,6 @@
       color: var(--red); letter-spacing: 1px;
     }
 
-    /* ── ERGEBNIS-KARTEN ── */
     .result-card {
       width: 100%; max-width: 480px;
       border: 2px solid var(--ink); background: var(--paper2);
@@ -484,6 +430,17 @@
       padding: 5px 0; border-bottom: 1px dashed rgba(90,80,64,.2);
       font-size: 18px;
     }
+    .result-row.host-clickable {
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .result-row.host-clickable:hover {
+      background: rgba(204,34,0,0.05);
+    }
+    .result-row.rejected .result-word {
+      text-decoration: line-through;
+      opacity: 0.4;
+    }
     .result-row:last-child { border-bottom: none; }
     .result-cat {
       font-family: 'Special Elite', monospace; font-size: 9px;
@@ -492,28 +449,23 @@
     }
     .result-word { flex: 1; font-family: 'Caveat', cursive; color: var(--blue); }
 
-    /* KI-Bewertungs-Stempel */
     .stamp {
       font-family: 'Special Elite', monospace; font-size: 9px;
       letter-spacing: 1px; padding: 2px 6px; white-space: nowrap;
       text-transform: uppercase;
     }
     .stamp-ok { border: 1.5px solid var(--green); color: var(--green); }
-    .stamp-no { border: 1.5px solid var(--red); color: var(--red); text-decoration: line-through; }
-    .stamp-wait { border: 1.5px solid var(--pencil); color: var(--pencil); }
+    .stamp-no { border: 1.5px solid var(--red); color: var(--red); }
 
-    /* ── VALIDIERUNGS-BANNER ── */
     .val-banner {
       width: 100%; max-width: 480px;
-      border: 2.5px solid var(--ink); background: var(--ink); color: var(--paper);
+      border: 2.5px solid var(--ink); background: #fff8d6; color: var(--ink);
       padding: 14px 18px; margin-bottom: 14px; text-align: center;
+      box-shadow: 4px 4px 0 var(--red);
     }
-    .val-banner.ok { background: var(--green); border-color: var(--green); }
-    .val-banner.fail { background: var(--paper2); color: var(--ink); border-color: var(--pencil); }
     .val-title { font-family: 'Permanent Marker', cursive; font-size: 1.2rem; margin-bottom: 2px; }
     .val-sub { font-family: 'Special Elite', monospace; font-size: 10px; opacity: .7; letter-spacing: 1px; }
 
-    /* ── CONN-INDICATOR ── */
     .conn-indicator {
       position: fixed; top: 10px; right: 10px;
       background: var(--paper); border: 2px solid var(--ink);
@@ -524,10 +476,8 @@
     .conn-dot { width: 7px; height: 7px; border: 1.5px solid var(--ink); border-radius: 50%; }
     .conn-dot.ok { background: var(--green); }
     .conn-dot.sync { background: #f5c842; animation: blink 1s infinite; }
-    .conn-dot.err { background: var(--red); }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-    /* ── VERLASSEN-BUTTON ── */
     .leave-btn {
       position: fixed; top: 10px; left: 10px; z-index: 100;
       background: var(--paper); border: 2px solid var(--ink);
@@ -538,11 +488,9 @@
     }
     .leave-btn:active { transform: translate(2px,2px); box-shadow: none; }
 
-    /* ── UTILS ── */
     .error-msg {
       color: var(--red); font-size: 17px; margin-top: 8px;
       font-family: 'Caveat', cursive;
-      /* wie mit Rotstift unterstrichen */
       text-decoration: underline wavy var(--red);
       text-underline-offset: 3px;
     }
@@ -561,13 +509,6 @@
       background: var(--green); margin-right: 6px;
       animation: blink 2s infinite;
     }
-    .spinner {
-      display: inline-block; width: 13px; height: 13px;
-      border: 2px solid rgba(253,250,244,.3); border-top-color: white;
-      border-radius: 50%; animation: spin .7s linear infinite;
-      vertical-align: middle; margin-right: 5px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -579,12 +520,11 @@
   <span id="conn-label">Bereit</span>
 </div>
 
-<!-- ═══════ JOIN ═══════ -->
 <div id="screen-join" class="screen">
   <div class="game-header">
     <div class="tape-strip"></div>
     <div class="game-title">Stadt<span class="slash">/</span>Land<span class="slash">/</span>Fluss</div>
-    <div class="game-sub">Multiplayer · KI-Schiedsrichter</div>
+    <div class="game-sub">Multiplayer · Klassischer Spielblock</div>
   </div>
 
   <div class="block">
@@ -599,7 +539,6 @@
   </div>
 </div>
 
-<!-- ═══════ LOBBY ═══════ -->
 <div id="screen-lobby" class="screen hidden">
   <div class="game-header">
     <div class="tape-strip"></div>
@@ -616,7 +555,6 @@
     <hr class="divider"/>
     <div class="field-label">Kategorien</div>
     <div id="lobby-cats-area"></div>
-    <div id="lobby-ai-suggestions"></div>
     <hr class="divider"/>
     <div class="field-label">Rundentimer</div>
     <div id="lobby-timer-area"></div>
@@ -624,7 +562,6 @@
   </div>
 </div>
 
-<!-- ═══════ SPIELEN ═══════ -->
 <div id="screen-playing" class="screen hidden">
   <div class="letter-stage">
     <span class="round-tag" id="round-badge">Runde 1</span>
@@ -635,7 +572,6 @@
   <div id="playing-content"></div>
 </div>
 
-<!-- ═══════ ERGEBNISSE ═══════ -->
 <div id="screen-results" class="screen hidden">
   <div class="game-header" style="margin-bottom:20px">
     <div class="tape-strip"></div>
@@ -674,8 +610,8 @@ const TIMER_PRESETS = [0,60,90,120,180];
 let myName="", myRoom="";
 let myId = "p_"+Math.random().toString(36).slice(2,10);
 let isHost=false, gameState=null, submitted=false;
-let localAnswers={}, validationResults={}, validationDone=false;
-let buzzerTimeout=null, heartbeatInterval=null, roomListener=null;
+let localAnswers={}, localBuzzerCountdown=null;
+let heartbeatInterval=null, roomListener=null;
 let roundTimerInterval=null, roundTimerSecondsLeft=0;
 
 const roomRef  = () => ref(db,`rooms/${myRoom}`);
@@ -730,7 +666,7 @@ window.joinRoom=async function(){
         players:{[myId]:{name:myName,score:0,hb:Date.now()}},
         cats:catsToObj(DEFAULT_CATS),roundDuration:90,
         phase:"lobby",round:0,letter:"",
-        buzzer:null,buzzerTs:null,roundAnswers:{},validation:null,roundStartTs:null,
+        buzzer:null,buzzerTs:null,roundAnswers:{},rejections:{},roundStartTs:null,
         createdAt:Date.now()
       });
     }else{
@@ -748,8 +684,9 @@ window.joinRoom=async function(){
 
 window.leaveRoom=async function(){
   stopRoundTimer();
+  if(localBuzzerCountdown) clearInterval(localBuzzerCountdown);
   if(myRoom&&myId)try{await update(roomRef(),{[`players/${myId}`]:null});}catch(e){}
-  sessionStorage.removeItem("slf_name");sessionStorage.removeItem("slf_room");sessionStorage.removeItem("slf_id");
+  sessionStorage.clear();
   if(heartbeatInterval)clearInterval(heartbeatInterval);
   if(roomListener)roomListener();
   myName="";myRoom="";gameState=null;
@@ -765,14 +702,28 @@ function startHeartbeat(){
 
 async function processStateUpdate(newState){
   const prev=gameState?.phase;
+  const prevBuzzer = gameState?.buzzer;
   gameState=newState; isHost=gameState.host===myId;
+  
   if(isHost){
     const now=Date.now();
     const stale=Object.entries(gameState.players||{}).filter(([id,p])=>id!==myId&&now-(p.hb||0)>10000).map(([id])=>id);
     if(stale.length>0){const patch={};stale.forEach(id=>patch[`players/${id}`]=null);await updateRoomData(patch);return;}
   }
-  if(gameState.phase==="playing"&&prev!=="playing")startRoundTimerClient();
-  if(gameState.phase!=="playing"&&gameState.phase!=="collecting")stopRoundTimer();
+  
+  if(gameState.phase==="playing" && prev!=="playing") {
+    // Backup laden falls Seite mitten im Spiel neu geladen wurde
+    const backup = sessionStorage.getItem("slf_local_answers");
+    if(backup) localAnswers = JSON.parse(backup);
+    startRoundTimerClient();
+  }
+  if(gameState.phase!=="playing" && gameState.phase!=="collecting") stopRoundTimer();
+  
+  // Lokaler Stopp-Countdown Ticker bei Buzzerdruck
+  if(gameState.buzzer && !prevBuzzer) {
+    triggerLocalBuzzerTicker();
+  }
+
   syncUIWithPhase();
 }
 
@@ -786,14 +737,15 @@ function syncUIWithPhase(){
     if(isHost)checkHostRoundEnd();
   }else if(p==="results"){
     stopRoundTimer();
-    if(gameState.validation){validationResults=gameState.validation;validationDone=true;}
+    if(localBuzzerCountdown) clearInterval(localBuzzerCountdown);
     showScreen("results");renderResults();
-    if(isHost&&!gameState.validation)runAIValidation();
   }
 }
 
 function resetRoundData(){
-  submitted=false;localAnswers={};validationResults={};validationDone=false;stopRoundTimer();
+  submitted=false;localAnswers={};stopRoundTimer();
+  sessionStorage.removeItem("slf_local_answers");
+  if(localBuzzerCountdown) clearInterval(localBuzzerCountdown);
 }
 
 /* ── TIMER ── */
@@ -874,19 +826,6 @@ function renderLobby(){
     catsArea.innerHTML=`<div class="cats-readonly">${cats.map(c=>`<div class="cat-tag">${c}</div>`).join("")}</div>`;
   }
 
-  // KI-Vorschläge
-  const sa=document.getElementById("lobby-ai-suggestions");
-  if(sa&&isHost&&!sa.querySelector(".ai-suggest-btn")){
-    sa.innerHTML=`
-      <button type="button" class="ai-suggest-btn" id="btn-ai-suggest" onclick="window.fetchCatSuggestions()">
-        ✦ KI schlägt Kategorien vor
-      </button>
-      <div id="ai-suggestions-chips-wrap"></div>`;
-  }else if(sa&&!isHost&&!sa.querySelector("#ai-suggestions-chips-wrap")){
-    sa.innerHTML=`<div id="ai-suggestions-chips-wrap"></div>`;
-  }
-
-  // Timer
   const ta=document.getElementById("lobby-timer-area");
   if(isHost){
     ta.innerHTML=`
@@ -932,51 +871,8 @@ window.removeCat=async function(idx){
 window.startRound=async function(){
   const letter=LETTERS[Math.floor(Math.random()*LETTERS.length)];
   await updateRoomData({phase:"playing",round:(gameState.round||0)+1,letter,
-    buzzer:null,buzzerTs:null,roundAnswers:{},validation:null,roundStartTs:Date.now()});
+    buzzer:null,buzzerTs:null,roundAnswers:{},rejections:{},roundStartTs:Date.now()});
   resetRoundData();
-};
-
-/* ── KI-VORSCHLÄGE ── */
-window.fetchCatSuggestions=async function(){
-  const btn=document.getElementById("btn-ai-suggest");
-  const wrap=document.getElementById("ai-suggestions-chips-wrap");
-  if(!btn||!wrap)return;
-  btn.disabled=true; btn.textContent="⟳ KI denkt nach…";
-  const existing=objToCats(gameState.cats);
-  const prompt=`Du bist Spielleiter bei "Stadt Land Fluss".
-Aktuelle Kategorien: ${existing.join(", ")}.
-Schlage genau 6 neue, kreative Kategorien vor die noch NICHT in der Liste sind.
-Mischung aus lustig, ungewöhnlich und klassisch. Auf Deutsch.
-Antworte NUR mit einem JSON-Array ohne Markdown: ["Kategorie1","Kategorie2","Kategorie3","Kategorie4","Kategorie5","Kategorie6"]`;
-  try{
-    const url=`https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai&json=true&seed=${Date.now()}`;
-    const resp=await fetch(url);if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
-    const text=await resp.text();
-    let sugg; try{sugg=JSON.parse(text);}catch{const m=text.match(/\[[\s\S]*?\]/);if(!m)throw new Error();sugg=JSON.parse(m[0]);}
-    if(!Array.isArray(sugg)||!sugg.length)throw new Error();
-    const cur=objToCats(gameState.cats).map(c=>c.toLowerCase());
-    wrap.innerHTML=`
-      <span class="ai-chips-label">✦ Tippen zum Hinzufügen</span>
-      <div class="ai-chips">
-        ${sugg.map((s,i)=>{
-          const added=cur.includes(s.toLowerCase());
-          return`<button type="button" class="ai-chip ${added?"added":""}" id="ai-chip-${i}"
-            onclick="window.addSuggestedCat(${i},'${s.replace(/'/g,"\\'")}')"
-            ${added?"disabled":""}>${added?"✓":"+"}  ${s}</button>`;
-        }).join("")}
-      </div>`;
-    btn.textContent="⟳ Neue Vorschläge"; btn.disabled=false;
-  }catch(e){
-    wrap.innerHTML=`<div style="font-size:15px;color:var(--red);margin-top:8px">Fehler — nochmal versuchen?</div>`;
-    btn.textContent="✦ KI schlägt Kategorien vor"; btn.disabled=false;
-  }
-};
-window.addSuggestedCat=async function(idx,name){
-  const cats=objToCats(gameState.cats);
-  if(cats.map(c=>c.toLowerCase()).includes(name.toLowerCase()))return;
-  cats.push(name); await updateRoomData({cats:catsToObj(cats)});
-  const chip=document.getElementById(`ai-chip-${idx}`);
-  if(chip){chip.classList.add("added");chip.disabled=true;chip.textContent=`✓  ${name}`;}
 };
 
 /* ── SPIELPHASE ── */
@@ -989,15 +885,18 @@ function renderPlaying(){
   const cEl=document.getElementById("playing-content");
 
   if(gameState.phase==="collecting"){
-    bEl.innerHTML=`<div class="buzzer-fired">⌛ Zeit läuft ab — abgeben!</div>`;
+    bEl.innerHTML=`<div class="buzzer-fired">⌛ Zeit läuft ab — Einsammeln!</div>`;
     if(submitted)cEl.innerHTML=renderWaiting();return;
   }
+  
   if(gameState.buzzer){
-    bEl.innerHTML=`<div class="buzzer-fired">🔔 ${gameState.buzzer} hat STOPP gerufen!</div>`;
+    bEl.innerHTML=`<div class="buzzer-fired" id="buzzer-ticker">🔔 ${gameState.buzzer} hat STOPP gerufen!</div>`;
   }else{
     bEl.innerHTML=submitted?"":`<div class="buzzer-wrap"><button type="button" class="buzzer-btn" onclick="window.triggerBuzzer()">STOPP!</button></div>`;
   }
+  
   if(submitted){cEl.innerHTML=renderWaiting();return;}
+  
   if(!cEl.querySelector(".answer-form")){
     cEl.innerHTML=`
       <div class="answer-form">
@@ -1024,7 +923,7 @@ function renderWaiting(){
   return`<div class="waiting-block">
     <div class="waiting-icon">✅</div>
     <div class="waiting-title">Abgegeben!</div>
-    <div style="font-size:17px;color:var(--pencil);margin-bottom:10px">Noch ${Math.max(0,pending)} ausstehend…</div>
+    <div style="font-size:17px;color:var(--pencil);margin-bottom:10px">Noch ${Math.max(0,pending)} Spieler…</div>
     <div class="wait-players">${chips}</div>
   </div>`;
 }
@@ -1033,15 +932,35 @@ window.triggerBuzzer=async function(){
   if(!gameState||gameState.buzzer)return;
   const s=await get(ref(db,`rooms/${myRoom}/buzzer`));if(s.val())return;
   await updateRoomData({buzzer:myName,buzzerTs:Date.now()});
-  clearTimeout(buzzerTimeout);
-  buzzerTimeout=setTimeout(async()=>{
-    const c=(await get(roomRef())).val();
-    if(c?.phase==="playing"&&c?.buzzer){
-      await updateRoomData({phase:"collecting"});
-      setTimeout(async()=>{const f=(await get(roomRef())).val();if(f?.phase==="collecting")await forceRoundEnd(f);},3500);
-    }
-  },5000);
 };
+
+function triggerLocalBuzzerTicker() {
+  if(localBuzzerCountdown) clearInterval(localBuzzerCountdown);
+  let countdown = 5;
+  
+  localBuzzerCountdown = setInterval(async () => {
+    countdown--;
+    const ticker = document.getElementById("buzzer-ticker");
+    if(ticker) ticker.textContent = `🔔 ${gameState.buzzer} hat STOPP gerufen! (${countdown}s)`;
+    
+    if(countdown <= 0) {
+      clearInterval(localBuzzerCountdown);
+      if(!submitted) window.submitAnswers();
+      if(isHost) {
+        const c = (await get(roomRef())).val();
+        if(c && c.phase === "playing") {
+          c.phase = "collecting";
+          await set(roomRef(), c);
+          setTimeout(async () => {
+            const f = (await get(roomRef())).val();
+            if(f && f.phase === "collecting") await forceRoundEnd(f);
+          }, 2000);
+        }
+      }
+    }
+  }, 1000);
+}
+
 window.submitAnswers=async function(){
   if(submitted)return;
   const cats=objToCats(gameState?.cats);
@@ -1049,6 +968,7 @@ window.submitAnswers=async function(){
   cats.forEach(cat=>{const e=document.getElementById(`ans-${sanitizeId(cat)}`);ans[cat]=e?e.value.trim():(localAnswers[cat]||"");});
   submitted=true;await updateRoomData({[`roundAnswers/${myId}`]:ans});
 };
+
 async function checkHostRoundEnd(){
   if(!isHost)return;
   const cur=(await get(roomRef())).val();
@@ -1056,16 +976,31 @@ async function checkHostRoundEnd(){
   const active=Object.entries(cur.players||{}).filter(([id,p])=>Date.now()-(p.hb||0)<12000).map(([id])=>id);
   if(active.length>0&&active.every(id=>cur.roundAnswers?.[id]))await forceRoundEnd(cur);
 }
+
 async function forceRoundEnd(cur){
   if(!cur||cur.phase==="results")return;
-  calculateBaseScores(cur);cur.phase="results";
+  calculateBaseScores(cur);
+  cur.phase="results";
   setConnStatus("sync");await set(roomRef(),cur);setConnStatus("ok");
 }
+
 function calculateBaseScores(state){
   const cats=objToCats(state.cats);
   const pids=Object.keys(state.players||{});
+  const rejections = state.rejections || {};
+  
+  // Scores zurücksetzen, um dynamische Korrekturen zu erlauben
+  pids.forEach(id => { state.players[id].score = 0; });
+
   cats.forEach(cat=>{
-    const valid=pids.map(id=>{let v=(state.roundAnswers?.[id]?.[cat]||"").trim().toLowerCase();if(v&&!v.startsWith(state.letter.toLowerCase()))v="";return{id,v};});
+    const valid=pids.map(id=>{
+      let v=(state.roundAnswers?.[id]?.[cat]||"").trim().toLowerCase();
+      // Streichung durch Host oder falscher Anfangsbuchstabe = ungültig
+      if(rejections[`${id}__${cat}`]) v = "";
+      if(v&&!v.startsWith(state.letter.toLowerCase())) v="";
+      return{id,v};
+    });
+    
     valid.forEach(({id,v})=>{
       if(!v)return;
       const tot=valid.filter(a=>a.v!=="").length,dup=valid.filter(a=>a.v===v).length;
@@ -1074,113 +1009,82 @@ function calculateBaseScores(state){
   });
 }
 
-/* ── KI-VALIDIERUNG (Pollinations.AI) ── */
-async function runAIValidation(){
-  if(!isHost||!gameState||validationDone)return;
-  const cats=objToCats(gameState.cats);
-  const answers=gameState.roundAnswers||{};
-  const letter=gameState.letter;
-  const toCheck=[];
-  Object.entries(gameState.players||{}).forEach(([pid,p])=>{
-    cats.forEach(cat=>{
-      const w=(answers[pid]?.[cat]||"").trim();
-      if(w&&w.toLowerCase().startsWith(letter.toLowerCase()))toCheck.push({pid,cat,word:w});
-    });
-  });
-  if(!toCheck.length){validationDone=true;renderResults();return;}
-  const banner=document.getElementById("validation-banner-area");
-  if(banner)banner.innerHTML=`<div class="val-banner"><div class="val-title"><span class="spinner"></span>KI prüft Antworten…</div><div class="val-sub">Dauert einen Moment</div></div>`;
-  const prompt=`Du bist Schiedsrichter bei "Stadt Land Fluss".
-Buchstabe: "${letter}"
-Prüfe jede Antwort: real und korrekt für die Kategorie?
-Sei locker – wenn das Wort existiert und passt, gilt es.
-Antworte NUR mit JSON ohne Markdown:
-{"results":[{"pid":"...","cat":"...","valid":true,"reason":"..."}]}
-Zu prüfen:
-${toCheck.map(x=>`- pid="${x.pid}" Kategorie="${x.cat}" Antwort="${x.word}"`).join("\n")}`;
-  try{
-    const url=`https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai&json=true&seed=42`;
-    const resp=await fetch(url);if(!resp.ok)throw new Error();
-    const text=await resp.text();
-    let parsed;try{parsed=JSON.parse(text);}catch{const m=text.match(/\{[\s\S]*\}/);if(!m)throw new Error();parsed=JSON.parse(m[0]);}
-    const mapped={};
-    (parsed.results||[]).forEach(r=>{mapped[`${r.pid}__${r.cat}`]={valid:r.valid,reason:r.reason||""};});
-    const cur=(await get(roomRef())).val();if(!cur)return;
-    applyAIResultsToScores(cur,mapped);
-    cur.validation=mapped;validationResults=mapped;validationDone=true;
-    await updateRoomData(cur);
-  }catch(e){
-    console.error(e);validationDone=true;
-    if(banner)banner.innerHTML=`<div class="val-banner fail"><div class="val-title">KI-Prüfung fehlgeschlagen</div><div class="val-sub">Punkte ohne KI vergeben</div></div>`;
-    renderResults();
+/* ── REAKTION VETO-KLICK (HOST-KORREKTUR) ── */
+window.toggleAnswerStrike = async function(pid, cat) {
+  if(!isHost || !gameState || gameState.phase !== "results") return;
+  const key = `${pid}__${cat}`;
+  const cur = (await get(roomRef())).val();
+  if(!cur) return;
+  
+  if(!cur.rejections) cur.rejections = {};
+  if(cur.rejections[key]) {
+    delete cur.rejections[key];
+  } else {
+    cur.rejections[key] = true;
   }
-}
-function applyAIResultsToScores(state,ai){
-  const cats=objToCats(state.cats);const pids=Object.keys(state.players||{});
-  pids.forEach(pid=>{
-    let rp=0;cats.forEach(cat=>{
-      let v=(state.roundAnswers?.[pid]?.[cat]||"").trim().toLowerCase();
-      if(!v||!v.startsWith(state.letter.toLowerCase()))return;
-      const all=pids.map(id=>(state.roundAnswers?.[id]?.[cat]||"").trim().toLowerCase()).filter(x=>x&&x.startsWith(state.letter.toLowerCase()));
-      const dup=all.filter(x=>x===v).length;
-      rp+=all.length===1?20:dup===1?10:5;
-    });
-    state.players[pid].score=Math.max(0,(state.players[pid].score||0)-rp);
-  });
-  cats.forEach(cat=>{
-    const valid=pids.map(id=>{
-      let v=(state.roundAnswers?.[id]?.[cat]||"").trim().toLowerCase();
-      if(!v||!v.startsWith(state.letter.toLowerCase()))return{id,v:""};
-      if(ai[`${id}__${cat}`]?.valid===false)return{id,v:""};
-      return{id,v};
-    });
-    valid.forEach(({id,v})=>{
-      if(!v)return;
-      const tot=valid.filter(a=>a.v!=="").length,dup=valid.filter(a=>a.v===v).length;
-      state.players[id].score=(state.players[id].score||0)+(tot===1?20:dup===1?10:5);
-    });
-  });
-}
+  
+  calculateBaseScores(cur);
+  await set(roomRef(), cur);
+};
 
 /* ── ERGEBNISSE ── */
 function renderResults(){
   if(!gameState)return;
   const cats=objToCats(gameState.cats);
+  const rejections = gameState.rejections || {};
+  
   document.getElementById("results-sub").textContent=`Runde ${gameState.round} · Buchstabe ${gameState.letter}`;
+  
   const banner=document.getElementById("validation-banner-area");
   if(banner){
-    if(validationDone&&gameState.validation)
-      banner.innerHTML=`<div class="val-banner ok"><div class="val-title">✓ KI hat alle Antworten geprüft</div><div class="val-sub">Ungültige Antworten wurden gestrichen</div></div>`;
-    else if(!validationDone)
-      banner.innerHTML=`<div class="val-banner"><div class="val-title"><span class="spinner"></span>KI prüft…</div></div>`;
+    banner.innerHTML = isHost 
+      ? `<div class="val-banner"><div class="val-title">✍️ Du bist der Korrektor!</div><div class="val-sub">Klicke auf falsche Antworten in den Blöcken, um sie per Rotstift zu streichen.</div></div>`
+      : `<div class="val-banner"><div class="val-title">👀 Notenbekanntgabe</div><div class="val-sub">Der Spielleiter prüft die Antworten und zückt bei Bedarf den Rotstift.</div></div>`;
   }
+  
   const sorted=Object.entries(gameState.players||{}).sort((a,b)=>(b[1].score||0)-(a[1].score||0));
-  document.getElementById("scoreboard").innerHTML=sorted.map(([id,p],i)=>`
+  document.getElementById("scoreboard").innerHTML=sorted.map(([id,p], i)=>`
     <div class="score-row ${i===0?"gold":""}">
       <div class="score-name">${["①","②","③"][i]||"  "} ${p.name}</div>
       <div class="score-pts">${p.score||0} Punkte</div>
     </div>`).join("");
+    
   document.getElementById("results-container").innerHTML=Object.entries(gameState.players||{}).map(([pid,p])=>{
     const ans=gameState.roundAnswers?.[pid]||{};
     return`<div class="result-card">
       <div class="result-player">${p.name}</div>
       ${cats.map(cat=>{
         const word=(ans[cat]||"").trim();
-        const wrong=word&&!word.toLowerCase().startsWith(gameState.letter.toLowerCase());
-        const key=`${pid}__${cat}`;const ai=validationResults[key];
-        let disp="",badge="";
-        if(!word){disp=`<i style="color:rgba(90,80,64,.3)">—</i>`;}
-        else if(wrong){disp=`<s style="color:var(--red)">${word}</s>`;badge=`<span class="stamp stamp-no">Falscher Buchstabe</span>`;}
-        else if(ai){
-          disp=ai.valid?`<span style="color:var(--blue)">${word}</span>`:`<s style="opacity:.4">${word}</s>`;
-          badge=ai.valid?`<span class="stamp stamp-ok" title="${ai.reason}">✓ gültig</span>`:`<span class="stamp stamp-no" title="${ai.reason}">✗ ${ai.reason||"ungültig"}</span>`;
-        }else if(!validationDone&&word&&!wrong){
-          disp=`<span style="color:var(--blue)">${word}</span>`;badge=`<span class="stamp stamp-wait">prüft…</span>`;
-        }else{disp=`<span style="color:var(--blue)">${word}</span>`;}
-        return`<div class="result-row"><span class="result-cat">${cat}</span><span class="result-word">${disp}</span>${badge}</div>`;
+        const wrongLetter = word && !word.toLowerCase().startsWith(gameState.letter.toLowerCase());
+        const isRejected = rejections[`${pid}__${cat}`];
+        
+        let disp="", badge="";
+        if(!word){
+          disp=`<i style="color:rgba(90,80,64,.3)">—</i>`;
+        } else if(wrongLetter) {
+          disp=`<s style="color:var(--red)">${word}</s>`;
+          badge=`<span class="stamp stamp-no">Falscher Buchstabe</span>`;
+        } else if(isRejected) {
+          disp=`<span style="color:var(--red)">${word}</span>`;
+          badge=`<span class="stamp stamp-no">✕ GESTRICHEN</span>`;
+        } else {
+          disp=`<span style="color:var(--blue)">${word}</span>`;
+          badge=`<span class="stamp stamp-ok">✓ OK</span>`;
+        }
+        
+        const hostClass = isHost && word && !wrongLetter ? "host-clickable" : "";
+        const rejectedClass = isRejected ? "rejected" : "";
+        
+        return`
+          <div class="result-row ${hostClass} ${rejectedClass}" onclick="window.toggleAnswerStrike('${pid}','${cat}')">
+            <span class="result-cat">${cat}</span>
+            <span class="result-word">${disp}</span>
+            ${badge}
+          </div>`;
       }).join("")}
     </div>`;
   }).join("");
+  
   document.getElementById("results-actions").innerHTML=isHost
     ?`<button type="button" class="btn" onclick="window.nextRound()">Nächste Runde →</button>`
     :`<div style="font-size:17px;color:var(--pencil)"><span class="pulse-dot"></span>Warte auf den Spielleiter…</div>`;
@@ -1188,14 +1092,17 @@ function renderResults(){
 
 window.nextRound=async function(){
   resetRoundData();
-  await updateRoomData({phase:"lobby",buzzer:null,buzzerTs:null,roundAnswers:{},validation:null,roundStartTs:null});
+  await updateRoomData({phase:"lobby",buzzer:null,buzzerTs:null,roundAnswers:{},rejections:{},roundStartTs:null});
 };
 
 document.addEventListener("input",e=>{
   if(e.target.matches(".answer-row input")&&gameState?.cats){
     const cats=objToCats(gameState.cats);
     const cat=cats.find(c=>`ans-${sanitizeId(c)}`===e.target.id);
-    if(cat)localAnswers[cat]=e.target.value;
+    if(cat) {
+      localAnswers[cat]=e.target.value;
+      sessionStorage.setItem("slf_local_answers", JSON.stringify(localAnswers));
+    }
   }
 });
 document.getElementById("input-room").addEventListener("input",e=>{
