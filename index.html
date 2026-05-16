@@ -275,14 +275,20 @@
     
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
     
+    /* ── NEUE/ANGEPASSTE ELEMENTE ── */
     .conn-indicator { position: fixed; top: 12px; right: 12px; display: flex; align-items: center; gap: 6px; background: white; border-radius: 20px; padding: 5px 10px; font-size: 11px; font-weight: 600; box-shadow: 0 2px 10px rgba(0,0,0,.1); z-index: 100; }
     .conn-dot { width: 7px; height: 7px; border-radius: 50%; }
     .conn-dot.ok { background: var(--sage); }
     .conn-dot.err { background: var(--rust); }
     .conn-dot.sync { background: var(--gold); animation: pulse 1s infinite; }
+
+    .leave-btn { position: fixed; top: 12px; left: 12px; z-index: 100; background: white; border: 1.5px solid var(--mist); border-radius: 20px; padding: 4px 10px; font-size: 11px; font-weight: 600; color: var(--rust); cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,.05); transition: transform 0.1s; display: none; }
+    .leave-btn:active { transform: scale(0.95); }
   </style>
 </head>
 <body>
+
+<button id="btn-leave" class="leave-btn" onclick="window.leaveRoom()">⬅ Verlassen</button>
 
 <div class="conn-indicator" id="conn-indicator">
   <div class="conn-dot sync" id="conn-dot"></div>
@@ -367,6 +373,7 @@ const db = getDatabase(app);
 // ── KONSTANTEN & STATE ──
 const DEFAULT_CATS = ["Stadt", "Land", "Fluss", "Tier", "Beruf"];
 const LETTERS = "ABCDEFGHIKLMNOPRSTW".split("");
+const ROOM_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 Stunden
 
 let myName = "";
 let myRoom = "";
@@ -378,6 +385,7 @@ let localAnswers = {};
 let countdownInterval = null;
 let buzzerTimeout = null;
 let heartbeatInterval = null;
+let roomListener = null; // Um sich bei Leave wieder abzumelden
 let validationResults = {};
 let validationDone = false;
 
@@ -397,6 +405,8 @@ function showScreen(id) {
   ["join", "lobby", "playing", "results"].forEach(s => {
     document.getElementById(`screen-${s}`).classList.toggle("hidden", s !== id);
   });
+  // Zeige Verlassen-Button überall außer im Join-Screen
+  document.getElementById("btn-leave").style.display = id === "join" ? "none" : "block";
 }
 
 function showError(msg) {
@@ -425,6 +435,20 @@ async function updateRoomData(patch) {
   setConnStatus("ok");
 }
 
+// ── SITZUNG WIEDERHERSTELLEN ──
+window.addEventListener("DOMContentLoaded", () => {
+  const sName = sessionStorage.getItem("slf_name");
+  const sRoom = sessionStorage.getItem("slf_room");
+  const sId = sessionStorage.getItem("slf_id");
+  
+  if (sName && sRoom && sId) {
+    document.getElementById("input-name").value = sName;
+    document.getElementById("input-room").value = sRoom;
+    myId = sId;
+    window.joinRoom();
+  }
+});
+
 // ── SPIEL BEITRETEN ──
 window.joinRoom = async function() {
   myName = document.getElementById("input-name").value.trim();
@@ -440,7 +464,12 @@ window.joinRoom = async function() {
   
   try {
     const snap = await get(roomRef());
-    const existingRoom = snap.exists() ? snap.val() : null;
+    let existingRoom = snap.exists() ? snap.val() : null;
+    
+    // Prüfen, ob der Raum älter als 24 Stunden ist (Reset)
+    if (existingRoom && existingRoom.createdAt && (Date.now() - existingRoom.createdAt > ROOM_EXPIRY_MS)) {
+      existingRoom = null; 
+    }
     
     if (!existingRoom) {
       isHost = true;
@@ -456,7 +485,7 @@ window.joinRoom = async function() {
         buzzerTs: null,
         roundAnswers: {},
         validation: null,
-        createdAt: Date.now()
+        createdAt: Date.now() // Speichert die Erstelldauer für den Reset-Check
       });
     } else {
       isHost = existingRoom.host === myId;
@@ -465,8 +494,15 @@ window.joinRoom = async function() {
       });
     }
     
+    // Daten in Session Storage speichern
+    sessionStorage.setItem("slf_name", myName);
+    sessionStorage.setItem("slf_room", myRoom);
+    sessionStorage.setItem("slf_id", myId);
+    
     startHeartbeat();
-    onValue(roomRef(), snapshot => { 
+    
+    if (roomListener) roomListener(); // Falls bereits ein Listener aktiv war
+    roomListener = onValue(roomRef(), snapshot => { 
       if(snapshot.exists()) processStateUpdate(snapshot.val()); 
     });
     
@@ -474,6 +510,32 @@ window.joinRoom = async function() {
     showError("Fehler: " + e.message);
     document.getElementById("btn-connect").disabled = false;
   }
+}
+
+// ── RAUM VERLASSEN ──
+window.leaveRoom = async function() {
+  // Spieler aus der Firebase DB entfernen
+  if (myRoom && myId) {
+    try { await update(roomRef(), { [`players/${myId}`]: null }); } catch(e) {}
+  }
+  
+  // Storage leeren
+  sessionStorage.removeItem("slf_name");
+  sessionStorage.removeItem("slf_room");
+  sessionStorage.removeItem("slf_id");
+  
+  // Listener & Intervals stoppen
+  if (heartbeatInterval) clearInterval(heartbeatInterval);
+  if (roomListener) roomListener();
+  
+  // Zustand zurücksetzen
+  myName = "";
+  myRoom = "";
+  gameState = null;
+  document.getElementById("btn-connect").disabled = false;
+  document.getElementById("join-error").style.display = "none";
+  
+  showScreen("join");
 }
 
 // ── HEARTBEAT (Online-Status) ──
@@ -569,8 +631,6 @@ function renderLobby() {
       </div>`
     ).join("");
 
-    // WICHTIG: Überschreibe das DOM nur, wenn die Struktur noch nicht existiert.
-    // Verhindert, dass das Eingabefeld durch den Heartbeat-Sync gelöscht wird.
     if (!document.getElementById("lobby-cats-list")) {
       catsArea.innerHTML = `
         <div id="lobby-cats-list">${listHtml}</div>
@@ -672,7 +732,6 @@ function renderPlaying() {
         <button type="button" class="btn btn-primary" style="margin-top:10px" onclick="window.submitAnswers()">✅ Fertig</button>
       </div>`;
       
-    // Wiederherstellen von lokalen Eingaben
     cats.forEach(cat => {
       if (localAnswers[cat]) {
         const el = document.getElementById(`ans-${sanitizeId(cat)}`);
@@ -721,7 +780,6 @@ function startCountdownUI() {
 window.triggerBuzzer = async function() {
   if (!gameState || gameState.buzzer) return;
   
-  // Doppelte Absicherung
   const snap = await get(ref(db, `rooms/${myRoom}/buzzer`));
   if (snap.val()) return;
   
@@ -733,7 +791,6 @@ window.triggerBuzzer = async function() {
     if (curState?.phase === "playing" && curState?.buzzer) {
       await updateRoomData({ phase: "collecting" });
       
-      // Nach 3.5s Sammelphase hart abbrechen
       setTimeout(async () => {
         const finalState = (await get(roomRef())).val();
         if (finalState?.phase === "collecting") await forceRoundEnd(finalState);
@@ -766,7 +823,6 @@ async function checkHostRoundEnd() {
     .filter(([id, p]) => Date.now() - (p.hb || 0) < 12000)
     .map(([id]) => id);
     
-  // Wenn alle aktiven Spieler abgegeben haben
   if (activePlayers.length > 0 && activePlayers.every(id => curState.roundAnswers?.[id])) {
     await forceRoundEnd(curState);
   }
@@ -848,20 +904,13 @@ Zu prüfen:
 ${toCheck.map(x => `- pid="${x.pid}" Kategorie="${x.cat}" Antwort="${x.word}"`).join("\n")}`;
 
   try {
-    /* ⚠️ KRITISCHER SICHERHEITSHINWEIS: 
-       Ein direkter Aufruf der Anthropic API aus dem Frontend ist extrem unsicher 
-       (dein API-Key wäre sichtbar) und wird von Browsern blockiert (CORS-Fehler).
-       
-       Ich habe hier die korrekten Header hinzugefügt, aber in der Praxis MUSST du 
-       diese Logik in ein Backend (z.B. Firebase Cloud Functions) auslagern.
-    */
     const resp = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
-        "x-api-key": "DEIN_ANTHROPIC_API_KEY_HIER_EINTRAGEN", // Darf nicht ins Frontend!
+        "x-api-key": "DEIN_ANTHROPIC_API_KEY_HIER_EINTRAGEN", 
         "anthropic-version": "2023-06-01",
-        "anthropic-dangerously-allow-browser": "true" // Nur für lokale Tests!
+        "anthropic-dangerously-allow-browser": "true" 
       },
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
@@ -874,7 +923,8 @@ ${toCheck.map(x => `- pid="${x.pid}" Kategorie="${x.cat}" Antwort="${x.word}"`).
     
     const data = await resp.json();
     const text = data.content?.map(b => b.text || "").join("") || "";
-    const cleanJson = text.replace(/```json|```/g, "").trim();
+    const cleanJson = text.replace(/```json|
+```/g, "").trim();
     const parsed = JSON.parse(cleanJson);
 
     const mappedResults = {};
@@ -882,7 +932,6 @@ ${toCheck.map(x => `- pid="${x.pid}" Kategorie="${x.cat}" Antwort="${x.word}"`).
       mappedResults[`${r.pid}__${r.cat}`] = { valid: r.valid, reason: r.reason || "" };
     });
 
-    // Hole frischen State und korrigiere die Punkte anhand der KI
     const curState = (await get(roomRef())).val();
     if (!curState) return;
     
@@ -912,7 +961,6 @@ function applyAIResultsToScores(state, aiResults) {
   const curCats = objToCats(state.cats);
   const pids = Object.keys(state.players || {});
 
-  // 1. Alte (Basis-)Punkte dieser Runde abziehen
   pids.forEach(pid => {
     let roundPts = 0;
     curCats.forEach(cat => {
@@ -928,7 +976,6 @@ function applyAIResultsToScores(state, aiResults) {
     state.players[pid].score = Math.max(0, (state.players[pid].score || 0) - roundPts);
   });
 
-  // 2. Neu berechnen MIT KI Filter
   curCats.forEach(cat => {
     const validAnswers = pids.map(id => {
       let val = (state.roundAnswers?.[id]?.[cat] || "").trim().toLowerCase();
@@ -973,7 +1020,6 @@ function renderResults() {
       </div>`;
   }
 
-  // Scoreboard
   const sortedPlayers = Object.entries(gameState.players || {}).sort((a,b) => (b[1].score || 0) - (a[1].score || 0));
   document.getElementById("scoreboard").innerHTML = sortedPlayers.map(([id, p], i) => `
     <div class="score-row ${i === 0 ? "score-top" : ""}">
@@ -981,7 +1027,6 @@ function renderResults() {
       <div class="score-pts">${p.score || 0} Punkte</div>
     </div>`).join("");
 
-  // Antworten
   document.getElementById("results-container").innerHTML = Object.entries(gameState.players || {}).map(([pid, p]) => {
     const ans = gameState.roundAnswers?.[pid] || {};
     
