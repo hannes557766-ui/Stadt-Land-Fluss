@@ -351,7 +351,14 @@
       mix-blend-mode: multiply;
     }
 
-    .timer-wrap { width: 100%; max-width: 480px; margin-bottom: 24px; }
+    .timer-wrap { 
+      width: 100%; max-width: 480px; margin-bottom: 24px; 
+      background: var(--paper2);
+      border: 2.5px solid var(--ink);
+      padding: 12px 16px;
+      border-radius: 12px;
+      box-shadow: 4px 4px 0 rgba(35, 33, 30, 0.05);
+    }
     .timer-head {
       display: flex; justify-content: space-between; align-items: baseline;
       margin-bottom: 6px;
@@ -600,11 +607,13 @@
 </div>
 
 <div id="screen-playing" class="screen hidden">
-  <div class="letter-stage">
+  <!-- Timer nach ganz oben geholt und "sticky" gemacht -->
+  <div id="timer-bar-area" style="width: 100%; max-width: 480px; position: sticky; top: 15px; z-index: 90;"></div>
+  
+  <div class="letter-stage" style="margin-top: 10px;">
     <span class="round-tag" id="round-badge">Runde 1</span>
     <div class="big-letter" id="big-letter">A</div>
   </div>
-  <div id="timer-bar-area"></div>
   <div id="buzzer-container"></div>
   <div id="playing-content"></div>
 </div>
