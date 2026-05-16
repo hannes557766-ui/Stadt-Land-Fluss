@@ -4,573 +4,428 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Stadt Land Fluss</title>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght=400;600;700&family=Special+Elite&family=Permanent+Marker&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght=500;700&family=Nunito:wght=400;600;700;800&family=Permanent+Marker&display=swap" rel="stylesheet"/>
   <style>
     /* ══════════════════════════════════════════
-       SCHULHEFT-BRUTALISM 2.0
-       Realistisches Papier · Tinte · Dynamik
+       CLEAN DESIGN 3.0
+       Aufgeräumt · Lesbar · Modern
     ══════════════════════════════════════════ */
     :root {
-      /* Authentische Schulheft-Farben */
-      --paper:    #f9f6f0;
-      --paper2:   #f2eee3;
-      --grid:     rgba(130, 160, 200, 0.25);
-      --margin:   rgba(220, 100, 100, 0.6);
-      --ink:      #23211e;
-      --red:      #d92020;
-      --blue:     #1d4ed8;
-      --pencil:   #6b645c;
-      --stamp:    #991b1b;
-      --green:    #166534;
-      --tape:     rgba(252, 243, 184, 0.85);
-      --highlight:#fef08a;
+      /* Saubere, moderne Farben */
+      --bg:         #f1f5f9;
+      --card-bg:    #ffffff;
+      --text-main:  #1e293b;
+      --text-muted: #64748b;
+      --primary:    #3b82f6; /* Modernes Blau */
+      --primary-hover:#2563eb;
+      --danger:     #ef4444; /* Klares Rot */
+      --success:    #10b981; /* Klares Grün */
+      --border:     #e2e8f0;
+      --highlight:  #fef08a;
+      
+      /* Variablen-Mapping für das bestehende JS */
+      --paper:      var(--bg);
+      --paper2:     var(--card-bg);
+      --ink:        var(--text-main);
+      --pencil:     var(--text-muted);
+      --red:        var(--danger);
+      --green:      var(--success);
+      --blue:       var(--primary);
+      --stamp:      var(--danger);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
 
     body {
-      background-color: var(--paper);
-      /* Verbessertes, realistischeres Karomuster */
-      background-image:
-        linear-gradient(var(--grid) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-      background-size: 24px 24px;
-      color: var(--ink);
-      font-family: 'Caveat', cursive;
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: 'Nunito', sans-serif; /* Lesbare Standardschrift */
       min-height: 100vh;
       overflow-x: hidden;
+      line-height: 1.5;
     }
 
-    /* Rote Randlinie links */
-    body::before {
-      content: '';
-      position: fixed;
-      left: clamp(30px, 8vw, 60px);
-      top: 0; bottom: 0;
-      width: 2px;
-      background: var(--margin);
-      z-index: 0;
-      pointer-events: none;
-      mix-blend-mode: multiply;
-    }
-
-    /* Perforations-Loch-Linie */
-    body::after {
-      content: '';
-      position: fixed;
-      left: clamp(10px, 3vw, 24px);
-      top: 0; bottom: 0;
-      width: 0;
-      border-left: 2px dashed rgba(0,0,0,0.1);
-      z-index: 0;
-      pointer-events: none;
-    }
-
+    /* Zentraler Container */
     .screen {
       position: relative; z-index: 1;
       min-height: 100vh;
       display: flex; flex-direction: column; align-items: center;
-      padding: 40px 20px 100px clamp(40px, 10vw, 80px);
-      animation: pageFlip 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      padding: 60px 20px 100px 20px;
+      animation: fadeIn 0.3s ease-out;
     }
     .screen.hidden { display: none; }
 
-    @keyframes pageFlip {
-      from { opacity: 0; transform: translateY(15px) rotate(-2deg); }
-      to   { opacity: 1; transform: translateY(0) rotate(0); }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
+    /* Kopfbereich (Header) */
     .game-header {
-      width: 100%; max-width: 480px;
-      margin-bottom: 40px;
-      position: relative;
+      width: 100%; max-width: 500px;
+      margin-bottom: 30px;
+      text-align: center;
     }
 
     .game-title {
       font-family: 'Permanent Marker', cursive;
-      font-size: clamp(3rem, 12vw, 5.5rem);
-      line-height: 0.9;
-      color: var(--ink);
-      letter-spacing: -2px;
-      transform: rotate(-2deg);
-      display: inline-block;
-      mix-blend-mode: multiply;
-      text-shadow: 2px 2px 0px rgba(0,0,0,0.05);
+      font-size: clamp(2.5rem, 8vw, 4rem);
+      line-height: 1.1;
+      color: var(--text-main);
     }
-    .game-title .slash { color: var(--red); }
+    .game-title .slash { color: var(--primary); }
 
     .game-sub {
-      font-family: 'Special Elite', monospace;
-      font-size: 12px;
-      letter-spacing: 4px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 2px;
       text-transform: uppercase;
-      color: var(--red);
-      margin-top: 12px;
-      padding-left: 4px;
-      font-weight: bold;
-      mix-blend-mode: multiply;
+      color: var(--text-muted);
+      margin-top: 8px;
     }
 
-    /* Realistischeres Klebeband */
-    .tape-strip {
-      position: absolute;
-      top: -18px; left: -15px;
-      width: 85px; height: 28px;
-      background: var(--tape);
-      transform: rotate(-4deg);
-      box-shadow: 1px 2px 4px rgba(0,0,0,0.1);
-      backdrop-filter: blur(2px);
-      z-index: 10;
-      /* Abrisskanten-Effekt */
-      border-left: 2px dotted rgba(0,0,0,0.05);
-      border-right: 2px dotted rgba(0,0,0,0.05);
-    }
-
+    /* Section Labels */
     .section-label {
-      font-family: 'Special Elite', monospace;
-      font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
-      color: var(--pencil); margin: 32px 0 12px;
-      width: 100%; max-width: 480px;
-      border-bottom: 1.5px dashed rgba(107, 100, 92, 0.4);
+      font-weight: 800;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin: 30px 0 10px;
+      width: 100%; max-width: 500px;
+      border-bottom: 2px solid var(--border);
       padding-bottom: 6px;
-      mix-blend-mode: multiply;
     }
 
-    /* Handgezeichneter Rahmen-Look */
+    /* Moderne Cards statt zackiger Blöcke */
     .block {
-      background: var(--paper2);
-      border: 3px solid var(--ink);
-      border-radius: 2px 255px 3px 255px / 255px 5px 225px 3px;
-      width: 100%; max-width: 480px;
-      padding: 24px 20px;
-      position: relative;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+      background: var(--card-bg);
+      border-radius: 16px;
+      width: 100%; max-width: 500px;
+      padding: 30px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
     }
 
     .block-title {
-      font-family: 'Permanent Marker', cursive;
-      font-size: 1.6rem;
-      color: var(--ink);
-      margin-bottom: 20px;
-      transform: rotate(-1deg);
-      display: inline-block;
-      mix-blend-mode: multiply;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 24px;
     }
 
-    /* Eingabefelder wie auf einer Grundschullinie */
+    /* Eingabefelder Clean */
     input[type=text], input[type=number] {
       width: 100%;
-      background: transparent;
-      border: none;
-      border-bottom: 2px solid rgba(35, 33, 30, 0.3);
-      padding: 8px 4px 4px;
-      font-family: 'Caveat', cursive;
-      font-size: 26px; /* Größer für echte Handschrift-Vibes */
-      color: var(--blue);
+      background: #f8fafc;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-main);
       outline: none;
       transition: all 0.2s;
-      -webkit-appearance: none;
-      mix-blend-mode: multiply;
     }
     input[type=text]::placeholder, input[type=number]::placeholder {
-      color: rgba(107, 100, 92, 0.4);
+      color: #94a3b8;
+      font-weight: 400;
     }
     input[type=text]:focus, input[type=number]:focus {
-      border-bottom: 3px solid var(--blue);
-      background: rgba(29, 78, 216, 0.03);
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     }
 
+    /* Labels für Inputs */
     .field-label {
-      font-family: 'Special Elite', monospace;
-      font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-      color: var(--red); margin-bottom: 4px; margin-top: 22px; display: block;
-      font-weight: bold;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 8px; margin-top: 20px; display: block;
     }
     .field-label:first-child { margin-top: 0; }
 
-    /* Organischere Buttons */
+    /* Moderne Buttons */
     .btn {
       width: 100%; padding: 14px 20px;
-      border: 3px solid var(--ink);
-      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-      background: var(--ink); color: var(--paper);
-      font-family: 'Permanent Marker', cursive;
-      font-size: 1.2rem; letter-spacing: 1px;
+      border: none;
+      border-radius: 10px;
+      background: var(--text-main); color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.1rem; font-weight: 800;
       cursor: pointer;
-      margin-top: 20px;
-      transition: transform 0.1s, box-shadow 0.1s, background 0.2s;
-      position: relative;
-      box-shadow: 5px 5px 0 var(--red);
+      margin-top: 24px;
+      transition: all 0.2s;
+      display: inline-flex; justify-content: center; align-items: center; gap: 8px;
     }
-    .btn:hover { background: #111; }
-    .btn:active {
-      transform: translate(4px, 4px);
-      box-shadow: 1px 1px 0 var(--red);
-    }
+    .btn:hover { background: #0f172a; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .btn:active { transform: translateY(0); }
     
     .btn-outline {
-      background: transparent; color: var(--ink);
-      box-shadow: 4px 4px 0 var(--pencil);
+      background: transparent; color: var(--text-main);
+      border: 2px solid var(--border);
+      margin-top: 0;
     }
-    .btn-outline:hover { background: rgba(0,0,0,0.03); }
-    .btn-outline:active { box-shadow: 1px 1px 0 var(--pencil); }
+    .btn-outline:hover { background: #f8fafc; border-color: #cbd5e1; }
     
-    .btn-red {
-      background: var(--red); border-color: var(--stamp);
-      box-shadow: 5px 5px 0 var(--ink);
-    }
-    .btn-red:hover { background: #b01a1a; }
-    .btn-red:active { box-shadow: 1px 1px 0 var(--ink); }
+    .btn-red { background: var(--danger); color: white; }
+    .btn-red:hover { background: #dc2626; }
 
-    .btn-green {
-      background: var(--green); border-color: #0f4523;
-      box-shadow: 5px 5px 0 var(--ink);
-    }
-    .btn-green:hover { background: #0f4523; }
-    .btn-green:active { box-shadow: 1px 1px 0 var(--ink); }
+    .btn-green { background: var(--success); color: white; }
+    .btn-green:hover { background: #059669; }
 
-    .btn-sm {
-      width: auto; padding: 6px 16px; font-size: 1rem;
-      margin-top: 0; box-shadow: 3px 3px 0 var(--pencil);
-    }
+    .btn-sm { width: auto; padding: 10px 16px; font-size: 1rem; }
 
+    /* Code-Box Lobby */
     .code-box {
-      background: var(--ink); color: var(--paper);
+      background: #f8fafc;
+      border: 2px solid var(--border);
       padding: 20px; margin-bottom: 24px;
+      text-align: center;
+      border-radius: 12px;
       position: relative;
-      border-radius: 4px 2px 6px 3px / 2px 8px 3px 4px;
     }
     .code-box::before {
       content: 'RAUM-CODE';
-      font-family: 'Special Elite', monospace;
-      font-size: 10px; letter-spacing: 4px;
-      color: rgba(253,250,244,0.6);
-      display: block; margin-bottom: 8px;
+      font-size: 0.75rem; font-weight: 800; letter-spacing: 2px;
+      color: var(--text-muted); display: block; margin-bottom: 4px;
     }
     .code-box .the-code {
-      font-family: 'Permanent Marker', cursive;
-      font-size: 3rem;
-      letter-spacing: 12px;
-      color: var(--highlight);
-      line-height: 1;
-      text-shadow: 0 0 10px rgba(254, 240, 138, 0.2);
+      font-family: 'Nunito', sans-serif; font-weight: 800;
+      font-size: 2.5rem; letter-spacing: 8px; color: var(--primary);
     }
 
-    /* Stempel-Design optimiert */
+    /* Host Badge */
     .host-stamp {
       position: absolute; top: 12px; right: 12px;
-      font-family: 'Special Elite', monospace;
-      font-size: 10px; letter-spacing: 3px; font-weight: bold;
-      color: var(--highlight); border: 2px solid var(--highlight);
-      padding: 4px 8px; transform: rotate(12deg);
-      border-radius: 4px;
-      opacity: 0.9;
+      font-size: 0.7rem; font-weight: 800; letter-spacing: 1px;
+      color: #fff; background: var(--primary);
+      padding: 4px 8px; border-radius: 6px;
     }
 
+    /* Spieler-Liste */
     .players-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
     .player-chip {
       display: inline-flex; align-items: center; gap: 8px;
-      border: 2px solid var(--pencil);
-      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-      padding: 4px 14px 2px;
-      font-family: 'Caveat', cursive; font-size: 20px;
-      background: var(--paper);
-      mix-blend-mode: multiply;
+      border: 1px solid var(--border); background: #f8fafc;
+      border-radius: 20px; padding: 6px 14px;
+      font-size: 1rem; font-weight: 600;
     }
-    .player-chip .online-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      border: 2px solid var(--ink);
-    }
+    .player-chip .online-dot { width: 8px; height: 8px; border-radius: 50%; }
     .player-chip .pts {
-      font-family: 'Special Elite', monospace;
-      font-size: 12px; color: var(--red); margin-left: 4px;
-      font-weight: bold;
+      font-size: 0.85rem; color: var(--primary); font-weight: 800; margin-left: 4px;
+      background: #eff6ff; padding: 2px 6px; border-radius: 10px;
     }
 
+    /* Kategorien im Warteraum */
     .cat-item {
       display: flex; align-items: center; justify-content: space-between;
-      border-bottom: 2px dashed rgba(107, 100, 92, 0.2);
-      padding: 10px 4px; font-size: 22px;
+      padding: 12px 16px; background: #f8fafc; border-radius: 8px;
+      margin-bottom: 8px; font-weight: 600;
     }
-    .cat-item:last-child { border-bottom: none; }
     .cat-remove {
       background: none; border: none; cursor: pointer;
-      color: var(--red); font-size: 22px; line-height: 1;
-      font-family: 'Permanent Marker', cursive;
-      transition: transform 0.1s;
+      color: var(--text-muted); font-size: 1.2rem;
+      transition: color 0.2s;
     }
-    .cat-remove:hover { transform: scale(1.2) rotate(10deg); }
+    .cat-remove:hover { color: var(--danger); }
     
     .cats-readonly { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
     .cat-tag {
-      border: 2px solid var(--pencil); 
-      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-      padding: 4px 12px 2px;
-      font-size: 18px; color: var(--ink);
-      mix-blend-mode: multiply;
+      background: #f8fafc; border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 12px; font-weight: 600;
     }
 
-    .timer-presets { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    /* Timer Presets */
+    .timer-presets { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
     .timer-preset {
-      padding: 6px 16px; border: 2px solid var(--pencil);
-      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-      font-family: 'Caveat', cursive; font-size: 18px;
-      background: transparent; color: var(--pencil);
-      cursor: pointer; transition: all 0.1s;
-      mix-blend-mode: multiply;
+      padding: 8px 16px; border: 2px solid var(--border);
+      border-radius: 8px; background: transparent; font-weight: 700;
+      color: var(--text-muted); cursor: pointer; transition: all 0.2s;
     }
-    .timer-preset:hover { background: rgba(0,0,0,0.05); }
+    .timer-preset:hover { background: #f8fafc; }
     .timer-preset.active {
-      background: var(--red); color: var(--paper);
-      border-color: var(--red); mix-blend-mode: normal;
-      box-shadow: 2px 2px 0 var(--ink);
-      transform: translateY(-2px);
+      background: var(--text-main); color: white; border-color: var(--text-main);
     }
 
-    .letter-stage {
-      text-align: center; margin: 0 0 24px;
-      width: 100%; max-width: 480px;
-    }
+    /* Spielbildschirm: Der große Buchstabe */
+    .letter-stage { text-align: center; margin: 0 0 30px; width: 100%; max-width: 500px; }
     .round-tag {
-      font-family: 'Special Elite', monospace;
-      font-size: 12px; letter-spacing: 4px; text-transform: uppercase;
-      color: var(--pencil); margin-bottom: 8px; display: block;
-      mix-blend-mode: multiply;
+      font-weight: 800; font-size: 0.9rem; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--primary); margin-bottom: 8px; display: block;
     }
     .big-letter {
       font-family: 'Permanent Marker', cursive;
-      font-size: clamp(8rem, 30vw, 14rem);
-      color: var(--red);
-      line-height: 0.8;
-      display: inline-block;
-      transform: rotate(-3deg);
-      text-decoration: underline;
-      text-decoration-color: rgba(217, 32, 32, 0.3);
-      text-decoration-thickness: 8px;
-      text-underline-offset: 10px;
-      mix-blend-mode: multiply;
+      font-size: clamp(6rem, 20vw, 10rem);
+      color: var(--text-main); line-height: 1;
     }
 
-    .timer-wrap { width: 100%; max-width: 480px; margin-bottom: 24px; }
+    /* Timer Bar */
+    .timer-wrap { width: 100%; max-width: 500px; margin-bottom: 30px; }
     .timer-head {
-      display: flex; justify-content: space-between; align-items: baseline;
+      display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 8px;
     }
-    .timer-label {
-      font-family: 'Special Elite', monospace; font-size: 11px;
-      letter-spacing: 2px; text-transform: uppercase; color: var(--pencil);
-    }
-    .timer-secs {
-      font-family: 'Permanent Marker', cursive; font-size: 2rem;
-      color: var(--ink); line-height: 1;
-    }
-    .timer-secs.urgent { color: var(--red); animation: pulseScale 0.5s infinite alternate; }
-    @keyframes pulseScale { from { transform: scale(1); } to { transform: scale(1.1); } }
+    .timer-label { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); }
+    .timer-secs { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .timer-secs.urgent { color: var(--danger); }
     
     .timer-track {
-      width: 100%; height: 12px;
-      border: 3px solid var(--ink); background: var(--paper);
-      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-      padding: 1px;
+      width: 100%; height: 16px; background: var(--border); border-radius: 10px; overflow: hidden;
     }
     .timer-fill {
-      height: 100%; background: var(--ink);
-      transition: width 1s linear;
-      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+      height: 100%; background: var(--primary); transition: width 1s linear; border-radius: 10px;
     }
-    .timer-fill.urgent { background: var(--red); }
+    .timer-fill.urgent { background: var(--danger); }
 
-    .buzzer-wrap { width: 100%; max-width: 480px; margin-bottom: 20px; }
+    /* Buzzer */
+    .buzzer-wrap { width: 100%; max-width: 500px; margin-bottom: 30px; }
     .buzzer-btn {
-      width: 100%; padding: 24px 20px;
-      border: 4px solid var(--ink); background: var(--red); color: var(--paper);
-      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-      font-family: 'Permanent Marker', cursive; font-size: 2rem;
-      letter-spacing: 2px; cursor: pointer;
-      box-shadow: 8px 8px 0 var(--stamp);
-      transition: transform 0.1s, box-shadow 0.1s;
+      width: 100%; padding: 24px;
+      border: none; background: var(--danger); color: white;
+      border-radius: 16px; font-size: 1.5rem; font-weight: 800; text-transform: uppercase;
+      cursor: pointer; transition: all 0.1s;
+      box-shadow: 0 8px 0 #b91c1c;
     }
-    .buzzer-btn:active {
-      transform: translate(6px, 6px);
-      box-shadow: 2px 2px 0 var(--stamp);
-    }
+    .buzzer-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #b91c1c; }
     
     .buzzer-fired {
-      width: 100%; max-width: 480px; padding: 18px;
-      border: 3px solid var(--ink); background: var(--highlight); color: var(--ink);
-      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-      font-family: 'Permanent Marker', cursive; font-size: 1.4rem;
-      text-align: center; margin-bottom: 20px;
-      animation: stampIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      box-shadow: 4px 4px 0 rgba(0,0,0,0.1);
-    }
-    @keyframes stampIn {
-      0%   { transform: scale(1.1) rotate(2deg); opacity: 0; }
-      100% { transform: scale(1) rotate(0); opacity: 1; }
+      width: 100%; max-width: 500px; padding: 20px;
+      background: #fef2f2; border: 2px solid #fca5a5; color: #991b1b;
+      border-radius: 12px; font-weight: 800; font-size: 1.2rem;
+      text-align: center; margin-bottom: 30px;
     }
 
-    .answer-form { width: 100%; max-width: 480px; }
+    /* Antwort-Formular (Hier behalten wir das handschriftliche Feeling für die Eingabe!) */
+    .answer-form { width: 100%; max-width: 500px; }
     .answer-row {
-      display: flex; align-items: flex-end; gap: 16px;
-      margin-bottom: 12px;
+      display: flex; flex-direction: column; gap: 4px;
+      margin-bottom: 16px;
     }
     .ans-cat {
-      font-family: 'Special Elite', monospace; font-size: 11px;
-      letter-spacing: 1.5px; text-transform: uppercase;
-      color: var(--red); min-width: 75px; padding-bottom: 8px;
-      font-weight: bold; mix-blend-mode: multiply;
+      font-size: 0.85rem; font-weight: 800; text-transform: uppercase;
+      color: var(--text-muted); padding-left: 4px;
+    }
+    .answer-row input {
+      font-family: 'Caveat', cursive; /* Handschrift NUR für die Lösung */
+      font-size: 1.8rem;
+      color: var(--primary);
+      padding: 8px 16px;
     }
 
+    /* Warten-Screen */
     .waiting-block {
-      width: 100%; max-width: 480px;
-      border: 3px solid var(--ink); background: var(--paper2);
-      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-      padding: 30px; text-align: center;
-      box-shadow: 5px 5px 0 rgba(0,0,0,0.05);
+      width: 100%; max-width: 500px;
+      background: var(--card-bg); border-radius: 16px;
+      padding: 40px 30px; text-align: center;
+      border: 1px solid var(--border); box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     }
-    .waiting-icon { font-size: 3rem; margin-bottom: 12px; }
-    .waiting-title {
-      font-family: 'Permanent Marker', cursive; font-size: 1.8rem;
-      margin-bottom: 16px; mix-blend-mode: multiply;
-    }
-    .wait-players { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .waiting-icon { font-size: 3rem; margin-bottom: 16px; }
+    .waiting-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 16px; }
+    .wait-players { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
     .wait-chip {
-      padding: 4px 14px 2px; font-family: 'Caveat', cursive; font-size: 20px;
-      border: 2px solid var(--ink);
-      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+      padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; font-weight: 700;
+      background: #f8fafc; color: var(--text-muted); border: 1px solid var(--border);
     }
-    .wait-chip.done { background: var(--green); color: var(--paper); border-color: #0f4523; }
-    .wait-chip.pending { background: transparent; color: var(--pencil); mix-blend-mode: multiply; }
+    .wait-chip.done { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
 
-    .scoreboard { width: 100%; max-width: 480px; margin-bottom: 32px; }
+    /* Scoreboard */
+    .scoreboard { width: 100%; max-width: 500px; margin-bottom: 40px; }
     .score-row {
       display: flex; align-items: center; justify-content: space-between;
-      border: 3px solid var(--ink); padding: 12px 18px;
-      margin-bottom: 8px;
-      background: var(--paper2);
-      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-      box-shadow: 3px 3px 0 rgba(0,0,0,0.05);
+      background: var(--card-bg); border: 1px solid var(--border); padding: 16px 20px;
+      margin-bottom: 8px; border-radius: 12px; font-weight: 700;
     }
     .score-row.gold {
-      background: var(--highlight); border-color: var(--ink);
-      border-left: 6px solid var(--red);
-      transform: scale(1.02);
-      box-shadow: 4px 4px 0 var(--ink);
+      background: #fffbeb; border-color: #fde68a;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.02);
     }
-    .score-name { font-family: 'Caveat', cursive; font-size: 24px; font-weight: bold; }
-    .score-pts {
-      font-family: 'Special Elite', monospace; font-size: 14px;
-      color: var(--red); letter-spacing: 1px; font-weight: bold;
-    }
+    .score-name { font-size: 1.1rem; }
+    .score-pts { font-size: 1rem; color: var(--primary); background: #eff6ff; padding: 4px 10px; border-radius: 20px; }
 
+    /* Ergebnisse */
     .result-card {
-      width: 100%; max-width: 480px;
-      border: 3px solid var(--ink); background: var(--paper2);
-      border-radius: 2px 255px 3px 255px / 255px 5px 225px 3px;
-      padding: 16px 20px; margin-bottom: 20px;
-      box-shadow: 4px 4px 0 rgba(0,0,0,0.05);
+      width: 100%; max-width: 500px;
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px; margin-bottom: 20px;
     }
     .result-player {
-      font-family: 'Permanent Marker', cursive; font-size: 1.4rem;
-      margin-bottom: 12px; border-bottom: 2px dashed var(--pencil);
-      padding-bottom: 8px; mix-blend-mode: multiply;
+      font-size: 1.2rem; font-weight: 800; margin-bottom: 16px;
+      border-bottom: 2px solid var(--border); padding-bottom: 12px;
     }
     .result-row {
       display: flex; align-items: center; gap: 12px;
-      padding: 8px 0; border-bottom: 1px solid rgba(107, 100, 92, 0.15);
-      font-size: 22px;
+      padding: 12px 0; border-bottom: 1px solid #f1f5f9;
     }
-    .result-row.host-clickable { cursor: pointer; transition: background 0.1s; }
-    .result-row.host-clickable:hover { background: rgba(217, 32, 32, 0.05); }
-    .result-row.rejected .result-word {
-      text-decoration: line-through; text-decoration-thickness: 3px;
-      text-decoration-color: var(--red); opacity: 0.6;
-    }
+    .result-row.host-clickable { cursor: pointer; transition: background 0.2s; border-radius: 8px; padding: 12px 8px; margin: 0 -8px; }
+    .result-row.host-clickable:hover { background: #f8fafc; }
     .result-row:last-child { border-bottom: none; }
+    
     .result-cat {
-      font-family: 'Special Elite', monospace; font-size: 10px;
-      letter-spacing: 1.5px; text-transform: uppercase;
-      color: var(--pencil); min-width: 60px; font-weight: bold;
+      font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); min-width: 70px;
     }
-    .result-word { flex: 1; font-family: 'Caveat', cursive; color: var(--blue); mix-blend-mode: multiply; font-weight: bold; }
+    .result-word {
+      flex: 1; font-family: 'Caveat', cursive; font-size: 1.6rem; font-weight: 700;
+    }
+    .result-row.rejected .result-word { color: var(--text-muted) !important; text-decoration: line-through; }
 
-    /* Authentischere Stempel */
+    /* Stempel -> Cleane Badges */
     .stamp {
-      font-family: 'Special Elite', monospace; font-size: 10px;
-      letter-spacing: 1px; padding: 3px 6px; white-space: nowrap;
-      text-transform: uppercase; font-weight: bold;
-      border-radius: 3px; transform: rotate(-2deg);
-      mix-blend-mode: multiply;
+      font-size: 0.7rem; font-weight: 800; padding: 4px 8px; border-radius: 6px;
+      text-transform: uppercase; white-space: nowrap;
     }
-    .stamp-ok { border: 2px solid var(--green); color: var(--green); transform: rotate(1deg); }
-    .stamp-no { border: 2px dashed var(--red); color: var(--red); }
+    .stamp-ok { background: #ecfdf5; color: #059669; }
+    .stamp-no { background: #fef2f2; color: #dc2626; }
 
+    /* Banner */
     .val-banner {
-      width: 100%; max-width: 480px;
-      border: 3px solid var(--ink); background: var(--highlight); color: var(--ink);
-      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-      padding: 16px 20px; margin-bottom: 24px; text-align: center;
-      box-shadow: 6px 6px 0 var(--red);
-      transform: rotate(-1deg);
+      width: 100%; max-width: 500px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a;
+      border-radius: 12px; padding: 20px; margin-bottom: 30px; text-align: center;
     }
-    .val-title { font-family: 'Permanent Marker', cursive; font-size: 1.4rem; margin-bottom: 4px; }
-    .val-sub { font-family: 'Special Elite', monospace; font-size: 11px; opacity: 0.8; letter-spacing: 1px; }
+    .val-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 8px; }
+    .val-sub { font-size: 0.9rem; }
 
+    /* Verbindungsanzeige (Top Right) */
     .conn-indicator {
-      position: fixed; top: 12px; right: 12px;
-      background: var(--paper); border: 2px solid var(--ink);
-      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-      padding: 6px 12px; z-index: 100;
-      font-family: 'Special Elite', monospace; font-size: 10px; font-weight: bold;
-      letter-spacing: 1px; display: flex; align-items: center; gap: 8px;
-      box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+      position: fixed; top: 16px; right: 16px;
+      background: rgba(255,255,255,0.9); backdrop-filter: blur(4px); border: 1px solid var(--border);
+      border-radius: 20px; padding: 6px 12px; z-index: 100;
+      font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
-    .conn-dot { width: 8px; height: 8px; border: 2px solid var(--ink); border-radius: 50%; }
-    .conn-dot.ok { background: var(--green); }
-    .conn-dot.sync { background: var(--highlight); animation: blink 1s infinite; }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; }
+    .conn-dot.ok { background: var(--success); }
+    .conn-dot.sync { background: var(--primary); animation: pulse 1s infinite alternate; }
+    @keyframes pulse { from { opacity: 1; } to { opacity: 0.5; } }
 
+    /* Raus-Button (Top Left) */
     .leave-btn {
-      position: fixed; top: 12px; left: 12px; z-index: 100;
-      background: var(--paper); border: 2px solid var(--ink);
-      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-      padding: 4px 12px 2px; font-family: 'Caveat', cursive;
-      font-size: 18px; color: var(--red); cursor: pointer;
-      display: none; transition: all 0.1s;
-      box-shadow: 3px 3px 0 var(--pencil);
-      font-weight: bold;
+      position: fixed; top: 16px; left: 16px; z-index: 100;
+      background: rgba(255,255,255,0.9); backdrop-filter: blur(4px); border: 1px solid var(--border);
+      border-radius: 20px; padding: 6px 12px;
+      font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 800; color: var(--danger); cursor: pointer;
+      display: none; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: background 0.2s;
     }
-    .leave-btn:hover { background: rgba(0,0,0,0.05); }
-    .leave-btn:active { transform: translate(3px,3px); box-shadow: none; }
+    .leave-btn:hover { background: #fef2f2; border-color: #fca5a5; }
 
     .error-msg {
-      color: var(--red); font-size: 20px; margin-top: 12px;
-      font-family: 'Caveat', cursive; font-weight: bold;
-      text-decoration: underline wavy var(--red);
-      text-underline-offset: 4px;
-      mix-blend-mode: multiply;
+      color: var(--danger); font-size: 0.9rem; margin-top: 12px; font-weight: 700; background: #fef2f2; padding: 10px; border-radius: 8px;
     }
-    .hint {
-      font-family: 'Special Elite', monospace; font-size: 11px;
-      color: var(--pencil); text-align: center; margin-top: 16px;
-      letter-spacing: 1px; mix-blend-mode: multiply;
-    }
-    .divider {
-      border: none; border-top: 2px dashed rgba(107, 100, 92, 0.3);
-      margin: 24px 0; width: 100%; max-width: 480px;
-    }
+    .hint { font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-top: 16px; }
+    
+    .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; width: 100%; }
     .pulse-dot {
-      display: inline-block; width: 8px; height: 8px;
-      border: 2px solid var(--pencil); border-radius: 50%;
-      background: var(--green); margin-right: 8px;
-      animation: blink 2s infinite;
+      display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--primary); margin-right: 8px; animation: pulse 1s infinite alternate;
     }
   </style>
 </head>
 <body>
 
-<button id="btn-leave" class="leave-btn" onclick="window.leaveRoom()">← Raus</button>
+<button id="btn-leave" class="leave-btn" onclick="window.leaveRoom()">← Verlassen</button>
 
 <div class="conn-indicator" id="conn-indicator">
   <div class="conn-dot sync" id="conn-dot"></div>
@@ -579,43 +434,47 @@
 
 <div id="screen-join" class="screen">
   <div class="game-header">
-    <div class="tape-strip"></div>
-    <div class="game-title">Stadt<span class="slash">/</span>Land<span class="slash">/</span>Fluss</div>
-    <div class="game-sub">Multiplayer · Klassischer Spielblock</div>
+    <div class="game-title">Stadt<span class="slash">.</span>Land<span class="slash">.</span>Fluss</div>
+    <div class="game-sub">Multiplayer Edition</div>
   </div>
 
   <div class="block">
     <div class="block-title">Mitspielen</div>
     <label class="field-label">Dein Name</label>
     <input type="text" id="input-name" placeholder="Wie heißt du?" maxlength="15"/>
+    
     <label class="field-label">Raum-Code</label>
     <input type="text" id="input-room" placeholder="z.B. SPIELEN" maxlength="10"/>
+    
     <div id="join-error" class="error-msg" style="display:none"></div>
-    <button type="button" class="btn" id="btn-connect" onclick="joinRoom()">Rein da →</button>
-    <p class="hint">Erster im Raum = Spielleiter. Alle gleichen Code eingeben.</p>
+    <button type="button" class="btn" id="btn-connect" onclick="joinRoom()">Raum betreten</button>
+    <p class="hint">Tipp: Der erste Spieler im Raum wird automatisch Spielleiter.</p>
   </div>
 </div>
 
 <div id="screen-lobby" class="screen hidden">
   <div class="game-header">
-    <div class="tape-strip"></div>
-    <div class="game-title" style="font-size:3rem;transform:rotate(-1deg)">Warteraum</div>
+    <div class="game-title" style="font-size:2.5rem;">Warteraum</div>
   </div>
 
   <div class="block">
     <div class="code-box">
       <div class="the-code" id="display-roomcode">—</div>
-      <span class="host-stamp" id="host-badge" style="display:none">HOST</span>
+      <span class="host-stamp" id="host-badge" style="display:none">SPIELLEITER</span>
     </div>
-    <div class="field-label">Spieler</div>
+    
+    <div class="field-label">Mitspieler</div>
     <div class="players-list" id="players-list"></div>
+    
     <hr class="divider"/>
     <div class="field-label">Kategorien</div>
     <div id="lobby-cats-area"></div>
+    
     <hr class="divider"/>
-    <div class="field-label">Rundentimer</div>
+    <div class="field-label">Zeitlimit pro Runde</div>
     <div id="lobby-timer-area"></div>
-    <div id="lobby-host-area" style="margin-top:20px"></div>
+    
+    <div id="lobby-host-area" style="margin-top:30px"></div>
   </div>
 </div>
 
@@ -624,23 +483,27 @@
     <span class="round-tag" id="round-badge">Runde 1</span>
     <div class="big-letter" id="big-letter">A</div>
   </div>
+  
   <div id="timer-bar-area"></div>
   <div id="buzzer-container"></div>
   <div id="playing-content"></div>
 </div>
 
 <div id="screen-results" class="screen hidden">
-  <div class="game-header" style="margin-bottom:20px">
-    <div class="tape-strip"></div>
-    <div class="game-title" style="font-size:2.8rem;transform:rotate(-1deg)">Auswertung</div>
+  <div class="game-header" style="margin-bottom:30px">
+    <div class="game-title" style="font-size:2.5rem;">Auswertung</div>
     <div class="game-sub" id="results-sub"></div>
   </div>
+  
   <div id="validation-banner-area"></div>
-  <div class="section-label">Punkte gesamt</div>
+  
+  <div class="section-label">Aktueller Punktestand</div>
   <div class="scoreboard" id="scoreboard"></div>
+  
   <div class="section-label">Antworten dieser Runde</div>
-  <div id="results-container" style="width:100%;max-width:480px"></div>
-  <div style="width:100%;max-width:480px;margin-top:16px" id="results-actions"></div>
+  <div id="results-container" style="width:100%;max-width:500px"></div>
+  
+  <div style="width:100%;max-width:500px;margin-top:24px" id="results-actions"></div>
 </div>
 
 <script type="module">
@@ -833,7 +696,7 @@ function renderTimerBar(){
   a.innerHTML=`
     <div class="timer-wrap">
       <div class="timer-head">
-        <span class="timer-label">Zeit</span>
+        <span class="timer-label">Restzeit</span>
         <span class="timer-secs ${urgent?"urgent":""}">${ts}</span>
       </div>
       <div class="timer-track">
@@ -855,7 +718,7 @@ function renderLobby(){
     return`<div class="player-chip">
       <div class="online-dot" style="background:${online?"var(--green)":"transparent"}"></div>
       ${p.name}${id===gameState.host?" ★":""}
-      <span class="pts">${p.score||0}P</span>
+      <span class="pts">${p.score||0}</span>
     </div>`;
   }).join("");
 
@@ -865,9 +728,9 @@ function renderLobby(){
       catsArea.innerHTML=`
         <div id="lobby-cats-list"></div>
         <div style="display:flex;gap:8px;margin-top:12px;align-items:flex-end">
-          <input type="text" id="lobby-cat-input" placeholder="Neue Kategorie…" maxlength="20"
+          <input type="text" id="lobby-cat-input" placeholder="Kategorie hinzufügen…" maxlength="20"
             onkeydown="if(event.key==='Enter'){event.preventDefault();window.addCat();}"/>
-          <button type="button" class="btn btn-outline btn-sm" onclick="window.addCat()">+ Add</button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="window.addCat()">+ Neu</button>
         </div>`;
     }
     document.getElementById("lobby-cats-list").innerHTML=cats.map((c,i)=>
@@ -884,25 +747,25 @@ function renderLobby(){
     ta.innerHTML=`
       <div class="timer-presets">
         ${TIMER_PRESETS.map(t=>{
-          const lbl=t===0?"Kein":t<60?`${t}s`:`${t/60}min`;
+          const lbl=t===0?"Ohne":t<60?`${t}s`:`${t/60}min`;
           return`<button type="button" class="timer-preset ${dur===t?"active":""}" onclick="window.setTimer(${t})">${lbl}</button>`;
         }).join("")}
       </div>
       <div style="display:flex;gap:8px;align-items:flex-end;margin-top:10px">
         <input type="number" id="timer-custom-input" min="10" max="600" placeholder="Eigene Sekunden…"
-          style="max-width:180px"
+          style="max-width:200px"
           onkeydown="if(event.key==='Enter'){event.preventDefault();window.setCustomTimer();}"
           value="${!TIMER_PRESETS.includes(dur)&&dur>0?dur:''}"/>
         <button type="button" class="btn btn-outline btn-sm" onclick="window.setCustomTimer()">OK</button>
       </div>`;
   }else{
-    const lbl=dur===0?"Kein Timer":dur<60?`${dur}s`:`${Math.floor(dur/60)}:${String(dur%60).padStart(2,"0")} min`;
-    ta.innerHTML=`<div style="font-size:20px;color:var(--pencil)">${lbl}</div>`;
+    const lbl=dur===0?"Kein Zeitlimit":dur<60?`${dur}s`:`${Math.floor(dur/60)}:${String(dur%60).padStart(2,"0")} min`;
+    ta.innerHTML=`<div style="font-size:1.1rem; font-weight:700; color:var(--text-main); margin-top:4px;">${lbl}</div>`;
   }
 
   document.getElementById("lobby-host-area").innerHTML=isHost
-    ?`<button type="button" class="btn btn-red" onclick="window.startRound()">Runde starten →</button>`
-    :`<div style="font-size:17px;color:var(--pencil)"><span class="pulse-dot"></span>Warte auf den Spielleiter…</div>`;
+    ?`<button type="button" class="btn btn-green" onclick="window.startRound()">Spiel starten</button>`
+    :`<div style="font-size:1rem;color:var(--text-muted); text-align:center; margin-top:20px;"><span class="pulse-dot"></span>Warte auf den Spielleiter…</div>`;
 }
 
 window.setTimer=async function(s){await updateRoomData({roundDuration:s});};
@@ -937,14 +800,14 @@ function renderPlaying(){
   const cEl=document.getElementById("playing-content");
 
   if(gameState.phase==="collecting"){
-    bEl.innerHTML=`<div class="buzzer-fired">⌛ Zeit läuft ab — Einsammeln!</div>`;
+    bEl.innerHTML=`<div class="buzzer-fired">⌛ Die Zeit ist um! Antworten werden eingesammelt...</div>`;
     if(submitted)cEl.innerHTML=renderWaiting();return;
   }
   
   if(gameState.buzzer){
-    bEl.innerHTML=`<div class="buzzer-fired" id="buzzer-ticker">🔔 ${gameState.buzzer} hat STOPP gerufen!</div>`;
+    bEl.innerHTML=`<div class="buzzer-fired" id="buzzer-ticker">🔔 ${gameState.buzzer} hat STOPP gedrückt!</div>`;
   }else{
-    bEl.innerHTML=submitted?"":`<div class="buzzer-wrap"><button type="button" class="buzzer-btn" onclick="window.triggerBuzzer()">STOPP!</button></div>`;
+    bEl.innerHTML=submitted?"":`<div class="buzzer-wrap"><button type="button" class="buzzer-btn" onclick="window.triggerBuzzer()">STOPP</button></div>`;
   }
   
   if(submitted){cEl.innerHTML=renderWaiting();return;}
@@ -955,9 +818,9 @@ function renderPlaying(){
         ${cats.map(cat=>`
           <div class="answer-row">
             <span class="ans-cat">${cat}</span>
-            <input type="text" id="ans-${sanitizeId(cat)}" placeholder="${cat} mit ${gameState.letter}…" autocomplete="off"/>
+            <input type="text" id="ans-${sanitizeId(cat)}" placeholder="${gameState.letter}..." autocomplete="off"/>
           </div>`).join("")}
-        <button type="button" class="btn btn-green" style="margin-top:14px" onclick="window.submitAnswers()">Fertig ✓</button>
+        <button type="button" class="btn btn-green" style="margin-top:20px" onclick="window.submitAnswers()">Fertig! (Abgeben)</button>
       </div>`;
     cats.forEach(cat=>{
       if(localAnswers[cat]){const e=document.getElementById(`ans-${sanitizeId(cat)}`);if(e)e.value=localAnswers[cat];}
@@ -974,8 +837,8 @@ function renderWaiting(){
     `<span class="wait-chip ${ans[id]?"done":"pending"}">${ans[id]?"✓":"…"} ${p.name}</span>`).join("");
   return`<div class="waiting-block">
     <div class="waiting-icon">✅</div>
-    <div class="waiting-title">Abgegeben!</div>
-    <div style="font-size:17px;color:var(--pencil);margin-bottom:10px">Noch ${Math.max(0,pending)} Spieler…</div>
+    <div class="waiting-title">Antworten eingeloggt!</div>
+    <div style="font-size:1rem;color:var(--text-muted);margin-bottom:20px">Noch ${Math.max(0,pending)} Spieler warten…</div>
     <div class="wait-players">${chips}</div>
   </div>`;
 }
@@ -993,7 +856,7 @@ function triggerLocalBuzzerTicker() {
   localBuzzerCountdown = setInterval(async () => {
     countdown--;
     const ticker = document.getElementById("buzzer-ticker");
-    if(ticker) ticker.textContent = `🔔 ${gameState.buzzer} hat STOPP gerufen! (${countdown}s)`;
+    if(ticker) ticker.textContent = `🔔 ${gameState.buzzer} hat STOPP gedrückt! (${countdown}s)`;
     
     if(countdown <= 0) {
       clearInterval(localBuzzerCountdown);
@@ -1081,19 +944,19 @@ function renderResults(){
   const cats=objToCats(gameState.cats);
   const rejections = gameState.rejections || {};
   
-  document.getElementById("results-sub").textContent=`Runde ${gameState.round} · Buchstabe ${gameState.letter}`;
+  document.getElementById("results-sub").textContent=`RUNDE ${gameState.round} · BUCHSTABE ${gameState.letter}`;
   
   const banner=document.getElementById("validation-banner-area");
   if(banner){
     banner.innerHTML = isHost 
-      ? `<div class="val-banner"><div class="val-title">✍️ Du bist der Korrektor!</div><div class="val-sub">Klicke auf falsche Antworten in den Blöcken, um sie per Rotstift zu streichen.</div></div>`
-      : `<div class="val-banner"><div class="val-title">👀 Notenbekanntgabe</div><div class="val-sub">Der Spielleiter prüft die Antworten und zückt bei Bedarf den Rotstift.</div></div>`;
+      ? `<div class="val-banner"><div class="val-title">✍️ Du bist der Schiedsrichter!</div><div class="val-sub">Klicke auf eine Antwort, um sie als "falsch" zu markieren (Punkteabzug).</div></div>`
+      : `<div class="val-banner"><div class="val-title">👀 Punkte-Korrektur</div><div class="val-sub">Der Spielleiter prüft gerade alle Antworten.</div></div>`;
   }
   
   const sorted=Object.entries(gameState.players||{}).sort((a,b)=>(b[1].score||0)-(a[1].score||0));
   document.getElementById("scoreboard").innerHTML=sorted.map(([id,p], i)=>`
     <div class="score-row ${i===0?"gold":""}">
-      <div class="score-name">${["①","②","③"][i]||"  "} ${p.name}</div>
+      <div class="score-name">${["🥇","🥈","🥉"][i]||"  "} ${p.name}</div>
       <div class="score-pts">${p.score||0} Punkte</div>
     </div>`).join("");
     
@@ -1108,20 +971,20 @@ function renderResults(){
         
         let disp="", badge="";
         if(!word){
-          disp=`<i style="color:rgba(107, 100, 92, 0.4)">—</i>`;
+          disp=`<i style="color:var(--text-muted)">—</i>`;
         } else if(wrongLetter) {
-          disp=`<s style="color:var(--red)">${word}</s>`;
+          disp=`<span style="color:var(--danger)">${word}</span>`;
           badge=`<span class="stamp stamp-no">Falscher Buchstabe</span>`;
         } else if(isRejected) {
-          disp=`<span style="color:var(--red)">${word}</span>`;
-          badge=`<span class="stamp stamp-no">✕ GESTRICHEN</span>`;
+          disp=`<span style="color:var(--danger)">${word}</span>`;
+          badge=`<span class="stamp stamp-no">Abgelehnt</span>`;
         } else {
-          disp=`<span style="color:var(--blue)">${word}</span>`;
-          badge=`<span class="stamp stamp-ok">✓ OK</span>`;
+          disp=`<span style="color:var(--primary)">${word}</span>`;
+          badge=`<span class="stamp stamp-ok">Gültig</span>`;
         }
         
         const hostClass = isHost && word && !wrongLetter ? "host-clickable" : "";
-        const rejectedClass = isRejected ? "rejected" : "";
+        const rejectedClass = (isRejected || wrongLetter) ? "rejected" : "";
         
         return`
           <div class="result-row ${hostClass} ${rejectedClass}" onclick="window.toggleAnswerStrike('${pid}','${cat}')">
@@ -1134,8 +997,8 @@ function renderResults(){
   }).join("");
   
   document.getElementById("results-actions").innerHTML=isHost
-    ?`<button type="button" class="btn" onclick="window.nextRound()">Nächste Runde →</button>`
-    :`<div style="font-size:17px;color:var(--pencil)"><span class="pulse-dot"></span>Warte auf den Spielleiter…</div>`;
+    ?`<button type="button" class="btn btn-primary" onclick="window.nextRound()">Nächste Runde starten</button>`
+    :`<div style="font-size:1rem;color:var(--text-muted); text-align:center;"><span class="pulse-dot"></span>Warte auf Spielleiter…</div>`;
 }
 
 window.nextRound=async function(){
