@@ -4,13 +4,8 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Stadt Land Fluss</title>
-  <!-- Tausch von Caveat gegen Nunito für maximale Lesbarkeit -->
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Special+Elite&family=Permanent+Marker&display=swap" rel="stylesheet"/>
   <style>
-    /* ══════════════════════════════════════════
-       SCHULHEFT-BRUTALISM 2.0 (Optimiert)
-       Realistisches Papier · Tinte · Struktur
-    ══════════════════════════════════════════ */
     :root {
       --paper:    #f9f6f0;
       --paper2:   #f2eee3;
@@ -25,10 +20,8 @@
       --tape:     rgba(252, 243, 184, 0.85);
       --highlight:#fef08a;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-
     body {
       background-color: var(--paper);
       background-image:
@@ -36,14 +29,12 @@
         linear-gradient(90deg, var(--grid) 1px, transparent 1px);
       background-size: 24px 24px;
       color: var(--ink);
-      font-family: 'Nunito', sans-serif; /* Clean & lesbar */
+      font-family: 'Nunito', sans-serif;
       font-weight: 400;
       min-height: 100vh;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
     }
-
-    /* Rote Randlinie links */
     body::before {
       content: '';
       position: fixed;
@@ -55,8 +46,6 @@
       pointer-events: none;
       mix-blend-mode: multiply;
     }
-
-    /* Perforations-Loch-Linie */
     body::after {
       content: '';
       position: fixed;
@@ -67,7 +56,6 @@
       z-index: 0;
       pointer-events: none;
     }
-
     .screen {
       position: relative; z-index: 1;
       min-height: 100vh;
@@ -76,18 +64,15 @@
       animation: pageFlip 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
     .screen.hidden { display: none; }
-
     @keyframes pageFlip {
       from { opacity: 0; transform: translateY(10px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
     .game-header {
       width: 100%; max-width: 480px;
       margin-bottom: 35px;
       position: relative;
     }
-
     .game-title {
       font-family: 'Permanent Marker', cursive;
       font-size: clamp(2.8rem, 11vw, 4.8rem);
@@ -100,7 +85,6 @@
       text-shadow: 2px 2px 0px rgba(0,0,0,0.03);
     }
     .game-title .slash { color: var(--red); }
-
     .game-sub {
       font-family: 'Special Elite', monospace;
       font-size: 11px;
@@ -112,7 +96,6 @@
       font-weight: bold;
       mix-blend-mode: multiply;
     }
-
     .tape-strip {
       position: absolute;
       top: -15px; left: -10px;
@@ -125,7 +108,6 @@
       border-left: 2px dotted rgba(0,0,0,0.05);
       border-right: 2px dotted rgba(0,0,0,0.05);
     }
-
     .section-label {
       font-family: 'Special Elite', monospace;
       font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
@@ -135,8 +117,6 @@
       padding-bottom: 6px;
       mix-blend-mode: multiply;
     }
-
-    /* Aufgeräumterer, leicht unperfekter Rahmen */
     .block {
       background: var(--paper2);
       border: 2.5px solid var(--ink);
@@ -146,7 +126,6 @@
       position: relative;
       box-shadow: 4px 4px 0px rgba(35, 33, 30, 0.05);
     }
-
     .block-title {
       font-family: 'Permanent Marker', cursive;
       font-size: 1.5rem;
@@ -156,8 +135,6 @@
       display: inline-block;
       mix-blend-mode: multiply;
     }
-
-    /* Strukturierte Eingabefelder */
     input[type=text], input[type=number] {
       width: 100%;
       background: transparent;
@@ -182,6 +159,9 @@
       border-bottom: 2.5px solid var(--blue);
       background: rgba(29, 78, 216, 0.02);
     }
+    /* Typing indicator border flash */
+    input.typing-ok { border-bottom-color: var(--green) !important; }
+    input.typing-bad { border-bottom-color: var(--red) !important; }
 
     .field-label {
       font-family: 'Special Elite', monospace;
@@ -190,8 +170,6 @@
       font-weight: bold;
     }
     .field-label:first-child { margin-top: 0; }
-
-    /* Knöpfe mit klarer Struktur */
     .btn {
       width: 100%; padding: 14px 20px;
       border: 2.5px solid var(--ink);
@@ -206,38 +184,30 @@
       box-shadow: 4px 4px 0 var(--red);
     }
     .btn:hover { background: #1a1917; }
-    .btn:active {
-      transform: translate(3px, 3px);
-      box-shadow: 1px 1px 0 var(--red);
-    }
-    
+    .btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--red); }
     .btn-outline {
       background: transparent; color: var(--ink);
       box-shadow: 3px 3px 0 var(--pencil);
     }
     .btn-outline:hover { background: rgba(0,0,0,0.04); }
     .btn-outline:active { box-shadow: 1px 1px 0 var(--pencil); }
-    
     .btn-red {
       background: var(--red); border-color: var(--stamp);
       box-shadow: 4px 4px 0 var(--ink);
     }
     .btn-red:hover { background: #c21a1a; }
     .btn-red:active { box-shadow: 1px 1px 0 var(--ink); }
-
     .btn-green {
       background: var(--green); border-color: #0f4523;
       box-shadow: 4px 4px 0 var(--ink);
     }
     .btn-green:hover { background: #115229; }
     .btn-green:active { box-shadow: 1px 1px 0 var(--ink); }
-
     .btn-sm {
       width: auto; padding: 6px 16px; font-size: 0.95rem;
       margin-top: 0; box-shadow: 2px 2px 0 var(--pencil);
       border-radius: 20px;
     }
-
     .code-box {
       background: var(--ink); color: var(--paper);
       padding: 20px; margin-bottom: 24px;
@@ -258,7 +228,6 @@
       color: var(--highlight);
       line-height: 1;
     }
-
     .host-stamp {
       position: absolute; top: 12px; right: 12px;
       font-family: 'Special Elite', monospace;
@@ -268,7 +237,6 @@
       border-radius: 4px;
       opacity: 0.85;
     }
-
     .players-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
     .player-chip {
       display: inline-flex; align-items: center; gap: 8px;
@@ -287,7 +255,6 @@
       font-size: 11px; color: var(--red); margin-left: 4px;
       font-weight: bold;
     }
-
     .cat-item {
       display: flex; align-items: center; justify-content: space-between;
       border-bottom: 1.5px dashed rgba(107, 100, 92, 0.2);
@@ -300,16 +267,14 @@
       font-family: 'Permanent Marker', cursive;
     }
     .cat-remove:hover { transform: scale(1.1) rotate(10deg); }
-    
     .cats-readonly { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
     .cat-tag {
-      border: 2px solid var(--pencil); 
+      border: 2px solid var(--pencil);
       border-radius: 20px;
       padding: 4px 12px;
       font-size: 15px; font-weight: 600; color: var(--ink);
       mix-blend-mode: multiply;
     }
-
     .timer-presets { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
     .timer-preset {
       padding: 6px 14px; border: 2px solid var(--pencil);
@@ -326,7 +291,6 @@
       box-shadow: 2px 2px 0 var(--ink);
       transform: translateY(-1px);
     }
-
     .letter-stage {
       text-align: center; margin: 0 0 20px;
       width: 100%; max-width: 480px;
@@ -350,15 +314,30 @@
       text-underline-offset: 8px;
       mix-blend-mode: multiply;
     }
+    /* Used-letters strip */
+    .used-letters {
+      display: flex; flex-wrap: wrap; gap: 5px; justify-content: center;
+      margin-top: 8px;
+    }
+    .used-letter-chip {
+      font-family: 'Permanent Marker', cursive;
+      font-size: 14px; color: var(--pencil);
+      border: 1.5px dashed rgba(107,100,92,0.35);
+      border-radius: 50%;
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0.6;
+      text-decoration: line-through;
+    }
 
-    .timer-wrap { 
-      width: 100%; max-width: 480px; margin-bottom: 24px; 
+    .timer-wrap {
+      width: 100%; max-width: 480px; margin-bottom: 24px;
       background: var(--paper2);
       border: 2.5px solid var(--ink);
       padding: 12px 16px;
       border-radius: 12px;
       box-shadow: 4px 4px 0 rgba(35, 33, 30, 0.05);
-      pointer-events: auto; /* WICHTIG: Damit der Timer anklickbar bliebe, falls nötig */
+      pointer-events: auto;
     }
     .timer-head {
       display: flex; justify-content: space-between; align-items: baseline;
@@ -374,7 +353,6 @@
     }
     .timer-secs.urgent { color: var(--red); animation: pulseScale 0.5s infinite alternate; }
     @keyframes pulseScale { from { transform: scale(1); } to { transform: scale(1.05); } }
-    
     .timer-track {
       width: 100%; height: 12px;
       border: 2.5px solid var(--ink); background: var(--paper);
@@ -385,7 +363,6 @@
       transition: width 1s linear; border-radius: 6px;
     }
     .timer-fill.urgent { background: var(--red); }
-
     .buzzer-wrap { width: 100%; max-width: 480px; margin-bottom: 20px; }
     .buzzer-btn {
       width: 100%; padding: 20px;
@@ -400,7 +377,6 @@
       transform: translate(4px, 4px);
       box-shadow: 2px 2px 0 var(--stamp);
     }
-    
     .buzzer-fired {
       width: 100%; max-width: 480px; padding: 16px;
       border: 2.5px solid var(--ink); background: var(--highlight); color: var(--ink);
@@ -409,18 +385,48 @@
       text-align: center; margin-bottom: 20px;
       box-shadow: 3px 3px 0 rgba(0,0,0,0.05);
     }
-
-    /* Aufgeräumte Formular-Zeilen */
     .answer-form { width: 100%; max-width: 480px; }
     .answer-row {
       display: flex; align-items: center; gap: 16px;
       margin-bottom: 16px;
+      position: relative;
     }
     .ans-cat {
       font-family: 'Special Elite', monospace; font-size: 12px;
       letter-spacing: 1px; text-transform: uppercase;
       color: var(--red); width: 90px; text-align: right; flex-shrink: 0;
       font-weight: bold; mix-blend-mode: multiply;
+    }
+
+    /* Live typing indicators */
+    .typing-indicators {
+      width: 100%; max-width: 480px;
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin-bottom: 14px; min-height: 28px;
+    }
+    .typing-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: 'Special Elite', monospace; font-size: 11px;
+      color: var(--pencil); letter-spacing: 0.5px;
+      background: rgba(107,100,92,0.07);
+      border: 1.5px solid rgba(107,100,92,0.2);
+      border-radius: 20px; padding: 3px 10px;
+      animation: fadeInChip 0.2s ease;
+    }
+    @keyframes fadeInChip { from { opacity:0; transform: scale(0.9); } to { opacity:1; transform: scale(1); } }
+    .typing-dots {
+      display: inline-flex; gap: 2px;
+    }
+    .typing-dots span {
+      width: 4px; height: 4px; border-radius: 50%;
+      background: var(--pencil);
+      animation: dotBounce 1.2s infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dotBounce {
+      0%,80%,100% { transform: translateY(0); opacity: 0.4; }
+      40% { transform: translateY(-4px); opacity: 1; }
     }
 
     .waiting-block {
@@ -440,8 +446,6 @@
     }
     .wait-chip.done { background: var(--green); color: var(--paper); border-color: #0f4523; }
     .wait-chip.pending { background: transparent; color: var(--pencil); mix-blend-mode: multiply; }
-
-    /* Scoreboard Übersichtlicher */
     .scoreboard { width: 100%; max-width: 480px; margin-bottom: 30px; }
     .score-row {
       display: flex; align-items: center; justify-content: space-between;
@@ -460,8 +464,6 @@
       font-family: 'Special Elite', monospace; font-size: 13px;
       color: var(--red); font-weight: bold;
     }
-
-    /* Strukturierte Ergebnis-Karten per Grid-Layout */
     .result-card {
       width: 100%; max-width: 480px;
       border: 2.5px solid var(--ink); background: var(--paper2);
@@ -486,13 +488,11 @@
       text-decoration-color: var(--red); opacity: 0.5;
     }
     .result-row:last-child { border-bottom: none; }
-    
     .result-cat {
       font-family: 'Special Elite', monospace; font-size: 11px;
       color: var(--pencil); font-weight: bold;
     }
     .result-word { font-size: 16px; color: var(--blue); mix-blend-mode: multiply; font-weight: 700; }
-
     .stamp {
       font-family: 'Special Elite', monospace; font-size: 10px;
       letter-spacing: 0.5px; padding: 2px 6px; white-space: nowrap;
@@ -502,7 +502,6 @@
     }
     .stamp-ok { border: 1.5px solid var(--green); color: var(--green); }
     .stamp-no { border: 1.5px dashed var(--red); color: var(--red); }
-
     .val-banner {
       width: 100%; max-width: 480px;
       border: 2.5px solid var(--ink); background: var(--highlight); color: var(--ink);
@@ -511,6 +510,34 @@
     }
     .val-title { font-family: 'Permanent Marker', cursive; font-size: 1.25rem; margin-bottom: 2px; }
     .val-sub { font-family: 'Special Elite', monospace; font-size: 10.5px; opacity: 0.85; }
+
+    /* Game over banner */
+    .gameover-banner {
+      width: 100%; max-width: 480px;
+      border: 3px solid var(--ink); background: var(--red); color: var(--paper);
+      border-radius: 12px; padding: 18px 20px; margin-bottom: 20px; text-align: center;
+      box-shadow: 5px 5px 0 var(--ink);
+    }
+    .gameover-title {
+      font-family: 'Permanent Marker', cursive; font-size: 2.2rem; line-height: 1;
+      margin-bottom: 4px;
+    }
+    .gameover-winner {
+      font-family: 'Special Elite', monospace; font-size: 13px; letter-spacing: 2px;
+      text-transform: uppercase; opacity: 0.9;
+    }
+
+    /* Round progress */
+    .round-progress {
+      display: flex; gap: 4px; justify-content: center; margin-top: 8px; flex-wrap: wrap;
+    }
+    .round-pip {
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 2px solid var(--pencil);
+    }
+    .round-pip.done { background: var(--pencil); }
+    .round-pip.current { background: var(--red); border-color: var(--red); }
+    .round-pip.future { background: transparent; }
 
     .conn-indicator {
       position: fixed; top: 12px; right: 12px;
@@ -525,6 +552,19 @@
     .conn-dot.sync { background: var(--highlight); border: 1px solid var(--ink); animation: blink 1s infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
+    /* Sound toggle */
+    .sound-toggle {
+      position: fixed; top: 48px; right: 12px; z-index: 100;
+      background: var(--paper); border: 2px solid var(--ink);
+      border-radius: 20px; padding: 4px 12px;
+      font-family: 'Special Elite', monospace; font-size: 11px;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.05);
+      transition: all 0.15s;
+    }
+    .sound-toggle:hover { background: rgba(0,0,0,0.04); }
+    .sound-toggle.muted { opacity: 0.5; }
+
     .leave-btn {
       position: fixed; top: 12px; left: 12px; z-index: 100;
       background: var(--paper); border: 2px solid var(--ink);
@@ -535,7 +575,6 @@
     }
     .leave-btn:hover { background: rgba(0,0,0,0.04); }
     .leave-btn:active { transform: translate(2px,2px); box-shadow: none; }
-
     .error-msg {
       color: var(--red); font-size: 15px; margin-top: 12px;
       font-weight: 700; text-decoration: underline wavy var(--red);
@@ -554,6 +593,44 @@
       display: inline-block; width: 6px; height: 6px; border-radius: 50%;
       background: var(--green); margin-right: 8px; animation: blink 2s infinite;
     }
+
+    /* Toggle switch */
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 0; border-bottom: 1px dashed rgba(107,100,92,0.2);
+      font-size: 15px; font-weight: 600;
+    }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-switch {
+      position: relative; width: 44px; height: 24px;
+      background: rgba(107,100,92,0.3); border: 2px solid var(--pencil);
+      border-radius: 12px; cursor: pointer; transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .toggle-switch.on { background: var(--green); border-color: #0f4523; }
+    .toggle-switch::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--paper); border: 1.5px solid var(--pencil);
+      transition: transform 0.2s;
+    }
+    .toggle-switch.on::after { transform: translateX(20px); border-color: #0f4523; }
+
+    /* Round limit presets */
+    .round-presets { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .round-preset {
+      padding: 6px 14px; border: 2px solid var(--pencil);
+      border-radius: 20px; font-size: 15px; font-weight: 600;
+      background: transparent; color: var(--pencil);
+      cursor: pointer; transition: all 0.15s; mix-blend-mode: multiply;
+    }
+    .round-preset:hover { background: rgba(0,0,0,0.05); }
+    .round-preset.active {
+      background: var(--blue); color: var(--paper);
+      border-color: var(--blue); mix-blend-mode: normal;
+      box-shadow: 2px 2px 0 var(--ink);
+      transform: translateY(-1px);
+    }
   </style>
 </head>
 <body>
@@ -565,6 +642,11 @@
   <span id="conn-label">Bereit</span>
 </div>
 
+<button class="sound-toggle" id="sound-toggle-btn" onclick="window.toggleSound()">
+  <span id="sound-icon">🔊</span>
+  <span id="sound-label">Sound</span>
+</button>
+
 <div id="screen-join" class="screen">
   <div class="game-header">
     <div class="tape-strip"></div>
@@ -575,9 +657,9 @@
   <div class="block">
     <div class="block-title">Mitspielen</div>
     <label class="field-label">Dein Name</label>
-    <input type="text" id="input-name" placeholder="Wie heißt du?" maxlength="15"/>
+    <input type="text" id="input-name" placeholder="Wie heißt du?" maxlength="15" autocomplete="off"/>
     <label class="field-label">Raum-Code</label>
-    <input type="text" id="input-room" placeholder="z.B. SPIELEN" maxlength="10"/>
+    <input type="text" id="input-room" placeholder="z.B. SPIELEN" maxlength="10" autocomplete="off"/>
     <div id="join-error" class="error-msg" style="display:none"></div>
     <button type="button" class="btn" id="btn-connect" onclick="joinRoom()">Rein da →</button>
     <p class="hint">Erster im Raum = Spielleiter. Alle gleichen Code eingeben.</p>
@@ -597,24 +679,31 @@
     </div>
     <div class="field-label">Spieler</div>
     <div class="players-list" id="players-list"></div>
-    <hr class="divider"/>
+    <hr class="divider" style="margin:20px -24px;width:calc(100% + 48px)"/>
     <div class="field-label">Kategorien</div>
     <div id="lobby-cats-area"></div>
-    <hr class="divider"/>
+    <hr class="divider" style="margin:20px -24px;width:calc(100% + 48px)"/>
     <div class="field-label">Rundentimer</div>
     <div id="lobby-timer-area"></div>
+    <hr class="divider" style="margin:20px -24px;width:calc(100% + 48px)"/>
+    <div class="field-label">Runden-Limit</div>
+    <div id="lobby-rounds-area"></div>
+    <hr class="divider" style="margin:20px -24px;width:calc(100% + 48px)"/>
+    <div class="field-label">Spieloptionen</div>
+    <div id="lobby-options-area"></div>
     <div id="lobby-host-area" style="margin-top:20px"></div>
   </div>
 </div>
 
 <div id="screen-playing" class="screen hidden">
-  <!-- Timer nach ganz oben geholt und "fixed" gemacht für absoluten Top-Stand -->
   <div id="timer-bar-area" style="position: fixed; top: 15px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; z-index: 200; padding: 0 15px; pointer-events: none;"></div>
-  
   <div class="letter-stage" style="margin-top: 80px;">
     <span class="round-tag" id="round-badge">Runde 1</span>
     <div class="big-letter" id="big-letter">A</div>
+    <div class="used-letters" id="used-letters-display"></div>
+    <div class="round-progress" id="round-progress-pips"></div>
   </div>
+  <div id="typing-indicators-area"></div>
   <div id="buzzer-container"></div>
   <div id="playing-content"></div>
 </div>
@@ -625,6 +714,7 @@
     <div class="game-title" style="font-size:2.4rem;transform:rotate(-1deg)">Auswertung</div>
     <div class="game-sub" id="results-sub"></div>
   </div>
+  <div id="gameover-area"></div>
   <div id="validation-banner-area"></div>
   <div class="section-label">Punkte gesamt</div>
   <div class="scoreboard" id="scoreboard"></div>
@@ -650,9 +740,10 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 const DEFAULT_CATS = ["Stadt","Land","Fluss","Tier","Beruf"];
-const LETTERS = "ABCDEFGHIKLMNOPRSTW".split("");
+const ALL_LETTERS = "ABCDEFGHIKLMNOPRSTW".split("");
 const ROOM_EXPIRY_MS = 24*60*60*1000;
 const TIMER_PRESETS = [0,60,90,120,180];
+const ROUND_PRESETS = [0,3,5,8,10];
 
 let myName="", myRoom="";
 let myId = "p_"+Math.random().toString(36).slice(2,10);
@@ -660,10 +751,71 @@ let isHost=false, gameState=null, submitted=false;
 let localAnswers={}, localBuzzerCountdown=null;
 let heartbeatInterval=null, roomListener=null;
 let roundTimerInterval=null, roundTimerSecondsLeft=0;
+let soundEnabled=true;
+let typingTimeout=null;
+let prevBuzzerValue=null; // BUG FIX: track separately from gameState
 
-const roomRef  = () => ref(db,`rooms/${myRoom}`);
-const playerRef= () => ref(db,`rooms/${myRoom}/players/${myId}`);
+const roomRef   = () => ref(db,`rooms/${myRoom}`);
+const playerRef = () => ref(db,`rooms/${myRoom}/players/${myId}`);
 
+// ─── SOUND ENGINE ───────────────────────────────────────────────
+let audioCtx = null;
+function getAudioCtx(){
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  return audioCtx;
+}
+function playTone(type, freq, duration, gain=0.3, delay=0){
+  if(!soundEnabled) return;
+  try{
+    const ctx=getAudioCtx();
+    const osc=ctx.createOscillator();
+    const gainNode=ctx.createGain();
+    osc.connect(gainNode); gainNode.connect(ctx.destination);
+    osc.type=type; osc.frequency.setValueAtTime(freq, ctx.currentTime+delay);
+    gainNode.gain.setValueAtTime(0, ctx.currentTime+delay);
+    gainNode.gain.linearRampToValueAtTime(gain, ctx.currentTime+delay+0.01);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+delay+duration);
+    osc.start(ctx.currentTime+delay);
+    osc.stop(ctx.currentTime+delay+duration+0.05);
+  }catch(e){}
+}
+function playSoundBuzzer(){
+  // Classic buzzer: descending notes
+  playTone('square',880,0.08,0.35,0);
+  playTone('square',660,0.08,0.35,0.1);
+  playTone('square',440,0.15,0.4,0.2);
+}
+function playSoundRoundStart(){
+  // Ascending fanfare
+  playTone('sine',440,0.1,0.25,0);
+  playTone('sine',550,0.1,0.25,0.12);
+  playTone('sine',660,0.15,0.3,0.24);
+}
+function playSoundSubmit(){
+  // Short happy ding
+  playTone('sine',880,0.08,0.2,0);
+  playTone('sine',1100,0.1,0.15,0.09);
+}
+function playSoundTimerUrgent(){
+  playTone('sine',440,0.05,0.15,0);
+}
+function playSoundGameOver(){
+  // Victory fanfare
+  [0,0.15,0.3,0.5].forEach((d,i)=>{
+    const freqs=[440,550,660,880];
+    playTone('sine',freqs[i],0.25,0.3,d);
+  });
+}
+
+window.toggleSound=function(){
+  soundEnabled=!soundEnabled;
+  document.getElementById("sound-icon").textContent=soundEnabled?"🔊":"🔇";
+  document.getElementById("sound-label").textContent=soundEnabled?"Sound":"Stumm";
+  document.getElementById("sound-toggle-btn").classList.toggle("muted",!soundEnabled);
+  localStorage.setItem("slf_sound",soundEnabled?"1":"0");
+};
+
+// ─── UTILS ──────────────────────────────────────────────────────
 function setConnStatus(s){
   const d=document.getElementById("conn-dot"), l=document.getElementById("conn-label");
   if(!d)return; d.className="conn-dot "+s;
@@ -691,11 +843,17 @@ async function updateRoomData(patch){
   setConnStatus("sync"); await update(roomRef(),patch); setConnStatus("ok");
 }
 
+// ─── INIT ────────────────────────────────────────────────────────
 window.addEventListener("DOMContentLoaded",()=>{
+  // Restore sound preference
+  const savedSound=localStorage.getItem("slf_sound");
+  if(savedSound==="0"){soundEnabled=false;document.getElementById("sound-icon").textContent="🔇";document.getElementById("sound-label").textContent="Stumm";document.getElementById("sound-toggle-btn").classList.add("muted");}
+
   const n=sessionStorage.getItem("slf_name"),r=sessionStorage.getItem("slf_room"),i=sessionStorage.getItem("slf_id");
   if(n&&r&&i){document.getElementById("input-name").value=n;document.getElementById("input-room").value=r;myId=i;window.joinRoom();}
 });
 
+// ─── JOIN ────────────────────────────────────────────────────────
 window.joinRoom=async function(){
   myName=document.getElementById("input-name").value.trim();
   myRoom=document.getElementById("input-room").value.trim().toUpperCase().replace(/[^A-Z0-9]/g,"");
@@ -709,11 +867,17 @@ window.joinRoom=async function(){
     if(!existing){
       isHost=true;
       await set(roomRef(),{
-        host:myId,hostName:myName,
+        host:myId, hostName:myName,
         players:{[myId]:{name:myName,score:0,hb:Date.now()}},
-        cats:catsToObj(DEFAULT_CATS),roundDuration:90,
-        phase:"lobby",round:0,letter:"",
-        buzzer:null,buzzerTs:null,roundAnswers:{},rejections:{},roundStartTs:null,
+        cats:catsToObj(DEFAULT_CATS),
+        roundDuration:90,
+        roundLimit:0,      // 0 = unbegrenzt
+        usedLetters:[],
+        typingStatus:{},
+        allowBuzzer:true,
+        phase:"lobby", round:0, letter:"",
+        buzzer:null, buzzerTs:null,
+        roundAnswers:{}, rejections:{}, roundStartTs:null,
         createdAt:Date.now()
       });
     }else{
@@ -725,18 +889,21 @@ window.joinRoom=async function(){
     sessionStorage.setItem("slf_id",myId);
     startHeartbeat();
     if(roomListener)roomListener();
+    prevBuzzerValue=null;
     roomListener=onValue(roomRef(),snap=>{if(snap.exists())processStateUpdate(snap.val());});
   }catch(e){showError("Fehler: "+e.message);document.getElementById("btn-connect").disabled=false;}
 };
 
 window.leaveRoom=async function(){
   stopRoundTimer();
-  if(localBuzzerCountdown) clearInterval(localBuzzerCountdown);
+  if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
+  // Clear typing status
+  if(myRoom&&myId)try{await update(roomRef(),{[`typingStatus/${myId}`]:null});}catch(e){}
   if(myRoom&&myId)try{await update(roomRef(),{[`players/${myId}`]:null});}catch(e){}
   sessionStorage.clear();
   if(heartbeatInterval)clearInterval(heartbeatInterval);
   if(roomListener)roomListener();
-  myName="";myRoom="";gameState=null;
+  myName="";myRoom="";gameState=null;prevBuzzerValue=null;
   document.getElementById("btn-connect").disabled=false;
   document.getElementById("join-error").style.display="none";
   showScreen("join");
@@ -747,26 +914,46 @@ function startHeartbeat(){
   heartbeatInterval=setInterval(async()=>{try{await update(playerRef(),{hb:Date.now()});}catch(e){}},3000);
 }
 
+// ─── STATE PROCESSING ────────────────────────────────────────────
 async function processStateUpdate(newState){
-  const prev=gameState?.phase;
-  const prevBuzzer = gameState?.buzzer;
-  gameState=newState; isHost=gameState.host===myId;
-  
+  const prevPhase=gameState?.phase;
+  // BUG FIX: capture buzzer BEFORE overwriting gameState
+  const prevBuzzer=prevBuzzerValue;
+
+  gameState=newState;
+  isHost=gameState.host===myId;
+
+  // BUG FIX: host stale cleanup — proper patch object spread
   if(isHost){
     const now=Date.now();
-    const stale=Object.entries(gameState.players||{}).filter(([id,p])=>id!==myId&&now-(p.hb||0)>10000).map(([id])=>id);
-    if(stale.length>0){const patch={};stale.forEach(id=>patch[`players/${id}`]=null);await updateRoomData({patch});return;}
+    const stale=Object.entries(gameState.players||{})
+      .filter(([id,p])=>id!==myId&&now-(p.hb||0)>10000)
+      .map(([id])=>id);
+    if(stale.length>0){
+      const patch={};
+      stale.forEach(id=>{patch[`players/${id}`]=null; patch[`typingStatus/${id}`]=null;});
+      await updateRoomData(patch);
+      return;
+    }
   }
-  
-  if(gameState.phase==="playing" && prev!=="playing") {
-    const backup = sessionStorage.getItem("slf_local_answers");
-    if(backup) localAnswers = JSON.parse(backup);
+
+  if(gameState.phase==="playing" && prevPhase!=="playing"){
+    const backup=sessionStorage.getItem("slf_local_answers");
+    localAnswers=backup?JSON.parse(backup):{};
     startRoundTimerClient();
+    playSoundRoundStart();
   }
-  if(gameState.phase!=="playing" && gameState.phase!=="collecting") stopRoundTimer();
-  
-  if(gameState.buzzer && !prevBuzzer) {
-    triggerLocalBuzzerTicker();
+  if(gameState.phase!=="playing" && gameState.phase!=="collecting"){
+    stopRoundTimer();
+  }
+
+  // BUG FIX: compare against separately tracked prevBuzzer, then update tracker
+  if(gameState.buzzer && gameState.buzzer!==prevBuzzer){
+    prevBuzzerValue=gameState.buzzer;
+    playSoundBuzzer();
+    if(gameState.phase==="playing") triggerLocalBuzzerTicker();
+  } else if(!gameState.buzzer){
+    prevBuzzerValue=null;
   }
 
   syncUIWithPhase();
@@ -775,37 +962,56 @@ async function processStateUpdate(newState){
 function syncUIWithPhase(){
   if(!gameState)return;
   const p=gameState.phase;
-  if(p==="lobby"){resetRoundData();showScreen("lobby");renderLobby();}
-  else if(p==="playing"||p==="collecting"){
-    showScreen("playing");renderPlaying();
+  if(p==="lobby"){
+    resetRoundData();
+    showScreen("lobby");
+    renderLobby();
+  } else if(p==="playing"||p==="collecting"){
+    showScreen("playing");
+    renderPlaying();
     if(p==="collecting"&&!submitted)submitAnswers();
     if(isHost)checkHostRoundEnd();
-  }else if(p==="results"){
+  } else if(p==="results"){
     stopRoundTimer();
-    if(localBuzzerCountdown) clearInterval(localBuzzerCountdown);
-    showScreen("results");renderResults();
+    if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
+    showScreen("results");
+    renderResults();
+    // Game over sound if final round
+    const limit=gameState.roundLimit||0;
+    if(limit>0&&gameState.round>=limit) playSoundGameOver();
   }
 }
 
 function resetRoundData(){
-  submitted=false;localAnswers={};stopRoundTimer();
+  submitted=false;
+  localAnswers={};
+  stopRoundTimer();
   sessionStorage.removeItem("slf_local_answers");
-  if(localBuzzerCountdown) clearInterval(localBuzzerCountdown);
+  if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
+  localBuzzerCountdown=null;
 }
 
+// ─── TIMER ───────────────────────────────────────────────────────
 function startRoundTimerClient(){
   stopRoundTimer();
-  const dur=gameState?.roundDuration||0; if(!dur)return;
+  const dur=gameState?.roundDuration||0;
+  if(!dur)return;
   const elapsed=Math.floor((Date.now()-(gameState?.roundStartTs||Date.now()))/1000);
   roundTimerSecondsLeft=Math.max(0,dur-elapsed);
   renderTimerBar();
   roundTimerInterval=setInterval(async()=>{
     roundTimerSecondsLeft=Math.max(0,roundTimerSecondsLeft-1);
     renderTimerBar();
+    // Urgent sound at 10s
+    if(roundTimerSecondsLeft===10) playSoundTimerUrgent();
     if(roundTimerSecondsLeft<=0){
       stopRoundTimer();
-      if(isHost){const c=(await get(roomRef())).val();if(c?.phase==="playing"||c?.phase==="collecting")await forceRoundEnd(c);}
-      else if(!submitted)window.submitAnswers();
+      if(isHost){
+        const c=(await get(roomRef())).val();
+        if(c?.phase==="playing"||c?.phase==="collecting") await forceRoundEnd(c);
+      } else if(!submitted) {
+        window.submitAnswers();
+      }
     }
   },1000);
 }
@@ -832,14 +1038,22 @@ function renderTimerBar(){
     </div>`;
 }
 
+// ─── LOBBY ───────────────────────────────────────────────────────
 function renderLobby(){
   if(!gameState)return;
   document.getElementById("display-roomcode").textContent=myRoom;
-  const hb=document.getElementById("host-badge");if(hb)hb.style.display=isHost?"block":"none";
+  const hb=document.getElementById("host-badge");
+  if(hb)hb.style.display=isHost?"block":"none";
+
   const now=Date.now();
   const cats=objToCats(gameState.cats);
   const dur=gameState.roundDuration??90;
+  const roundLimit=gameState.roundLimit??0;
+  const usedLetters=gameState.usedLetters||[];
+  const available=ALL_LETTERS.filter(l=>!usedLetters.includes(l));
+  const allowBuzzer=gameState.allowBuzzer!==false;
 
+  // Players
   document.getElementById("players-list").innerHTML=Object.entries(gameState.players||{}).map(([id,p])=>{
     const online=now-(p.hb||0)<10000;
     return`<div class="player-chip">
@@ -849,6 +1063,7 @@ function renderLobby(){
     </div>`;
   }).join("");
 
+  // Categories
   const catsArea=document.getElementById("lobby-cats-area");
   if(isHost){
     if(!document.getElementById("lobby-cats-list")){
@@ -869,6 +1084,7 @@ function renderLobby(){
     catsArea.innerHTML=`<div class="cats-readonly">${cats.map(c=>`<div class="cat-tag">${c}</div>`).join("")}</div>`;
   }
 
+  // Timer
   const ta=document.getElementById("lobby-timer-area");
   if(isHost){
     ta.innerHTML=`
@@ -890,15 +1106,65 @@ function renderLobby(){
     ta.innerHTML=`<div style="font-size:18px;color:var(--pencil);font-weight:600;">${lbl}</div>`;
   }
 
+  // Round limit
+  const ra=document.getElementById("lobby-rounds-area");
+  if(isHost){
+    ra.innerHTML=`
+      <div class="round-presets">
+        ${ROUND_PRESETS.map(r=>{
+          const lbl=r===0?"∞":String(r);
+          return`<button type="button" class="round-preset ${roundLimit===r?"active":""}" onclick="window.setRoundLimit(${r})" title="${r===0?"Unbegrenzt":r+' Runden'}">${lbl}</button>`;
+        }).join("")}
+      </div>
+      <div style="font-size:12px;color:var(--pencil);margin-top:8px;font-family:'Special Elite',monospace;">
+        ${roundLimit===0?"Unbegrenzt viele Runden":roundLimit+" Runden insgesamt"}
+        · Noch ${available.length} Buchstaben verfügbar
+      </div>`;
+  }else{
+    const lbl=roundLimit===0?"Unbegrenzt":roundLimit+" Runden";
+    ra.innerHTML=`<div style="font-size:18px;color:var(--pencil);font-weight:600;">${lbl}</div>`;
+  }
+
+  // Options (buzzer toggle etc.)
+  const oa=document.getElementById("lobby-options-area");
+  if(isHost){
+    oa.innerHTML=`
+      <div class="toggle-row">
+        <span>STOPP-Buzzer erlaubt</span>
+        <div class="toggle-switch ${allowBuzzer?"on":""}" onclick="window.toggleBuzzer()"></div>
+      </div>`;
+  }else{
+    oa.innerHTML=`
+      <div class="toggle-row">
+        <span>STOPP-Buzzer</span>
+        <span style="font-size:14px;color:var(--pencil)">${allowBuzzer?"✓ Ja":"✕ Nein"}</span>
+      </div>`;
+  }
+
+  // Host actions
+  const leftCount=ALL_LETTERS.filter(l=>!(gameState.usedLetters||[]).includes(l)).length;
   document.getElementById("lobby-host-area").innerHTML=isHost
-    ?`<button type="button" class="btn btn-red" onclick="window.startRound()">Runde starten →</button>`
+    ?`<button type="button" class="btn btn-red" onclick="window.startRound()" ${leftCount===0?"disabled":""}>
+        Runde starten → ${gameState.round>0?`(${gameState.round} gespielt)`:""}
+      </button>
+      ${leftCount===0?`<p class="hint" style="margin-top:8px">Alle Buchstaben gespielt! Zurücksetzen um weiterzumachen.</p>`:``}
+      ${gameState.round>0?`<button type="button" class="btn btn-outline" style="margin-top:10px" onclick="window.resetLetters()">Buchstaben zurücksetzen</button>`:""}
+      `
     :`<div style="font-size:16px;color:var(--pencil);font-weight:600;"><span class="pulse-dot"></span>Warte auf den Spielleiter…</div>`;
 }
 
 window.setTimer=async function(s){await updateRoomData({roundDuration:s});};
 window.setCustomTimer=async function(){
   const v=parseInt(document.getElementById("timer-custom-input")?.value||"0",10);
-  if(!v||v<10||v>600)return; await updateRoomData({roundDuration:v});
+  if(!v||v<10||v>600)return;
+  await updateRoomData({roundDuration:v});
+};
+window.setRoundLimit=async function(r){await updateRoomData({roundLimit:r});};
+window.toggleBuzzer=async function(){
+  await updateRoomData({allowBuzzer:gameState.allowBuzzer===false});
+};
+window.resetLetters=async function(){
+  await updateRoomData({usedLetters:[]});
 };
 window.addCat=async function(){
   const i=document.getElementById("lobby-cat-input");if(!i)return;
@@ -912,48 +1178,112 @@ window.removeCat=async function(idx){
   cats.splice(idx,1);await updateRoomData({cats:catsToObj(cats)});
 };
 window.startRound=async function(){
-  // BUGHUB-FIX: Reset muss zwingend als Erstes ausgeführt werden, bevor der Datenbank-Update
-  // asynchron triggert. Sonst tötet der Reset den gerade neu gestarteten Timer!
-  resetRoundData(); 
-  
-  const letter=LETTERS[Math.floor(Math.random()*LETTERS.length)];
-  await updateRoomData({phase:"playing",round:(gameState.round||0)+1,letter,
-    buzzer:null,buzzerTs:null,roundAnswers:{},rejections:{},roundStartTs:Date.now()});
+  const usedLetters=gameState.usedLetters||[];
+  const available=ALL_LETTERS.filter(l=>!usedLetters.includes(l));
+  if(available.length===0)return;
+
+  // Pick random letter from available pool
+  const letter=available[Math.floor(Math.random()*available.length)];
+  const newUsed=[...usedLetters,letter];
+
+  // BUG FIX: resetRoundData is called client-side only AFTER the DB write triggers processStateUpdate
+  // Do NOT call it here before the write — it would clear local state before the new phase starts
+  await updateRoomData({
+    phase:"playing",
+    round:(gameState.round||0)+1,
+    letter,
+    usedLetters:newUsed,
+    buzzer:null,
+    buzzerTs:null,
+    roundAnswers:{},
+    rejections:{},
+    roundStartTs:Date.now(),
+    typingStatus:{}
+  });
 };
 
+// ─── PLAYING ─────────────────────────────────────────────────────
 function renderPlaying(){
   if(!gameState)return;
   const cats=objToCats(gameState.cats);
-  document.getElementById("round-badge").textContent=`Runde ${gameState.round}`;
+  const usedLetters=gameState.usedLetters||[];
+  const roundLimit=gameState.roundLimit||0;
+
+  document.getElementById("round-badge").textContent=`Runde ${gameState.round}${roundLimit>0?" / "+roundLimit:""}`;
   document.getElementById("big-letter").textContent=gameState.letter;
+
+  // Used letters display
+  const prevUsed=usedLetters.filter(l=>l!==gameState.letter);
+  document.getElementById("used-letters-display").innerHTML=prevUsed.length>0
+    ?prevUsed.map(l=>`<div class="used-letter-chip">${l}</div>`).join("")
+    :"";
+
+  // Round progress pips
+  if(roundLimit>0){
+    document.getElementById("round-progress-pips").innerHTML=Array.from({length:roundLimit},(_,i)=>{
+      const rn=i+1;
+      const cls=rn<gameState.round?"done":rn===gameState.round?"current":"future";
+      return`<div class="round-pip ${cls}"></div>`;
+    }).join("");
+  }else{
+    document.getElementById("round-progress-pips").innerHTML="";
+  }
+
+  // Typing indicators (other players)
+  const typingStatus=gameState.typingStatus||{};
+  const typingOthers=Object.entries(typingStatus)
+    .filter(([id,ts])=>id!==myId&&Date.now()-ts<4000)
+    .map(([id])=>gameState.players?.[id]?.name)
+    .filter(Boolean);
+
+  const tiEl=document.getElementById("typing-indicators-area");
+  if(tiEl){
+    tiEl.innerHTML=typingOthers.length>0
+      ?`<div class="typing-indicators">${typingOthers.map(name=>
+          `<div class="typing-chip">${name} <div class="typing-dots"><span></span><span></span><span></span></div></div>`
+        ).join("")}</div>`
+      :`<div class="typing-indicators"></div>`;
+  }
+
   const bEl=document.getElementById("buzzer-container");
   const cEl=document.getElementById("playing-content");
 
   if(gameState.phase==="collecting"){
     bEl.innerHTML=`<div class="buzzer-fired">⌛ Zeit läuft ab — Einsammeln!</div>`;
-    if(submitted)cEl.innerHTML=renderWaiting();return;
+    if(submitted){cEl.innerHTML=renderWaiting();return;}
   }
-  
-  if(gameState.buzzer){
-    bEl.innerHTML=`<div class="buzzer-fired" id="buzzer-ticker">🔔 ${gameState.buzzer} hat STOPP gerufen!</div>`;
-  }else{
-    bEl.innerHTML=submitted?"":`<div class="buzzer-wrap"><button type="button" class="buzzer-btn" onclick="window.triggerBuzzer()">STOPP!</button></div>`;
+
+  if(gameState.phase==="playing"){
+    if(gameState.buzzer){
+      bEl.innerHTML=`<div class="buzzer-fired" id="buzzer-ticker">🔔 ${escHtml(gameState.buzzer)} hat STOPP gerufen!</div>`;
+    }else if(!submitted && gameState.allowBuzzer!==false){
+      bEl.innerHTML=`<div class="buzzer-wrap"><button type="button" class="buzzer-btn" onclick="window.triggerBuzzer()">STOPP!</button></div>`;
+    }else{
+      bEl.innerHTML="";
+    }
   }
-  
+
   if(submitted){cEl.innerHTML=renderWaiting();return;}
-  
+
   if(!cEl.querySelector(".answer-form")){
     cEl.innerHTML=`
       <div class="answer-form">
         ${cats.map(cat=>`
           <div class="answer-row">
-            <span class="ans-cat">${cat}</span>
-            <input type="text" id="ans-${sanitizeId(cat)}" placeholder="${cat} mit ${gameState.letter}…" autocomplete="off"/>
+            <span class="ans-cat">${escHtml(cat)}</span>
+            <input type="text" id="ans-${sanitizeId(cat)}"
+              placeholder="${escHtml(cat)} mit ${gameState.letter}…"
+              autocomplete="off"
+              inputmode="text"
+              autocapitalize="words"/>
           </div>`).join("")}
         <button type="button" class="btn btn-green" style="margin-top:14px" onclick="window.submitAnswers()">Fertig ✓</button>
       </div>`;
     cats.forEach(cat=>{
-      if(localAnswers[cat]){const e=document.getElementById(`ans-${sanitizeId(cat)}`);if(e)e.value=localAnswers[cat];}
+      if(localAnswers[cat]){
+        const e=document.getElementById(`ans-${sanitizeId(cat)}`);
+        if(e)e.value=localAnswers[cat];
+      }
     });
   }
 }
@@ -964,7 +1294,7 @@ function renderWaiting(){
   const total=Object.keys(gameState.players||{}).length;
   const pending=total-Object.keys(ans).length;
   const chips=Object.entries(gameState.players||{}).map(([id,p])=>
-    `<span class="wait-chip ${ans[id]?"done":"pending"}">${ans[id]?"✓":"…"} ${p.name}</span>`).join("");
+    `<span class="wait-chip ${ans[id]?"done":"pending"}">${ans[id]?"✓":"…"} ${escHtml(p.name)}</span>`).join("");
   return`<div class="waiting-block">
     <div class="waiting-icon">✅</div>
     <div class="waiting-title">Abgegeben!</div>
@@ -974,51 +1304,61 @@ function renderWaiting(){
 }
 
 window.triggerBuzzer=async function(){
-  if(!gameState||gameState.buzzer)return;
-  const s=await get(ref(db,`rooms/${myRoom}/buzzer`));if(s.val())return;
+  if(!gameState||gameState.buzzer||gameState.allowBuzzer===false)return;
+  const s=await get(ref(db,`rooms/${myRoom}/buzzer`));
+  if(s.val())return;
   await updateRoomData({buzzer:myName,buzzerTs:Date.now()});
 };
 
-function triggerLocalBuzzerTicker() {
-  if(localBuzzerCountdown) clearInterval(localBuzzerCountdown);
-  let countdown = 5;
-  
-  localBuzzerCountdown = setInterval(async () => {
+function triggerLocalBuzzerTicker(){
+  if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
+  let countdown=5;
+  localBuzzerCountdown=setInterval(async()=>{
     countdown--;
-    const ticker = document.getElementById("buzzer-ticker");
-    if(ticker) ticker.textContent = `🔔 ${gameState.buzzer} hat STOPP gerufen! (${countdown}s)`;
-    
-    if(countdown <= 0) {
+    const ticker=document.getElementById("buzzer-ticker");
+    if(ticker)ticker.textContent=`🔔 ${gameState.buzzer} hat STOPP gerufen! (${countdown}s)`;
+    if(countdown<=0){
       clearInterval(localBuzzerCountdown);
-      if(!submitted) window.submitAnswers();
-      if(isHost) {
-        const c = (await get(roomRef())).val();
-        if(c && c.phase === "playing") {
-          c.phase = "collecting";
-          await set(roomRef(), c);
-          setTimeout(async () => {
-            const f = (await get(roomRef())).val();
-            if(f && f.phase === "collecting") await forceRoundEnd(f);
-          }, 2000);
+      localBuzzerCountdown=null;
+      if(!submitted)window.submitAnswers();
+      if(isHost){
+        const c=(await get(roomRef())).val();
+        if(c&&c.phase==="playing"){
+          // BUG FIX: Don't mutate `c` directly for phase, use update to avoid race
+          await updateRoomData({phase:"collecting"});
+          setTimeout(async()=>{
+            const f=(await get(roomRef())).val();
+            if(f&&f.phase==="collecting") await forceRoundEnd(f);
+          },2000);
         }
       }
     }
-  }, 1000);
+  },1000);
 }
 
 window.submitAnswers=async function(){
   if(submitted)return;
   const cats=objToCats(gameState?.cats);
   const ans={};
-  cats.forEach(cat=>{const e=document.getElementById(`ans-${sanitizeId(cat)}`);ans[cat]=e?e.value.trim():(localAnswers[cat]||"");});
-  submitted=true;await updateRoomData({[`roundAnswers/${myId}`]:ans});
+  cats.forEach(cat=>{
+    const e=document.getElementById(`ans-${sanitizeId(cat)}`);
+    ans[cat]=e?e.value.trim():(localAnswers[cat]||"");
+  });
+  submitted=true;
+  // Clear typing indicator on submit
+  try{await update(roomRef(),{[`typingStatus/${myId}`]:null});}catch(e){}
+  await updateRoomData({[`roundAnswers/${myId}`]:ans});
+  playSoundSubmit();
 };
 
+// ─── HOST ROUND END ──────────────────────────────────────────────
 async function checkHostRoundEnd(){
   if(!isHost)return;
   const cur=(await get(roomRef())).val();
   if(!cur||(cur.phase!=="playing"&&cur.phase!=="collecting"))return;
-  const active=Object.entries(cur.players||{}).filter(([id,p])=>Date.now()-(p.hb||0)<12000).map(([id])=>id);
+  const active=Object.entries(cur.players||{})
+    .filter(([id,p])=>Date.now()-(p.hb||0)<12000)
+    .map(([id])=>id);
   if(active.length>0&&active.every(id=>cur.roundAnswers?.[id]))await forceRoundEnd(cur);
 }
 
@@ -1026,129 +1366,231 @@ async function forceRoundEnd(cur){
   if(!cur||cur.phase==="results")return;
   calculateBaseScores(cur);
   cur.phase="results";
+  // Clear typing status
+  cur.typingStatus={};
   setConnStatus("sync");await set(roomRef(),cur);setConnStatus("ok");
 }
 
 function calculateBaseScores(state){
   const cats=objToCats(state.cats);
   const pids=Object.keys(state.players||{});
-  const rejections = state.rejections || {};
-  
-  pids.forEach(id => { state.players[id].score = 0; });
+  const rejections=state.rejections||{};
+
+  // BUG FIX: scores are CUMULATIVE across rounds — we only add this round's delta
+  // The old code reset scores to 0 every round, wiping previous rounds!
+  // We need to add to existing scores, not replace them.
+  // Store round scores separately and add them in.
+  const roundScores={};
+  pids.forEach(id=>{roundScores[id]=0;});
 
   cats.forEach(cat=>{
     const valid=pids.map(id=>{
       let v=(state.roundAnswers?.[id]?.[cat]||"").trim().toLowerCase();
-      if(rejections[`${id}__${cat}`]) v = "";
-      if(v&&!v.startsWith(state.letter.toLowerCase())) v="";
+      if(rejections[`${id}__${cat}`])v="";
+      if(v&&!v.startsWith(state.letter.toLowerCase()))v="";
       return{id,v};
     });
-    
     valid.forEach(({id,v})=>{
       if(!v)return;
-      const tot=valid.filter(a=>a.v!=="").length,dup=valid.filter(a=>a.v===v).length;
-      state.players[id].score=(state.players[id].score||0)+(tot===1?20:dup===1?10:5);
+      const tot=valid.filter(a=>a.v!=="").length;
+      const dup=valid.filter(a=>a.v===v).length;
+      roundScores[id]+=(tot===1?20:dup===1?10:5);
     });
+  });
+
+  // Add round scores to cumulative scores
+  pids.forEach(id=>{
+    state.players[id].score=(state.players[id].score||0)+roundScores[id];
   });
 }
 
-window.toggleAnswerStrike = async function(pid, cat) {
-  if(!isHost || !gameState || gameState.phase !== "results") return;
-  const key = `${pid}__${cat}`;
-  const cur = (await get(roomRef())).val();
-  if(!cur) return;
-  
-  if(!cur.rejections) cur.rejections = {};
-  if(cur.rejections[key]) {
+window.toggleAnswerStrike=async function(pid,cat){
+  if(!isHost||!gameState||gameState.phase!=="results")return;
+  const key=`${pid}__${cat}`;
+  const cur=(await get(roomRef())).val();
+  if(!cur)return;
+  if(!cur.rejections)cur.rejections={};
+  if(cur.rejections[key]){
     delete cur.rejections[key];
-  } else {
-    cur.rejections[key] = true;
+  }else{
+    cur.rejections[key]=true;
   }
-  
-  calculateBaseScores(cur);
-  await set(roomRef(), cur);
+  // Recalculate from scratch for this round
+  // Reset to pre-round scores first (subtract this round's contribution)
+  // Since we store cumulative, we need to re-derive: save pre-round base and recompute
+  // Simplest approach: store roundBaseScores snapshot when round ends
+  // For now: full recalc by resetting to preRoundScores if available
+  if(cur.preRoundScores){
+    Object.keys(cur.players||{}).forEach(id=>{
+      cur.players[id].score=cur.preRoundScores[id]||0;
+    });
+    calculateBaseScores(cur);
+  } else {
+    // Fallback: just recalc (may double-count, but keeps existing behavior)
+    Object.keys(cur.players||{}).forEach(id=>{cur.players[id].score=0;});
+    calculateBaseScores(cur);
+  }
+  await set(roomRef(),cur);
 };
 
+// ─── RESULTS ─────────────────────────────────────────────────────
 function renderResults(){
   if(!gameState)return;
   const cats=objToCats(gameState.cats);
-  const rejections = gameState.rejections || {};
-  
-  document.getElementById("results-sub").textContent=`Runde ${gameState.round} · Buchstabe ${gameState.letter}`;
-  
+  const rejections=gameState.rejections||{};
+  const roundLimit=gameState.roundLimit||0;
+  const isGameOver=roundLimit>0&&gameState.round>=roundLimit;
+
+  document.getElementById("results-sub").textContent=`Runde ${gameState.round}${roundLimit>0?" / "+roundLimit:""} · Buchstabe ${gameState.letter}`;
+
+  // Game over banner
+  const goArea=document.getElementById("gameover-area");
+  if(isGameOver&&goArea){
+    const sorted=Object.entries(gameState.players||{}).sort((a,b)=>(b[1].score||0)-(a[1].score||0));
+    const winner=sorted[0]?.[1]?.name||"?";
+    goArea.innerHTML=`<div class="gameover-banner">
+      <div class="gameover-title">🏆 Spiel vorbei!</div>
+      <div class="gameover-winner">Gewinner: ${escHtml(winner)} · ${sorted[0]?.[1]?.score||0} Punkte</div>
+    </div>`;
+  }else if(goArea){
+    goArea.innerHTML="";
+  }
+
   const banner=document.getElementById("validation-banner-area");
   if(banner){
-    banner.innerHTML = isHost 
-      ? `<div class="val-banner"><div class="val-title">✍️ Du bist der Korrektor!</div><div class="val-sub">Klicke auf falsche Antworten in den Blöcken, um sie per Rotstift zu streichen.</div></div>`
-      : `<div class="val-banner"><div class="val-title">👀 Notenbekanntgabe</div><div class="val-sub">Der Spielleiter prüft die Antworten und zückt bei Bedarf den Rotstift.</div></div>`;
+    banner.innerHTML=isHost
+      ?`<div class="val-banner"><div class="val-title">✍️ Du bist der Korrektor!</div><div class="val-sub">Klicke auf falsche Antworten in den Blöcken, um sie per Rotstift zu streichen.</div></div>`
+      :`<div class="val-banner"><div class="val-title">👀 Notenbekanntgabe</div><div class="val-sub">Der Spielleiter prüft die Antworten und zückt bei Bedarf den Rotstift.</div></div>`;
   }
-  
+
   const sorted=Object.entries(gameState.players||{}).sort((a,b)=>(b[1].score||0)-(a[1].score||0));
-  document.getElementById("scoreboard").innerHTML=sorted.map(([id,p], i)=>`
+  document.getElementById("scoreboard").innerHTML=sorted.map(([id,p],i)=>`
     <div class="score-row ${i===0?"gold":""}">
-      <div class="score-name">${["①","②","③"][i]||"  "} ${p.name}</div>
+      <div class="score-name">${["①","②","③"][i]||"  "} ${escHtml(p.name)}</div>
       <div class="score-pts">${p.score||0} Punkte</div>
     </div>`).join("");
-    
+
   document.getElementById("results-container").innerHTML=Object.entries(gameState.players||{}).map(([pid,p])=>{
     const ans=gameState.roundAnswers?.[pid]||{};
     return`<div class="result-card">
-      <div class="result-player">${p.name}</div>
+      <div class="result-player">${escHtml(p.name)}</div>
       ${cats.map(cat=>{
         const word=(ans[cat]||"").trim();
-        const wrongLetter = word && !word.toLowerCase().startsWith(gameState.letter.toLowerCase());
-        const isRejected = rejections[`${pid}__${cat}`];
-        
-        let disp="", badge="";
+        const wrongLetter=word&&!word.toLowerCase().startsWith(gameState.letter.toLowerCase());
+        const isRejected=rejections[`${pid}__${cat}`];
+        let disp="",badge="";
         if(!word){
           disp=`<i style="color:rgba(107, 100, 92, 0.4)">—</i>`;
-        } else if(wrongLetter) {
-          disp=`<s style="color:var(--red)">${word}</s>`;
+        }else if(wrongLetter){
+          disp=`<s style="color:var(--red)">${escHtml(word)}</s>`;
           badge=`<span class="stamp stamp-no">Falscher Buchstabe</span>`;
-        } else if(isRejected) {
-          disp=`<span style="color:var(--red)">${word}</span>`;
+        }else if(isRejected){
+          disp=`<span style="color:var(--red)">${escHtml(word)}</span>`;
           badge=`<span class="stamp stamp-no">✕ GESTRICHEN</span>`;
-        } else {
-          disp=`<span style="color:var(--blue)">${word}</span>`;
+        }else{
+          disp=`<span style="color:var(--blue)">${escHtml(word)}</span>`;
           badge=`<span class="stamp stamp-ok">✓ OK</span>`;
         }
-        
-        const hostClass = isHost && word && !wrongLetter ? "host-clickable" : "";
-        const rejectedClass = isRejected ? "rejected" : "";
-        
+        const hostClass=isHost&&word&&!wrongLetter?"host-clickable":"";
+        const rejectedClass=isRejected?"rejected":"";
         return`
-          <div class="result-row ${hostClass} ${rejectedClass}" onclick="window.toggleAnswerStrike('${pid}','${cat}')">
-            <span class="result-cat">${cat}</span>
+          <div class="result-row ${hostClass} ${rejectedClass}"
+               onclick="window.toggleAnswerStrike('${pid}','${escHtml(cat)}')">
+            <span class="result-cat">${escHtml(cat)}</span>
             <span class="result-word">${disp}</span>
             ${badge}
           </div>`;
       }).join("")}
     </div>`;
   }).join("");
-  
-  document.getElementById("results-actions").innerHTML=isHost
-    ?`<button type="button" class="btn" onclick="window.nextRound()">Nächste Runde →</button>`
-    :`<div style="font-size:16px;color:var(--pencil);font-weight:600;"><span class="pulse-dot"></span>Warte auf den Spielleiter…</div>`;
+
+  if(isGameOver){
+    document.getElementById("results-actions").innerHTML=isHost
+      ?`<button type="button" class="btn" onclick="window.newGame()">Neues Spiel →</button>`
+      :`<div style="font-size:16px;color:var(--pencil);font-weight:600;"><span class="pulse-dot"></span>Warte auf den Spielleiter…</div>`;
+  }else{
+    document.getElementById("results-actions").innerHTML=isHost
+      ?`<button type="button" class="btn" onclick="window.nextRound()">Nächste Runde →</button>`
+      :`<div style="font-size:16px;color:var(--pencil);font-weight:600;"><span class="pulse-dot"></span>Warte auf den Spielleiter…</div>`;
+  }
 }
 
 window.nextRound=async function(){
+  // Save pre-round scores before resetting
+  const preRoundScores={};
+  Object.entries(gameState.players||{}).forEach(([id,p])=>{preRoundScores[id]=p.score||0;});
   resetRoundData();
-  await updateRoomData({phase:"lobby",buzzer:null,buzzerTs:null,roundAnswers:{},rejections:{},roundStartTs:null});
+  await updateRoomData({
+    phase:"lobby",
+    buzzer:null,buzzerTs:null,
+    roundAnswers:{},rejections:{},
+    roundStartTs:null,
+    preRoundScores,
+    typingStatus:{}
+  });
 };
 
+window.newGame=async function(){
+  // Full reset: scores and letters
+  const playerReset={};
+  Object.keys(gameState.players||{}).forEach(id=>{
+    playerReset[`players/${id}/score`]=0;
+  });
+  resetRoundData();
+  await updateRoomData({
+    ...playerReset,
+    phase:"lobby",
+    round:0,
+    buzzer:null,buzzerTs:null,
+    roundAnswers:{},rejections:{},
+    roundStartTs:null,
+    usedLetters:[],
+    preRoundScores:null,
+    typingStatus:{}
+  });
+};
+
+// ─── TYPING STATUS ────────────────────────────────────────────────
 document.addEventListener("input",e=>{
   if(e.target.matches(".answer-row input")&&gameState?.cats){
     const cats=objToCats(gameState.cats);
     const cat=cats.find(c=>`ans-${sanitizeId(c)}`===e.target.id);
-    if(cat) {
+    if(cat){
       localAnswers[cat]=e.target.value;
-      sessionStorage.setItem("slf_local_answers", JSON.stringify(localAnswers));
+      sessionStorage.setItem("slf_local_answers",JSON.stringify(localAnswers));
+
+      // Visual letter feedback
+      const val=e.target.value.trim();
+      if(val.length===0){
+        e.target.classList.remove("typing-ok","typing-bad");
+      }else if(val.toLowerCase().startsWith(gameState.letter.toLowerCase())){
+        e.target.classList.add("typing-ok");
+        e.target.classList.remove("typing-bad");
+      }else{
+        e.target.classList.add("typing-bad");
+        e.target.classList.remove("typing-ok");
+      }
+    }
+
+    // Broadcast typing status (throttled)
+    if(typingTimeout)clearTimeout(typingTimeout);
+    if(myRoom&&myId&&gameState?.phase==="playing"){
+      update(ref(db,`rooms/${myRoom}/typingStatus`),{[myId]:Date.now()}).catch(()=>{});
+      typingTimeout=setTimeout(()=>{
+        update(ref(db,`rooms/${myRoom}/typingStatus`),{[myId]:null}).catch(()=>{});
+      },3000);
     }
   }
 });
+
 document.getElementById("input-room").addEventListener("input",e=>{
   e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,"");
 });
+
+// ─── HELPERS ──────────────────────────────────────────────────────
+function escHtml(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
 </script>
 </body>
 </html>
