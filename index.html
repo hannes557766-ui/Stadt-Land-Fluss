@@ -358,6 +358,7 @@
       padding: 12px 16px;
       border-radius: 12px;
       box-shadow: 4px 4px 0 rgba(35, 33, 30, 0.05);
+      pointer-events: auto; /* WICHTIG: Damit der Timer anklickbar bliebe, falls nötig */
     }
     .timer-head {
       display: flex; justify-content: space-between; align-items: baseline;
@@ -607,10 +608,10 @@
 </div>
 
 <div id="screen-playing" class="screen hidden">
-  <!-- Timer nach ganz oben geholt und "sticky" gemacht -->
-  <div id="timer-bar-area" style="width: 100%; max-width: 480px; position: sticky; top: 15px; z-index: 90;"></div>
+  <!-- Timer nach ganz oben geholt und "fixed" gemacht für absoluten Top-Stand -->
+  <div id="timer-bar-area" style="position: fixed; top: 15px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; z-index: 200; padding: 0 15px; pointer-events: none;"></div>
   
-  <div class="letter-stage" style="margin-top: 10px;">
+  <div class="letter-stage" style="margin-top: 80px;">
     <span class="round-tag" id="round-badge">Runde 1</span>
     <div class="big-letter" id="big-letter">A</div>
   </div>
@@ -911,10 +912,13 @@ window.removeCat=async function(idx){
   cats.splice(idx,1);await updateRoomData({cats:catsToObj(cats)});
 };
 window.startRound=async function(){
+  // BUGHUB-FIX: Reset muss zwingend als Erstes ausgeführt werden, bevor der Datenbank-Update
+  // asynchron triggert. Sonst tötet der Reset den gerade neu gestarteten Timer!
+  resetRoundData(); 
+  
   const letter=LETTERS[Math.floor(Math.random()*LETTERS.length)];
   await updateRoomData({phase:"playing",round:(gameState.round||0)+1,letter,
     buzzer:null,buzzerTs:null,roundAnswers:{},rejections:{},roundStartTs:Date.now()});
-  resetRoundData();
 };
 
 function renderPlaying(){
