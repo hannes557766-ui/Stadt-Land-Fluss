@@ -7,108 +7,79 @@
 <title>Stadt Land Fluss</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
-  :root {
-    --cream: #faf6ef;
-    --ink: #1a1612;
-    --rust: #c94a2a;
-    --gold: #d4a017;
-    --sage: #5c7a5a;
-    --mist: #e8e2d9;
-    --paper: #f2ece2;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--cream); color: var(--ink); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
-  body::before {
-    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    background: radial-gradient(circle at 20% 20%, rgba(201,74,42,0.06) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(92,122,90,0.07) 0%, transparent 50%);
-  }
-  .screen { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 28px 20px 60px; animation: fadeIn 0.35s ease; }
-  .screen.hidden { display: none; }
-  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-
-.game-header { text-align: center; margin-bottom: 32px; }
-.game-title { font-family: ‘Fraunces’, serif; font-size: clamp(2.6rem,10vw,4.5rem); font-weight: 900; line-height: 0.95; color: var(–ink); letter-spacing: -2px; }
-.game-title span { color: var(–rust); font-style: italic; }
-.game-sub { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(–rust); margin-top: 10px; font-weight: 600; }
-
-.card { background: var(–paper); border: 1.5px solid var(–mist); border-radius: 20px; padding: 24px 22px; width: 100%; max-width: 440px; box-shadow: 0 4px 24px rgba(26,22,18,0.07); }
-
-.label { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(–rust); margin-bottom: 7px; margin-top: 16px; display: block; }
-.label:first-child { margin-top: 0; }
-
-input[type=text] { width: 100%; background: var(–cream); border: 1.5px solid var(–mist); border-radius: 10px; padding: 13px 15px; font-family: ‘DM Sans’, sans-serif; font-size: 16px; color: var(–ink); outline: none; transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; }
-input[type=text]:focus { border-color: var(–rust); box-shadow: 0 0 0 3px rgba(201,74,42,0.12); }
-
-.btn { width: 100%; padding: 14px 20px; border-radius: 12px; border: none; font-family: ‘DM Sans’, sans-serif; font-weight: 600; font-size: 15px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; margin-top: 12px; }
-.btn:active { transform: scale(0.97); }
-.btn-primary { background: var(–rust); color: white; box-shadow: 0 3px 14px rgba(201,74,42,0.3); }
-.btn-secondary { background: var(–mist); color: var(–ink); border: 1.5px solid rgba(26,22,18,0.1); }
-.btn-sm { width: auto; padding: 7px 14px; font-size: 13px; margin-top: 0; border-radius: 8px; }
-.btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
-
-.room-code-display { text-align: center; background: var(–ink); color: var(–cream); border-radius: 14px; padding: 18px; margin-bottom: 18px; }
-.room-code-display .code { font-family: ‘Fraunces’, serif; font-size: 2.6rem; font-weight: 900; letter-spacing: 8px; color: var(–gold); line-height: 1; }
-.room-code-display .code-hint { font-size: 11px; color: rgba(250,246,239,0.45); margin-top: 5px; letter-spacing: 1px; text-transform: uppercase; }
-
-.players-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-.player-chip { display: inline-flex; align-items: center; gap: 6px; background: var(–cream); border: 1.5px solid var(–mist); border-radius: 30px; padding: 6px 14px; font-size: 13px; font-weight: 500; }
-.player-chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(–sage); }
-
-.cat-item { display: flex; align-items: center; justify-content: space-between; background: var(–cream); border: 1.5px solid var(–mist); border-radius: 10px; padding: 8px 12px; margin-bottom: 6px; font-size: 14px; }
-.cat-remove { background: none; border: none; cursor: pointer; color: rgba(26,22,18,0.3); font-size: 16px; }
-.cats-readonly { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.cat-tag { background: var(–cream); border: 1.5px solid var(–mist); border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 600; }
-
-.letter-stage { text-align: center; margin: 8px 0 16px; }
-.big-letter { font-family: ‘Fraunces’, serif; font-size: clamp(6rem,24vw,10rem); font-weight: 900; font-style: italic; color: var(–rust); line-height: 0.9; text-shadow: 6px 6px 0 rgba(201,74,42,0.1); }
-.round-badge { display: inline-block; background: var(–ink); color: var(–cream); border-radius: 20px; padding: 4px 14px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
-
-.buzzer-wrap { width: 100%; max-width: 440px; margin-bottom: 14px; }
-.buzzer-btn { width: 100%; padding: 18px; border-radius: 16px; border: none; background: linear-gradient(135deg, #c94a2a, #e05a35); color: white; font-family: ‘Fraunces’, serif; font-size: 1.3rem; font-weight: 700; cursor: pointer; box-shadow: 0 6px 24px rgba(201,74,42,0.45); transition: transform 0.1s; }
-.buzzer-btn:active { transform: scale(0.96); }
-.buzzer-fired { text-align: center; background: var(–ink); color: var(–cream); border-radius: 16px; padding: 14px; margin-bottom: 14px; font-size: 14px; font-weight: 600; width: 100%; max-width: 440px; }
-
-.answer-form { width: 100%; max-width: 440px; }
-.answer-field { background: var(–paper); border: 1.5px solid var(–mist); border-radius: 14px; padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
-.answer-field .cat-name { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(–rust); min-width: 60px; }
-.answer-field input { flex: 1; background: transparent; border: none; border-bottom: 1.5px solid var(–mist); padding: 4px 2px; font-size: 15px; color: var(–ink); outline: none; }
-
-.waiting-box { text-align: center; padding: 24px 20px; font-weight: 600; }
-.submit-waiting { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 20px; }
-.submit-waiting .check { font-size: 2.5rem; }
-.submit-waiting .wait-players { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; }
-.wait-chip { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-.wait-chip.done { background: var(–sage); color: white; }
-.wait-chip.pending { background: var(–mist); color: var(–ink); }
-
-.scoreboard { width: 100%; max-width: 440px; margin-bottom: 16px; }
-.score-row { display: flex; align-items: center; justify-content: space-between; background: var(–paper); border: 1.5px solid var(–mist); border-radius: 12px; padding: 10px 16px; margin-bottom: 8px; }
-.score-row.score-top { border-color: var(–gold); background: #fffbf0; }
-.score-name { font-weight: 600; font-size: 14px; }
-.score-pts { font-family: ‘Fraunces’, serif; font-size: 1.1rem; font-weight: 700; color: var(–rust); }
-
-.result-card { background: var(–paper); border: 1.5px solid var(–mist); border-radius: 16px; padding: 16px 18px; margin-bottom: 10px; width: 100%; max-width: 440px; }
-.result-player-name { font-family: ‘Fraunces’, serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; }
-.result-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(–mist); font-size: 14px; }
-.result-cat { font-size: 11px; font-weight: 600; color: rgba(26,22,18,0.4); text-transform: uppercase; }
-
-.error-msg { color: var(–rust); font-size: 13px; margin-top: 8px; text-align: center; font-weight: 500; }
-.hint { font-size: 12px; color: rgba(26,22,18,0.38); text-align: center; margin-top: 12px; }
-.divider { border: none; border-top: 1.5px solid var(–mist); margin: 16px 0; }
-.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; background: var(–sage); animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-.section-header { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: rgba(26,22,18,0.4); margin: 20px 0 10px; width: 100%; max-width: 440px; }
-
-.conn-indicator { position: fixed; top: 12px; right: 12px; display: flex; align-items: center; gap: 6px; background: white; border-radius: 20px; padding: 5px 10px; font-size: 11px; font-weight: 600; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 100; }
-.conn-dot { width: 7px; height: 7px; border-radius: 50%; }
-.conn-dot.ok { background: var(–sage); }
-.conn-dot.err { background: var(–rust); }
-.conn-dot.sync { background: var(–gold); animation: pulse 1s infinite; }
-
-.card-title { font-family: ‘Fraunces’, serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 18px; color: var(–ink); }
+  :root{--cream:#faf6ef;--ink:#1a1612;--rust:#c94a2a;--gold:#d4a017;--sage:#5c7a5a;--mist:#e8e2d9;--paper:#f2ece2;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(circle at 20% 20%,rgba(201,74,42,.06) 0%,transparent 50%),
+               radial-gradient(circle at 80% 80%,rgba(92,122,90,.07) 0%,transparent 50%);}
+  .screen{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:28px 20px 60px;animation:fadeIn .35s ease;}
+  .screen.hidden{display:none;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .game-header{text-align:center;margin-bottom:32px;}
+  .game-title{font-family:'Fraunces',serif;font-size:clamp(2.6rem,10vw,4.5rem);font-weight:900;line-height:.95;color:var(--ink);letter-spacing:-2px;}
+  .game-title span{color:var(--rust);font-style:italic;}
+  .game-sub{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--rust);margin-top:10px;font-weight:600;}
+  .card{background:var(--paper);border:1.5px solid var(--mist);border-radius:20px;padding:24px 22px;width:100%;max-width:440px;box-shadow:0 4px 24px rgba(26,22,18,.07);}
+  .card-title{font-family:'Fraunces',serif;font-size:1.25rem;font-weight:700;margin-bottom:18px;color:var(--ink);}
+  .label{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--rust);margin-bottom:7px;margin-top:16px;display:block;}
+  .label:first-child{margin-top:0;}
+  input[type=text]{width:100%;background:var(--cream);border:1.5px solid var(--mist);border-radius:10px;padding:13px 15px;font-family:'DM Sans',sans-serif;font-size:16px;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;}
+  input[type=text]:focus{border-color:var(--rust);box-shadow:0 0 0 3px rgba(201,74,42,.12);}
+  .btn{width:100%;padding:14px 20px;border-radius:12px;border:none;font-family:'DM Sans',sans-serif;font-weight:600;font-size:15px;cursor:pointer;transition:transform .15s,box-shadow .15s;margin-top:12px;}
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:var(--rust);color:white;box-shadow:0 3px 14px rgba(201,74,42,.3);}
+  .btn-secondary{background:var(--mist);color:var(--ink);border:1.5px solid rgba(26,22,18,.1);}
+  .btn-sm{width:auto;padding:7px 14px;font-size:13px;margin-top:0;border-radius:8px;}
+  .btn:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none;}
+  .room-code-display{text-align:center;background:var(--ink);color:var(--cream);border-radius:14px;padding:18px;margin-bottom:18px;}
+  .room-code-display .code{font-family:'Fraunces',serif;font-size:2.6rem;font-weight:900;letter-spacing:8px;color:var(--gold);line-height:1;}
+  .room-code-display .code-hint{font-size:11px;color:rgba(250,246,239,.45);margin-top:5px;letter-spacing:1px;text-transform:uppercase;}
+  .players-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+  .player-chip{display:inline-flex;align-items:center;gap:6px;background:var(--cream);border:1.5px solid var(--mist);border-radius:30px;padding:6px 14px;font-size:13px;font-weight:500;}
+  .player-chip .dot{width:7px;height:7px;border-radius:50%;}
+  .cat-item{display:flex;align-items:center;justify-content:space-between;background:var(--cream);border:1.5px solid var(--mist);border-radius:10px;padding:8px 12px;margin-bottom:6px;font-size:14px;}
+  .cat-remove{background:none;border:none;cursor:pointer;color:rgba(26,22,18,.3);font-size:16px;}
+  .cats-readonly{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .cat-tag{background:var(--cream);border:1.5px solid var(--mist);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;}
+  .letter-stage{text-align:center;margin:8px 0 16px;}
+  .big-letter{font-family:'Fraunces',serif;font-size:clamp(6rem,24vw,10rem);font-weight:900;font-style:italic;color:var(--rust);line-height:.9;text-shadow:6px 6px 0 rgba(201,74,42,.1);}
+  .round-badge{display:inline-block;background:var(--ink);color:var(--cream);border-radius:20px;padding:4px 14px;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;}
+  .buzzer-wrap{width:100%;max-width:440px;margin-bottom:14px;}
+  .buzzer-btn{width:100%;padding:18px;border-radius:16px;border:none;background:linear-gradient(135deg,#c94a2a,#e05a35);color:white;font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;cursor:pointer;box-shadow:0 6px 24px rgba(201,74,42,.45);transition:transform .1s;}
+  .buzzer-btn:active{transform:scale(.96);}
+  .buzzer-fired{text-align:center;background:var(--ink);color:var(--cream);border-radius:16px;padding:14px;margin-bottom:14px;font-size:14px;font-weight:600;width:100%;max-width:440px;}
+  .answer-form{width:100%;max-width:440px;}
+  .answer-field{background:var(--paper);border:1.5px solid var(--mist);border-radius:14px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+  .answer-field .cat-name{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--rust);min-width:60px;}
+  .answer-field input{flex:1;background:transparent;border:none;border-bottom:1.5px solid var(--mist);padding:4px 2px;font-size:15px;color:var(--ink);outline:none;}
+  .submit-waiting{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;}
+  .submit-waiting .check{font-size:2.5rem;}
+  .wait-players{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px;}
+  .wait-chip{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;}
+  .wait-chip.done{background:var(--sage);color:white;}
+  .wait-chip.pending{background:var(--mist);color:var(--ink);}
+  .scoreboard{width:100%;max-width:440px;margin-bottom:16px;}
+  .score-row{display:flex;align-items:center;justify-content:space-between;background:var(--paper);border:1.5px solid var(--mist);border-radius:12px;padding:10px 16px;margin-bottom:8px;}
+  .score-row.score-top{border-color:var(--gold);background:#fffbf0;}
+  .score-name{font-weight:600;font-size:14px;}
+  .score-pts{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;color:var(--rust);}
+  .result-card{background:var(--paper);border:1.5px solid var(--mist);border-radius:16px;padding:16px 18px;margin-bottom:10px;width:100%;max-width:440px;}
+  .result-player-name{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:700;margin-bottom:10px;}
+  .result-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--mist);font-size:14px;}
+  .result-cat{font-size:11px;font-weight:600;color:rgba(26,22,18,.4);text-transform:uppercase;}
+  .error-msg{color:var(--rust);font-size:13px;margin-top:8px;text-align:center;font-weight:500;}
+  .hint{font-size:12px;color:rgba(26,22,18,.38);text-align:center;margin-top:12px;}
+  .divider{border:none;border-top:1.5px solid var(--mist);margin:16px 0;}
+  .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;background:var(--sage);animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .section-header{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(26,22,18,.4);margin:20px 0 10px;width:100%;max-width:440px;}
+  .conn-indicator{position:fixed;top:12px;right:12px;display:flex;align-items:center;gap:6px;background:white;border-radius:20px;padding:5px 10px;font-size:11px;font-weight:600;box-shadow:0 2px 10px rgba(0,0,0,.1);z-index:100;}
+  .conn-dot{width:7px;height:7px;border-radius:50%;}
+  .conn-dot.ok{background:var(--sage);}
+  .conn-dot.err{background:var(--rust);}
+  .conn-dot.sync{background:var(--gold);animation:pulse 1s infinite;}
 </style>
-
 </head>
 <body>
 
@@ -117,26 +88,26 @@ input[type=text]:focus { border-color: var(–rust); box-shadow: 0 0 0 3px rgba(
   <span id="conn-label">Bereit</span>
 </div>
 
-<!-- JOIN SCREEN -->
+<!-- JOIN -->
 
 <div id="screen-join" class="screen">
   <div class="game-header">
     <div class="game-title">Stadt<br/><span>Land</span><br/>Fluss</div>
-    <div class="game-sub">Multiplayer</div>
+    <div class="game-sub">Multiplayer · Firebase</div>
   </div>
   <div class="card">
     <div class="card-title">Mitspielen 👋</div>
     <label class="label">Dein Name</label>
-    <input type="text" id="input-name" placeholder="Dein Name..." maxlength="15"/>
+    <input type="text" id="input-name" placeholder="Dein Name…" maxlength="15"/>
     <label class="label">Raum-Code</label>
-    <input type="text" id="input-room" placeholder="Z.B. SPIELEN" maxlength="10" style="text-transform:uppercase"/>
+    <input type="text" id="input-room" placeholder="Z.B. SPIELEN" maxlength="10"/>
     <div id="join-error" class="error-msg" style="display:none"></div>
     <button type="button" class="btn btn-primary" id="btn-connect" onclick="joinRoom()">Spiel betreten 🚀</button>
-    <p class="hint">Der Erste im Raum wird automatisch Host. Einfach denselben Code teilen!</p>
+    <p class="hint">Erster im Raum = Host. Einfach denselben Code teilen!</p>
   </div>
 </div>
 
-<!-- LOBBY SCREEN -->
+<!-- LOBBY -->
 
 <div id="screen-lobby" class="screen hidden">
   <div class="game-header">
@@ -156,7 +127,7 @@ input[type=text]:focus { border-color: var(–rust); box-shadow: 0 0 0 3px rgba(
   </div>
 </div>
 
-<!-- PLAYING SCREEN -->
+<!-- PLAYING -->
 
 <div id="screen-playing" class="screen hidden">
   <div class="letter-stage">
@@ -167,12 +138,12 @@ input[type=text]:focus { border-color: var(–rust); box-shadow: 0 0 0 3px rgba(
   <div id="playing-content"></div>
 </div>
 
-<!-- RESULTS SCREEN -->
+<!-- RESULTS -->
 
 <div id="screen-results" class="screen hidden">
   <div class="game-header" style="margin-bottom:16px">
     <div class="game-title" style="font-size:2rem">Auswertung</div>
-    <div class="game-sub" id="results-sub">Ergebnisse</div>
+    <div class="game-sub" id="results-sub"></div>
   </div>
   <div class="section-header">🏆 Gesamtpunkte</div>
   <div class="scoreboard" id="scoreboard"></div>
@@ -181,482 +152,392 @@ input[type=text]:focus { border-color: var(–rust); box-shadow: 0 0 0 3px rgba(
   <div style="width:100%;max-width:440px;margin-top:12px" id="results-actions"></div>
 </div>
 
-<script>
-// ── CONFIG ───────────────────────────────────────────────────────
-const DEFAULT_CATS = ["Stadt", "Land", "Fluss", "Tier", "Beruf"];
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, update, onValue, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+// ── FIREBASE ─────────────────────────────────────────────────────
+const app = initializeApp({
+  apiKey: "AIzaSyBnmd0GcbVIFYT2aivcRpppt1h1_XX0XFY",
+  authDomain: "stadtlandfluss-e5c2b.firebaseapp.com",
+  projectId: "stadtlandfluss-e5c2b",
+  storageBucket: "stadtlandfluss-e5c2b.firebasestorage.app",
+  messagingSenderId: "84856664843",
+  appId: "1:84856664843:web:47d586715de95b67a0280e",
+  databaseURL: "https://stadtlandfluss-e5c2b-default-rtdb.firebaseio.com"
+});
+const db = getDatabase(app);
+
+// ── CONSTANTS ─────────────────────────────────────────────────────
+const DEFAULT_CATS = ["Stadt","Land","Fluss","Tier","Beruf"];
 const LETTERS = "ABCDEFGHIKLMNOPRSTW".split("");
-const POLL_INTERVAL = 1500; // ms
 
-// ── STATE ────────────────────────────────────────────────────────
-let myName = "";
-let myRoom = "";
-let myId = Math.random().toString(36).slice(2, 10); // unique player ID per session
-let pollTimer = null;
-let lastStateHash = "";
-let submitted = false;
-let countdownInterval = null;
-let buzzCountdown = 0;
-let localAnswers = {};
-
-// The full game state (stored in shared storage)
+// ── SESSION ───────────────────────────────────────────────────────
+let myName="", myRoom="";
+let myId = "p_" + Math.random().toString(36).slice(2,10);
+let isHost = false;
 let gs = null;
+let submitted = false;
+let localAnswers = {};
+let countdownInterval = null;
+let buzzerTimeout = null;
+let heartbeatInterval = null;
 
-// ── STORAGE HELPERS ──────────────────────────────────────────────
-const KEY = () => `slf-room-${myRoom}`;
+// ── REFS ──────────────────────────────────────────────────────────
+const roomRef = () => ref(db, `rooms/${myRoom}`);
+const pRef    = () => ref(db, `rooms/${myRoom}/players/${myId}`);
 
-async function loadState() {
-  try {
-    const res = await window.storage.get(KEY(), true);
-    if (!res) return null;
-    return JSON.parse(res.value);
-  } catch { return null; }
+// ── HELPERS ───────────────────────────────────────────────────────
+function setConn(s) {
+  const dot=document.getElementById("conn-dot"), lbl=document.getElementById("conn-label");
+  if(!dot) return;
+  dot.className="conn-dot "+s;
+  lbl.textContent = s==="ok"?"Verbunden":s==="sync"?"Sync…":"Fehler";
 }
-
-async function saveState(state) {
-  try {
-    setConnStatus("sync");
-    await window.storage.set(KEY(), JSON.stringify(state), true);
-    setConnStatus("ok");
-  } catch(e) {
-    setConnStatus("err");
-    console.error("Save failed", e);
-  }
-}
-
-// ── CONNECTION INDICATOR ─────────────────────────────────────────
-function setConnStatus(status) {
-  const dot = document.getElementById("conn-dot");
-  const label = document.getElementById("conn-label");
-  dot.className = "conn-dot " + status;
-  label.textContent = status === "ok" ? "Verbunden" : status === "sync" ? "Sync..." : "Fehler";
-}
-
-// ── SCREEN SWITCHING ─────────────────────────────────────────────
 function show(id) {
-  ["join","lobby","playing","results"].forEach(s =>
-    document.getElementById(`screen-${s}`).classList.toggle("hidden", s !== id)
-  );
+  ["join","lobby","playing","results"].forEach(s=>
+    document.getElementById(`screen-${s}`).classList.toggle("hidden",s!==id));
+}
+function setError(msg) {
+  const el=document.getElementById("join-error");
+  el.textContent=msg; el.style.display=msg?"block":"none";
+}
+function sid(str){ return str.replace(/[^a-zA-Z0-9]/g,"_"); }
+
+async function readState() {
+  const snap = await get(roomRef());
+  return snap.exists() ? snap.val() : null;
+}
+async function writeState(state) {
+  setConn("sync");
+  await set(roomRef(), state);
+  setConn("ok");
+}
+async function patchState(patch) {
+  setConn("sync");
+  await update(roomRef(), patch);
+  setConn("ok");
 }
 
-function updateError(msg) {
-  const el = document.getElementById("join-error");
-  el.textContent = msg;
-  el.style.display = msg ? "block" : "none";
-}
-
-// ── JOIN ─────────────────────────────────────────────────────────
-async function joinRoom() {
+// ── JOIN ──────────────────────────────────────────────────────────
+window.joinRoom = async function() {
   myName = document.getElementById("input-name").value.trim();
-  myRoom = document.getElementById("input-room").value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
-  if (!myName || !myRoom) { updateError("Bitte Name und Raum-Code eingeben."); return; }
+  myRoom = document.getElementById("input-room").value.trim().toUpperCase().replace(/[^A-Z0-9]/g,"");
+  if (!myName||!myRoom) { setError("Bitte Name und Raum-Code eingeben."); return; }
 
   document.getElementById("btn-connect").disabled = true;
-  updateError("Verbinde...");
+  setError("Verbinde mit Firebase…");
 
-  const existing = await loadState();
-
-  if (!existing) {
-    // Create new room as host
-    const newState = {
-      host: myId,
-      hostName: myName,
-      players: { [myId]: { name: myName, score: 0, online: Date.now() } },
-      categories: [...DEFAULT_CATS],
-      phase: "lobby",
-      round: 0,
-      letter: "",
-      buzzer: null,
-      buzzerTs: null,
-      roundAnswers: {},
-      createdAt: Date.now()
-    };
-    await saveState(newState);
-    gs = newState;
-  } else {
-    // Join existing room
-    existing.players[myId] = { name: myName, score: existing.players[myId]?.score || 0, online: Date.now() };
-    await saveState(existing);
-    gs = existing;
+  try {
+    const existing = await readState();
+    if (!existing) {
+      isHost = true;
+      await writeState({
+        host: myId, hostName: myName,
+        players: { [myId]: { name: myName, score: 0, hb: Date.now() } },
+        categories: [...DEFAULT_CATS],
+        phase: "lobby", round: 0, letter: "",
+        buzzer: null, buzzerTs: null, roundAnswers: {},
+        createdAt: Date.now()
+      });
+    } else {
+      isHost = existing.host === myId;
+      await patchState({
+        [`players/${myId}`]: { name: myName, score: existing.players?.[myId]?.score||0, hb: Date.now() }
+      });
+    }
+    startHeartbeat();
+    onValue(roomRef(), snap => { if(snap.exists()) onStateUpdate(snap.val()); });
+    show("lobby");
+  } catch(e) {
+    setError("Fehler: " + e.message);
+    document.getElementById("btn-connect").disabled = false;
   }
-
-  startPolling();
-  show("lobby");
-  renderLobby();
 }
 
-// ── POLLING ──────────────────────────────────────────────────────
-function startPolling() {
-  if (pollTimer) clearInterval(pollTimer);
-  pollTimer = setInterval(poll, POLL_INTERVAL);
+// ── HEARTBEAT ─────────────────────────────────────────────────────
+function startHeartbeat() {
+  if(heartbeatInterval) clearInterval(heartbeatInterval);
+  heartbeatInterval = setInterval(async () => {
+    try { await update(pRef(), { hb: Date.now() }); } catch(e){}
+  }, 3000);
 }
 
-async function poll() {
-  // Heartbeat: update our online timestamp
-  const current = await loadState();
-  if (!current) return;
+// ── LIVE STATE ────────────────────────────────────────────────────
+async function onStateUpdate(state) {
+  gs = state;
+  isHost = gs.host === myId;
 
-  // Update own heartbeat
-  if (current.players[myId]) {
-    current.players[myId].online = Date.now();
-  }
-
-  // Prune stale players (offline > 8s), but only if we are host
-  if (isHost(current)) {
+  // Host: prune stale players
+  if (isHost) {
     const now = Date.now();
-    Object.keys(current.players).forEach(id => {
-      if (id !== myId && current.players[id].online && now - current.players[id].online > 8000) {
-        delete current.players[id];
-      }
-    });
-    await saveState(current);
-  } else {
-    // Non-host: just write heartbeat
-    await saveState(current);
+    const stale = Object.entries(gs.players||{})
+      .filter(([id,p]) => id!==myId && now-(p.hb||0)>10000).map(([id])=>id);
+    if (stale.length) {
+      const patch = {};
+      stale.forEach(id => patch[`players/${id}`] = null);
+      await patchState(patch);
+      return;
+    }
   }
-
-  const hash = JSON.stringify(current);
-  if (hash !== lastStateHash) {
-    lastStateHash = hash;
-    gs = current;
-    syncPhaseUI();
-  }
-}
-
-function isHost(state) {
-  return (state || gs)?.host === myId;
-}
-
-// ── HOST WRITES ──────────────────────────────────────────────────
-// Only the host modifies game state beyond heartbeats & answers
-async function hostWrite(mutator) {
-  // Load fresh, mutate, save
-  const fresh = await loadState();
-  if (!fresh) return;
-  mutator(fresh);
-  await saveState(fresh);
-  gs = fresh;
   syncPhaseUI();
 }
 
-// ── PHASE SYNC ──────────────────────────────────────────────────
+// ── PHASE SYNC ────────────────────────────────────────────────────
 function syncPhaseUI() {
-  if (!gs) return;
-  const phase = gs.phase;
-
-  if (phase === "lobby") {
-    submitted = false;
-    clearInterval(countdownInterval);
-    show("lobby");
-    renderLobby();
-  } else if (phase === "playing" || phase === "collecting") {
-    show("playing");
-    renderPlaying();
-
-    // Auto-submit when collecting starts and we haven't submitted
-    if (phase === "collecting" && !submitted) {
-      submitAnswers(true);
-    }
-
-    // Check if all submitted (host only)
-    if (isHost(gs)) {
-      checkRoundEnd();
-    }
-  } else if (phase === "results") {
-    show("results");
-    renderResults();
+  if(!gs) return;
+  const ph = gs.phase;
+  if (ph==="lobby") {
+    submitted=false; localAnswers={};
+    clearInterval(countdownInterval); countdownInterval=null;
+    show("lobby"); renderLobby();
+  } else if (ph==="playing"||ph==="collecting") {
+    show("playing"); renderPlaying();
+    if (ph==="collecting"&&!submitted) submitAnswers();
+    if (isHost) hostCheckRoundEnd();
+  } else if (ph==="results") {
+    show("results"); renderResults();
   }
 }
 
-// ── LOBBY ────────────────────────────────────────────────────────
+// ── LOBBY ─────────────────────────────────────────────────────────
 function renderLobby() {
-  if (!gs) return;
+  if(!gs) return;
   document.getElementById("display-roomcode").textContent = myRoom;
-
-  const players = Object.values(gs.players);
-  document.getElementById("players-list").innerHTML = players.map(p => {
-    const online = Date.now() - p.online < 8000;
+  const now = Date.now();
+  document.getElementById("players-list").innerHTML = Object.entries(gs.players||{}).map(([id,p])=>{
+    const online = now-(p.hb||0)<10000;
     return `<div class="player-chip">
-      <div class="dot" style="background:${online ? 'var(--sage)' : '#ccc'}"></div>
-      ${p.name} ${gs.host === Object.keys(gs.players).find(k => gs.players[k].name === p.name) && gs.host === Object.keys(gs.players)[0] ? '👑' : ''}
+      <div class="dot" style="background:${online?"var(--sage)":"#ccc"}"></div>
+      ${p.name}${id===gs.host?" 👑":""}
       <span style="color:var(--rust);font-weight:700;margin-left:4px">${p.score||0}P</span>
     </div>`;
   }).join("");
 
-  const catsArea = document.getElementById("lobby-cats-area");
-  if (isHost(gs)) {
-    catsArea.innerHTML = `<div id="lobby-cats-list"></div>
+  const ca = document.getElementById("lobby-cats-area");
+  if (isHost) {
+    ca.innerHTML = `<div id="lobby-cats-list"></div>
       <div style="display:flex;gap:8px;margin-top:10px">
-        <input type="text" id="lobby-cat-input" placeholder="Kategorie..." maxlength="20" onkeydown="if(event.key==='Enter')addLobbyCat()"/>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="addLobbyCat()">+</button>
+        <input type="text" id="lobby-cat-input" placeholder="Kategorie…" maxlength="20"
+          onkeydown="if(event.key==='Enter')window.addCat()"/>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="window.addCat()">+</button>
       </div>`;
-    document.getElementById("lobby-cats-list").innerHTML = gs.categories.map((c,i) =>
-      `<div class="cat-item"><span>${c}</span><button type="button" class="cat-remove" onclick="removeLobbyCat(${i})">✕</button></div>`
+    document.getElementById("lobby-cats-list").innerHTML = (gs.categories||[]).map((c,i)=>
+      `<div class="cat-item"><span>${c}</span>
+       <button type="button" class="cat-remove" onclick="window.removeCat(${i})">✕</button></div>`
     ).join("");
-    document.getElementById("lobby-host-area").innerHTML = `
-      <button type="button" class="btn btn-primary" onclick="startRound()" ${Object.keys(gs.players).length < 1 ? 'disabled' : ''}>🎲 Runde starten</button>`;
+    document.getElementById("lobby-host-area").innerHTML =
+      `<button type="button" class="btn btn-primary" onclick="window.startRound()">🎲 Runde starten</button>`;
   } else {
-    catsArea.innerHTML = `<div class="cats-readonly">${gs.categories.map(c => `<div class="cat-tag">${c}</div>`).join("")}</div>`;
-    document.getElementById("lobby-host-area").innerHTML = `<div style="text-align:center;color:rgba(26,22,18,0.4);font-size:14px;margin-top:16px"><span class="status-dot"></span>Warte auf Host für Start…</div>`;
+    ca.innerHTML = `<div class="cats-readonly">${(gs.categories||[]).map(c=>`<div class="cat-tag">${c}</div>`).join("")}</div>`;
+    document.getElementById("lobby-host-area").innerHTML =
+      `<div style="text-align:center;color:rgba(26,22,18,0.4);font-size:14px;margin-top:16px">
+        <span class="status-dot"></span>Warte auf Host…</div>`;
   }
 }
 
-async function addLobbyCat() {
-  const inp = document.getElementById("lobby-cat-input");
-  const val = inp.value.trim();
-  inp.value = "";
-  if (!val) return;
-  await hostWrite(s => { if (!s.categories.includes(val)) s.categories.push(val); });
+window.addCat = async function() {
+  const inp=document.getElementById("lobby-cat-input");
+  const val=inp.value.trim(); inp.value="";
+  if(!val||(gs.categories||[]).includes(val)) return;
+  await patchState({ categories:[...(gs.categories||[]),val] });
 }
 
-async function removeLobbyCat(i) {
-  await hostWrite(s => { if (s.categories.length > 1) s.categories.splice(i, 1); });
+window.removeCat = async function(i) {
+  const cats=[...(gs.categories||[])];
+  if(cats.length<=1) return;
+  cats.splice(i,1);
+  await patchState({ categories:cats });
 }
 
-async function startRound() {
-  await hostWrite(s => {
-    s.round++;
-    s.letter = LETTERS[Math.floor(Math.random() * LETTERS.length)];
-    s.phase = "playing";
-    s.buzzer = null;
-    s.buzzerTs = null;
-    s.roundAnswers = {};
+window.startRound = async function() {
+  const letter = LETTERS[Math.floor(Math.random()*LETTERS.length)];
+  await patchState({
+    phase:"playing", round:(gs.round||0)+1, letter,
+    buzzer:null, buzzerTs:null, roundAnswers:{}
   });
-  submitted = false;
-  localAnswers = {};
+  submitted=false; localAnswers={};
 }
 
-// ── PLAYING ──────────────────────────────────────────────────────
+// ── PLAYING ───────────────────────────────────────────────────────
 function renderPlaying() {
-  if (!gs) return;
+  if(!gs) return;
   document.getElementById("round-badge").textContent = `Runde ${gs.round}`;
   document.getElementById("big-letter").textContent = gs.letter;
 
   const buzzerEl = document.getElementById("buzzer-container");
-  const content = document.getElementById("playing-content");
+  const content  = document.getElementById("playing-content");
 
-  if (gs.phase === "collecting") {
+  if (gs.phase==="collecting") {
     buzzerEl.innerHTML = `<div class="buzzer-fired">⌛ Zeit läuft ab! Antworten absenden…</div>`;
-    if (submitted) {
-      content.innerHTML = renderWaitingForPlayers();
-    }
-    return;
+    if(submitted){ content.innerHTML=renderWaiting(); } return;
   }
 
-  // Phase = playing
   if (gs.buzzer) {
-    const secondsLeft = Math.max(0, 5 - Math.floor((Date.now() - gs.buzzerTs) / 1000));
-    buzzerEl.innerHTML = `<div class="buzzer-fired" id="buzzer-text">🔔 ${gs.buzzer} hat gestoppt! Noch ${secondsLeft}s!</div>`;
-    if (!countdownInterval) startCountdownUI();
+    const left = Math.max(0,5-Math.floor((Date.now()-(gs.buzzerTs||Date.now()))/1000));
+    buzzerEl.innerHTML=`<div class="buzzer-fired" id="buzzer-text">🔔 ${gs.buzzer} hat gestoppt! Noch ${left}s!</div>`;
+    if(!countdownInterval) startCountdownUI();
   } else {
-    clearInterval(countdownInterval);
-    countdownInterval = null;
-    buzzerEl.innerHTML = submitted ? '' : `<div class="buzzer-wrap"><button type="button" class="buzzer-btn" onclick="triggerBuzzer()">🔔 STOPP!</button></div>`;
+    clearInterval(countdownInterval); countdownInterval=null;
+    buzzerEl.innerHTML = submitted?"":
+      `<div class="buzzer-wrap"><button type="button" class="buzzer-btn" onclick="window.triggerBuzzer()">🔔 STOPP!</button></div>`;
   }
 
-  if (submitted) {
-    content.innerHTML = renderWaitingForPlayers();
-    return;
-  }
+  if(submitted){ content.innerHTML=renderWaiting(); return; }
 
-  // Show answer form (preserve if already rendered)
-  if (!content.querySelector(".answer-form")) {
-    content.innerHTML = `<div class="answer-form" id="ans-form">
-      ${gs.categories.map(cat => `
+  if(!content.querySelector(".answer-form")) {
+    content.innerHTML=`<div class="answer-form">
+      ${(gs.categories||[]).map(cat=>`
         <div class="answer-field">
           <span class="cat-name">${cat}</span>
-          <input type="text" id="ans-${sanitizeId(cat)}" placeholder="${cat} mit ${gs.letter}..." autocomplete="off"/>
-        </div>
-      `).join("")}
-      <button type="button" class="btn btn-primary" style="margin-top:10px" onclick="submitAnswers(false)">✅ Fertig</button>
+          <input type="text" id="ans-${sid(cat)}" placeholder="${cat} mit ${gs.letter}…" autocomplete="off"/>
+        </div>`).join("")}
+      <button type="button" class="btn btn-primary" style="margin-top:10px" onclick="window.submitAnswers()">✅ Fertig</button>
     </div>`;
-    // Restore local answers if any
-    gs.categories.forEach(cat => {
-      if (localAnswers[cat]) {
-        const el = document.getElementById(`ans-${sanitizeId(cat)}`);
-        if (el) el.value = localAnswers[cat];
-      }
+    (gs.categories||[]).forEach(cat=>{
+      if(localAnswers[cat]){const el=document.getElementById(`ans-${sid(cat)}`);if(el)el.value=localAnswers[cat];}
     });
   }
 }
 
-function renderWaitingForPlayers() {
-  if (!gs) return '';
-  const players = Object.values(gs.players);
-  const submitted_count = Object.keys(gs.roundAnswers).length;
-  const names = players.map(p => {
-    const pid = Object.keys(gs.players).find(k => gs.players[k].name === p.name);
-    const done = !!gs.roundAnswers[pid];
-    return `<span class="wait-chip ${done ? 'done' : 'pending'}">${done ? '✓' : '⏳'} ${p.name}</span>`;
-  });
+function renderWaiting() {
+  if(!gs) return "";
+  const players=Object.values(gs.players||{});
+  const answers=gs.roundAnswers||{};
+  const chips=Object.entries(gs.players||{}).map(([id,p])=>{
+    const done=!!answers[id];
+    return `<span class="wait-chip ${done?"done":"pending"}">${done?"✓":"⏳"} ${p.name}</span>`;
+  }).join("");
+  const pending=players.length-Object.keys(answers).length;
   return `<div class="card"><div class="submit-waiting">
-    <div class="check">✅</div>
-    <strong>Antworten gesendet!</strong>
-    <p style="font-size:13px;color:rgba(26,22,18,0.5)">Warte auf ${players.length - submitted_count} weitere Spieler…</p>
-    <div class="wait-players">${names.join("")}</div>
+    <div class="check">✅</div><strong>Antworten gesendet!</strong>
+    <p style="font-size:13px;color:rgba(26,22,18,0.5)">Warte auf ${Math.max(0,pending)} weitere…</p>
+    <div class="wait-players">${chips}</div>
   </div></div>`;
 }
 
-function sanitizeId(str) { return str.replace(/[^a-zA-Z0-9]/g, '_'); }
-
 function startCountdownUI() {
   clearInterval(countdownInterval);
-  countdownInterval = setInterval(() => {
-    const el = document.getElementById("buzzer-text");
-    if (!el || !gs?.buzzerTs) { clearInterval(countdownInterval); countdownInterval = null; return; }
-    const left = Math.max(0, 5 - Math.floor((Date.now() - gs.buzzerTs) / 1000));
-    el.textContent = `🔔 ${gs.buzzer} hat gestoppt! Noch ${left}s!`;
-    if (left <= 0) { clearInterval(countdownInterval); countdownInterval = null; }
-  }, 500);
+  countdownInterval = setInterval(()=>{
+    const el=document.getElementById("buzzer-text");
+    if(!el||!gs?.buzzerTs){clearInterval(countdownInterval);countdownInterval=null;return;}
+    const left=Math.max(0,5-Math.floor((Date.now()-gs.buzzerTs)/1000));
+    el.textContent=`🔔 ${gs.buzzer} hat gestoppt! Noch ${left}s!`;
+    if(left<=0){clearInterval(countdownInterval);countdownInterval=null;}
+  },500);
 }
 
-async function triggerBuzzer() {
-  if (!gs || gs.buzzer) return;
-  await loadAndMutate(s => {
-    if (!s.buzzer && s.phase === "playing") {
-      s.buzzer = myName;
-      s.buzzerTs = Date.now();
-      s.phase = "playing"; // stays playing for 5s then collecting
+window.triggerBuzzer = async function() {
+  if(!gs||gs.buzzer) return;
+  // Atomarer Check: nur wenn noch kein Buzzer
+  const snap = await get(ref(db,`rooms/${myRoom}/buzzer`));
+  if(snap.val()) return;
+  const ts = Date.now();
+  await patchState({ buzzer:myName, buzzerTs:ts });
+  clearTimeout(buzzerTimeout);
+  buzzerTimeout = setTimeout(async()=>{
+    const cur=await readState();
+    if(cur?.phase==="playing"&&cur?.buzzer){
+      await patchState({phase:"collecting"});
+      setTimeout(async()=>{
+        const cur2=await readState();
+        if(cur2?.phase==="collecting") await hostForceFinish(cur2);
+      },3500);
     }
-  });
-
-  // After 5s, transition to collecting (anyone can do this, but we guard with a flag)
-  setTimeout(async () => {
-    await loadAndMutate(s => {
-      if (s.buzzer && s.phase === "playing") {
-        s.phase = "collecting";
-      }
-    });
-  }, 5000);
+  },5000);
 }
 
-// ── ANSWER SUBMISSION ─────────────────────────────────────────────
-async function submitAnswers(auto) {
-  if (submitted) return;
-
-  // Collect answers from DOM or use blanks on auto-submit
-  const ans = {};
-  gs.categories.forEach(cat => {
-    const el = document.getElementById(`ans-${sanitizeId(cat)}`);
-    ans[cat] = (el ? el.value.trim() : localAnswers[cat] || "");
+// ── SUBMIT ────────────────────────────────────────────────────────
+window.submitAnswers = async function() {
+  if(submitted) return;
+  const ans={};
+  (gs?.categories||[]).forEach(cat=>{
+    const el=document.getElementById(`ans-${sid(cat)}`);
+    ans[cat]=el?el.value.trim():(localAnswers[cat]||"");
   });
-
-  submitted = true;
-
-  await loadAndMutate(s => {
-    s.roundAnswers[myId] = ans;
-  });
-
-  checkRoundEnd();
+  submitted=true;
+  await patchState({ [`roundAnswers/${myId}`]:ans });
 }
 
-async function checkRoundEnd() {
-  if (!isHost(gs)) return;
-  const fresh = await loadState();
-  if (!fresh || (fresh.phase !== "playing" && fresh.phase !== "collecting")) return;
-
-  const activePlayers = Object.keys(fresh.players).filter(id =>
-    Date.now() - fresh.players[id].online < 10000
-  );
-  const allSubmitted = activePlayers.every(id => fresh.roundAnswers[id]);
-
-  if (allSubmitted && activePlayers.length > 0) {
-    // Calculate scores and move to results
-    calculateScores(fresh);
-    fresh.phase = "results";
-    await saveState(fresh);
-    gs = fresh;
-    syncPhaseUI();
+// ── HOST: CHECK ALL SUBMITTED ─────────────────────────────────────
+async function hostCheckRoundEnd() {
+  if(!isHost) return;
+  const cur=await readState();
+  if(!cur||(cur.phase!=="playing"&&cur.phase!=="collecting")) return;
+  const active=Object.entries(cur.players||{})
+    .filter(([id,p])=>Date.now()-(p.hb||0)<12000).map(([id])=>id);
+  if(active.length>0&&active.every(id=>cur.roundAnswers?.[id])) {
+    await hostForceFinish(cur);
   }
+}
+
+async function hostForceFinish(cur) {
+  if(!cur||cur.phase==="results") return;
+  calculateScores(cur);
+  cur.phase="results";
+  await writeState(cur);
 }
 
 // ── SCORES ────────────────────────────────────────────────────────
 function calculateScores(state) {
-  const players = Object.keys(state.players);
-  state.categories.forEach(cat => {
-    const answers = players.map(pid => {
-      let v = (state.roundAnswers[pid]?.[cat] || "").trim().toLowerCase();
-      if (v && !v.startsWith(state.letter.toLowerCase())) v = "";
-      return { pid, v };
+  const pids=Object.keys(state.players||{});
+  (state.categories||[]).forEach(cat=>{
+    const answers=pids.map(id=>{
+      let v=((state.roundAnswers?.[id]?.[cat])||"").trim().toLowerCase();
+      if(v&&!v.startsWith(state.letter.toLowerCase())) v="";
+      return {id,v};
     });
-
-    answers.forEach(({ pid, v }) => {
-      if (!v) return;
-      const valid = answers.filter(a => a.v !== "").length;
-      const dupes = answers.filter(a => a.v === v).length;
-      const points = valid === 1 ? 20 : dupes === 1 ? 10 : 5;
-      state.players[pid].score = (state.players[pid].score || 0) + points;
+    answers.forEach(({id,v})=>{
+      if(!v) return;
+      const valid=answers.filter(a=>a.v!=="").length;
+      const dupes=answers.filter(a=>a.v===v).length;
+      const pts=valid===1?20:dupes===1?10:5;
+      state.players[id].score=(state.players[id].score||0)+pts;
     });
   });
 }
 
 // ── RESULTS ───────────────────────────────────────────────────────
 function renderResults() {
-  if (!gs) return;
-  document.getElementById("results-sub").textContent = `Runde ${gs.round} • Buchstabe ${gs.letter}`;
-
-  const players = Object.entries(gs.players).sort((a,b) => b[1].score - a[1].score);
-
-  document.getElementById("scoreboard").innerHTML = players.map(([pid, p], i) => `
-    <div class="score-row ${i===0?'score-top':''}">
+  if(!gs) return;
+  document.getElementById("results-sub").textContent=`Runde ${gs.round} • Buchstabe ${gs.letter}`;
+  const sorted=Object.entries(gs.players||{}).sort((a,b)=>(b[1].score||0)-(a[1].score||0));
+  document.getElementById("scoreboard").innerHTML=sorted.map(([id,p],i)=>`
+    <div class="score-row ${i===0?"score-top":""}">
       <div class="score-name">${i+1}. ${p.name}</div>
       <div class="score-pts">${p.score||0} Punkte</div>
-    </div>
-  `).join("");
-
-  document.getElementById("results-container").innerHTML = Object.entries(gs.players).map(([pid, p]) => {
-    const ans = gs.roundAnswers[pid] || {};
+    </div>`).join("");
+  document.getElementById("results-container").innerHTML=Object.entries(gs.players||{}).map(([id,p])=>{
+    const ans=gs.roundAnswers?.[id]||{};
     return `<div class="result-card">
       <div class="result-player-name">${p.name}</div>
-      ${gs.categories.map(cat => {
-        let word = (ans[cat] || "").trim();
-        const wrong = word && !word.toLowerCase().startsWith(gs.letter.toLowerCase());
-        const display = word
-          ? (wrong ? `<span style="text-decoration:line-through;color:var(--rust)">${word}</span> <span style="font-size:10px;color:var(--rust)">(falscher Buchstabe)</span>` : word)
-          : `<i style="color:gray">—</i>`;
+      ${(gs.categories||[]).map(cat=>{
+        const word=(ans[cat]||"").trim();
+        const wrong=word&&!word.toLowerCase().startsWith(gs.letter.toLowerCase());
+        const display=word?(wrong?`<span style="text-decoration:line-through;color:var(--rust)">${word}</span> <small style="color:var(--rust)">(falscher Buchstabe)</small>`:word):`<i style="color:gray">—</i>`;
         return `<div class="result-row"><span class="result-cat">${cat}</span><span>${display}</span></div>`;
       }).join("")}
     </div>`;
   }).join("");
-
-  const actions = document.getElementById("results-actions");
-  if (isHost(gs)) {
-    actions.innerHTML = `<button type="button" class="btn btn-primary" onclick="nextRound()">Nächste Runde 🔄</button>`;
-  } else {
-    actions.innerHTML = `<div style="text-align:center;color:rgba(26,22,18,0.4);font-size:14px"><span class="status-dot"></span>Warte auf Host…</div>`;
-  }
+  document.getElementById("results-actions").innerHTML=isHost
+    ?`<button type="button" class="btn btn-primary" onclick="window.nextRound()">Nächste Runde 🔄</button>`
+    :`<div style="text-align:center;color:rgba(26,22,18,0.4);font-size:14px"><span class="status-dot"></span>Warte auf Host…</div>`;
 }
 
-async function nextRound() {
-  submitted = false;
-  localAnswers = {};
-  await hostWrite(s => {
-    s.phase = "lobby";
-    s.buzzer = null;
-    s.buzzerTs = null;
-    s.roundAnswers = {};
-  });
+window.nextRound = async function() {
+  submitted=false; localAnswers={};
+  await patchState({phase:"lobby",buzzer:null,buzzerTs:null,roundAnswers:{}});
 }
 
-// ── UTILITY ──────────────────────────────────────────────────────
-async function loadAndMutate(mutator) {
-  const fresh = await loadState();
-  if (!fresh) return;
-  mutator(fresh);
-  await saveState(fresh);
-  gs = fresh;
-  syncPhaseUI();
-}
-
-// Save local answer values as user types (preserve across re-renders)
-document.addEventListener("input", e => {
-  if (e.target.matches(".answer-field input")) {
-    const cat = gs?.categories?.find(c => `ans-${sanitizeId(c)}` === e.target.id);
-    if (cat) localAnswers[cat] = e.target.value;
+// ── INPUT HANDLING ────────────────────────────────────────────────
+document.addEventListener("input", e=>{
+  if(e.target.matches(".answer-field input")&&gs?.categories){
+    const cat=gs.categories.find(c=>`ans-${sid(c)}`===e.target.id);
+    if(cat) localAnswers[cat]=e.target.value;
   }
 });
-
-document.getElementById("input-room").addEventListener("input", e => {
-  e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+document.getElementById("input-room").addEventListener("input", e=>{
+  e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,"");
 });
 </script>
 
