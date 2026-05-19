@@ -7,20 +7,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Special+Elite&family=Permanent+Marker&family=Caveat:wght@600&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      /* Standard-Akzentfarbe */
-      --primary-accent: #7950f2;
+      /* Standard-Akzentfarbe von rot/violett auf grün geändert */
+      --primary-accent: #51cf66;
       
       /* Helles Heft-Theme */
       --paper:        #fdfbf7; 
       --paper-white:  #ffffff;
       --paper2:       #f0ede6; 
       --grid:         rgba(100, 130, 190, 0.12); 
-      --margin:       rgba(235, 100, 100, 0.3); 
+      --margin:       rgba(81, 207, 102, 0.3); /* Von rot auf grün geändert */
       --ink:          #343a40; 
-      --red:          #ff6b6b; 
+      --red:          #51cf66; /* Von rot auf grün geändert */
       --blue:         #339af0;
       --pencil:       #868e96;
-      --stamp:        #fa5252;
+      --stamp:        #51cf66; /* Von rot auf grün geändert */
       --green:        #51cf66; 
       --tape:         rgba(255, 243, 191, 0.9);
       --highlight:    #ffec99; 
@@ -30,16 +30,17 @@
 
     /* Tafel-Modus (Dark Theme) */
     body.chalkboard-mode {
+      --primary-accent: #69db7c;
       --paper:        #2b303a; 
       --paper-white:  #343a40;
       --paper2:       #212529; 
       --grid:         rgba(255, 255, 255, 0.07); 
-      --margin:       rgba(255, 107, 107, 0.4); 
+      --margin:       rgba(105, 219, 124, 0.4); /* Von rot auf grün geändert */
       --ink:          #f8f9fa; 
-      --red:          #ff8787; 
+      --red:          #69db7c; /* Von rot auf grün geändert */
       --blue:         #74c0fc;
       --pencil:       #adb5bd;
-      --stamp:        #ff8787;
+      --stamp:        #69db7c; /* Von rot auf grün geändert */
       --green:        #69db7c; 
       --tape:         rgba(103, 115, 130, 0.6);
       --highlight:    #e5dbff; 
@@ -83,7 +84,7 @@
       pointer-events: none;
     }
 
-    /* Dekorative Doodles im Hintergrund (Punkt 1) */
+    /* Dekorative Doodles im Hintergrund */
     .doodle-bg {
       position: fixed;
       font-family: 'Permanent Marker', cursive;
@@ -196,7 +197,6 @@
       -webkit-appearance: none;
     }
     
-    /* Handschriftliche Eingaben für die echten Antworten (Punkt 1) */
     .answer-row input[type=text] {
       font-family: var(--input-font);
       font-size: 24px;
@@ -215,13 +215,12 @@
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-accent) 15%, transparent);
     }
     
-    /* Sanftes Pulsieren bei korrektem Anfangsbuchstaben (Punkt 2) */
     input.typing-ok { 
       border-color: var(--green) !important; 
       box-shadow: 0 0 0 4px rgba(81, 207, 102, 0.15) !important;
       animation: pulseSuccess 0.3s ease-in-out 1;
     }
-    input.typing-bad { border-color: var(--red) !important; box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.15) !important;}
+    input.typing-bad { border-color: var(--red) !important; box-shadow: 0 0 0 4px rgba(81, 207, 102, 0.15) !important;}
 
     @keyframes pulseSuccess {
       0% { transform: scale(1); }
@@ -264,10 +263,10 @@
     .btn-outline:hover { background: var(--paper2); filter: none; }
     
     .btn-red {
-      background: var(--red); color: white;
-      box-shadow: 0 4px 12px rgba(255, 107, 107, 0.25);
+      background: var(--green); color: white; /* Aus Rot wird Grün */
+      box-shadow: 0 4px 12px rgba(81, 207, 102, 0.25);
     }
-    .btn-red:hover { background: #fa5252; }
+    .btn-red:hover { background: #40c057; }
     
     .btn-sm {
       width: auto; padding: 10px 16px; font-size: 0.95rem;
@@ -514,7 +513,6 @@
     .result-cat { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; color: var(--pencil); text-transform: uppercase; }
     .result-word { font-size: 22px; color: var(--blue); font-weight: 700; font-family: var(--input-font); }
     
-    /* Verzögerte, satte Stempel-Animation (Punkt 2) */
     .stamp {
       font-family: 'Special Elite', monospace; font-size: 10px;
       letter-spacing: 0.5px; padding: 4px 8px; white-space: nowrap;
@@ -583,7 +581,6 @@
     .sound-toggle:hover { background: var(--paper2); }
     .sound-toggle.muted { opacity: 0.6; }
 
-    /* Theme-Umschalter (Punkt 5) */
     .theme-toggle-btn {
       position: fixed; top: 104px; right: 16px; z-index: 100;
       background: var(--paper-white); border: 1px solid var(--paper2);
@@ -595,7 +592,6 @@
     }
     .theme-toggle-btn:hover { background: var(--paper2); }
 
-    /* Aufgewerteter Farbwähler mit Farb-Swatches (Punkt 2) */
     .color-picker-container {
       position: fixed; top: 148px; right: 16px; z-index: 100;
       background: var(--paper-white); border: 1px solid var(--paper2);
@@ -685,15 +681,20 @@
     <div class="game-title">Stadt<span class="slash">/</span>Land<span class="slash">/</span>Fluss</div>
     <div class="game-sub">Multiplayer · Klassischer Spielblock</div>
   </div>
-
+  
   <div class="block">
     <div class="block-title">Mitspielen</div>
+    
     <label class="field-label">Dein Name</label>
     <input type="text" id="input-name" placeholder="Wie heißt du?" maxlength="15" autocomplete="off"/>
+    
     <label class="field-label">Raum-Code</label>
     <input type="text" id="input-room" placeholder="z.B. SPIELEN" maxlength="10" autocomplete="off"/>
+    
     <div id="join-error" class="error-msg" style="display:none"></div>
+    
     <button type="button" class="btn" id="btn-connect" onclick="joinRoom()">Rein da →</button>
+    
     <p class="hint">Erster im Raum = Spielleiter. Alle gleichen Code eingeben.</p>
   </div>
 </div>
@@ -703,38 +704,50 @@
     <div class="tape-strip"></div>
     <div class="game-title" style="font-size:2.6rem;transform:rotate(-1deg)">Warteraum</div>
   </div>
-
+  
   <div class="block">
     <div class="code-box">
       <div class="the-code" id="display-roomcode">—</div>
       <span class="host-stamp" id="host-badge" style="display:none">HOST</span>
     </div>
+    
     <div class="field-label">Spieler</div>
     <div class="players-list" id="players-list"></div>
+    
     <hr class="divider" style="margin:20px -28px;width:calc(100% + 56px)"/>
+    
     <div class="field-label">Kategorien</div>
     <div id="lobby-cats-area"></div>
+    
     <hr class="divider" style="margin:20px -28px;width:calc(100% + 56px)"/>
+    
     <div class="field-label">Rundentimer</div>
     <div id="lobby-timer-area"></div>
+    
     <hr class="divider" style="margin:20px -28px;width:calc(100% + 56px)"/>
+    
     <div class="field-label">Runden-Limit</div>
     <div id="lobby-rounds-area"></div>
+    
     <hr class="divider" style="margin:20px -28px;width:calc(100% + 56px)"/>
+    
     <div class="field-label">Spieloptionen</div>
     <div id="lobby-options-area"></div>
+    
     <div id="lobby-host-area" style="margin-top:28px"></div>
   </div>
 </div>
 
 <div id="screen-playing" class="screen hidden">
   <div id="timer-bar-area" style="position: fixed; top: 15px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; z-index: 200; padding: 0 15px; pointer-events: none;"></div>
+  
   <div class="letter-stage" style="margin-top: 80px;">
     <span class="round-tag" id="round-badge">Runde 1</span>
     <div class="big-letter" id="big-letter">A</div>
     <div class="used-letters" id="used-letters-display"></div>
     <div class="round-progress" id="round-progress-pips"></div>
   </div>
+  
   <div id="typing-indicators-area"></div>
   <div id="playing-content"></div>
   <div id="buzzer-container"></div>
@@ -746,897 +759,1190 @@
     <div class="game-title" style="font-size:2.4rem;transform:rotate(-1deg)">Auswertung</div>
     <div class="game-sub" id="results-sub"></div>
   </div>
+  
   <div id="gameover-area"></div>
   <div id="validation-banner-area"></div>
+  
   <div class="section-label">Punkte gesamt</div>
   <div class="scoreboard" id="scoreboard"></div>
+  
   <div class="section-label">Antworten dieser Runde</div>
   <div id="results-container" style="width:100%;max-width:480px"></div>
+  
   <div style="width:100%;max-width:480px;margin-top:24px" id="results-actions"></div>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, set, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBnmd0GcbVIFYT2aivcRpppt1h1_XX0XFY",
-  authDomain: "stadtlandfluss-e5c2b.firebaseapp.com",
-  projectId: "stadtlandfluss-e5c2b",
-  storageBucket: "stadtlandfluss-e5c2b.firebasestorage.app",
-  messagingSenderId: "84856664843",
-  appId: "1:84856664843:web:47d586715de95b67a0280e",
-  databaseURL: "https://stadtlandfluss-e5c2b-default-rtdb.firebaseio.com"
-};
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+  const firebaseConfig = {
+    apiKey: "AIzaSyBnmd0GcbVIFYT2aivcRpppt1h1_XX0XFY",
+    authDomain: "stadtlandfluss-e5c2b.firebaseapp.com",
+    projectId: "stadtlandfluss-e5c2b",
+    storageBucket: "stadtlandfluss-e5c2b.firebasestorage.app",
+    messagingSenderId: "84856664843",
+    appId: "1:84856664843:web:47d586715de95b67a0280e",
+    databaseURL: "https://stadtlandfluss-e5c2b-default-rtdb.firebaseio.com"
+  };
 
-// ─── THEME & FARBWÄHLER (Punkte 2 & 5) ───────────────────────────
-const PRESET_COLORS = ["#7950f2", "#339af0", "#22b8cf", "#51cf66", "#f783ac", "#f59f00", "#ff6b6b"];
-let currentAccentColor = localStorage.getItem('slf_accent_color') || "#7950f2";
-let isChalkboard = localStorage.getItem('slf_chalkboard_mode') === "1";
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
 
-function initThemeAndColors() {
-  if (isChalkboard) {
-    document.body.classList.add('chalkboard-mode');
-    document.getElementById("theme-icon").textContent = "𓊍";
-    document.getElementById("theme-label").textContent = "Tafel";
+  /* Grün ist nun die erste Option und der Default-Wert im Array */
+  const PRESET_COLORS = ["#51cf66", "#339af0", "#7950f2", "#22b8cf", "#f06595", "#ff922b", "#343a40"];
+  let currentAccentColor = localStorage.getItem("slf_accent_color") || PRESET_COLORS[0];
+  let isChalkboard = localStorage.getItem("slf_chalkboard") === "true";
+  let isMuted = localStorage.getItem("slf_muted") === "true";
+
+  function applyAccentColor(color) {
+    document.documentElement.style.setProperty('--primary-accent', color);
+    currentAccentColor = color;
+    localStorage.setItem("slf_accent_color", color);
+    renderSwatches();
   }
-  document.documentElement.style.setProperty('--primary-accent', currentAccentColor);
-  renderSwatches();
-}
 
-window.toggleTheme = function() {
-  isChalkboard = !isChalkboard;
-  if (isChalkboard) {
-    document.body.classList.add('chalkboard-mode');
-    document.getElementById("theme-icon").textContent = "𓊍";
-    document.getElementById("theme-label").textContent = "Tafel";
-    localStorage.setItem('slf_chalkboard_mode', "1");
-  } else {
-    document.body.classList.remove('chalkboard-mode');
-    document.getElementById("theme-icon").textContent = "📝";
-    document.getElementById("theme-label").textContent = "Block";
-    localStorage.setItem('slf_chalkboard_mode', "0");
+  function renderSwatches() {
+    const container = document.getElementById("color-swatches-container");
+    if(!container) return;
+    container.innerHTML = "";
+    PRESET_COLORS.forEach(c => {
+      const s = document.createElement("div");
+      s.className = `swatch ${c.toLowerCase() === currentAccentColor.toLowerCase() ? "active" : ""}`;
+      s.style.backgroundColor = c;
+      s.onclick = () => applyAccentColor(c);
+      container.appendChild(s);
+    });
   }
-};
 
-function renderSwatches() {
-  const container = document.getElementById("color-swatches-container");
-  if (!container) return;
-  container.innerHTML = PRESET_COLORS.map(color => `
-    <div class="swatch ${color === currentAccentColor ? 'active' : ''}" 
-         style="background: ${color}" 
-         onclick="window.selectAccentColor('${color}')">
-    </div>
-  `).join("");
-}
+  window.toggleTheme = function() {
+    isChalkboard = !isChalkboard;
+    localStorage.setItem("slf_chalkboard", isChalkboard);
+    updateThemeClasses();
+  };
 
-window.selectAccentColor = function(color) {
-  currentAccentColor = color;
-  document.documentElement.style.setProperty('--primary-accent', color);
-  localStorage.setItem('slf_accent_color', color);
-  renderSwatches();
-};
-
-// ─────────────────────────────────────────────────────────────────
-
-const DEFAULT_CATS = ["Stadt","Land","Fluss","Tier","Beruf"];
-const ALL_LETTERS = "ABCDEFGHIKLMNOPRSTW".split("");
-const ROOM_EXPIRY_MS = 24*60*60*1000;
-const TIMER_PRESETS = [0,60,90,120,180];
-const ROUND_PRESETS = [0,3,5,8,10];
-
-let myName="", myRoom="";
-let myId = "p_"+Math.random().toString(36).slice(2,10);
-let isHost=false, gameState=null, submitted=false;
-let localAnswers={}, localBuzzerCountdown=null;
-let heartbeatInterval=null, roomListener=null;
-let roundTimerInterval=null, roundTimerSecondsLeft=0;
-let soundEnabled=true;
-let typingTimeout=null;
-let prevBuzzerValue=null;
-
-const roomRef   = () => ref(db,`rooms/${myRoom}`);
-const playerRef = () => ref(db,`rooms/${myRoom}/players/${myId}`);
-
-// ─── SOUND ENGINE ───────────────────────────────────────────────
-let audioCtx = null;
-function getAudioCtx(){
-  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-  if(audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume().catch(()=>{});
-  }
-  return audioCtx;
-}
-function playTone(type, freq, duration, gain=0.3, delay=0){
-  if(!soundEnabled) return;
-  try{
-    const ctx=getAudioCtx();
-    const osc=ctx.createOscillator();
-    const gainNode=ctx.createGain();
-    osc.connect(gainNode); gainNode.connect(ctx.destination);
-    osc.type=type; osc.frequency.setValueAtTime(freq, ctx.currentTime+delay);
-    gainNode.gain.setValueAtTime(0, ctx.currentTime+delay);
-    gainNode.gain.linearRampToValueAtTime(gain, ctx.currentTime+delay+0.01);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+delay+duration);
-    osc.start(ctx.currentTime+delay);
-    osc.stop(ctx.currentTime+delay+duration+0.05);
-  }catch(e){}
-}
-function playSoundBuzzer(){
-  playTone('square',880,0.08,0.35,0);
-  playTone('square',660,0.08,0.35,0.1);
-  playTone('square',440,0.15,0.4,0.2);
-}
-function playSoundRoundStart(){
-  playTone('sine',440,0.1,0.25,0);
-  playTone('sine',550,0.1,0.25,0.12);
-  playTone('sine',660,0.15,0.3,0.24);
-}
-function playSoundSubmit(){
-  playTone('sine',880,0.08,0.2,0);
-  playTone('sine',1100,0.1,0.15,0.09);
-}
-function playSoundTimerUrgent(){
-  playTone('sine',440,0.05,0.15,0);
-}
-function playSoundGameOver(){
-  [0,0.15,0.3,0.5].forEach((d,i)=>{
-    const freqs=[440,550,660,880];
-    playTone('sine',freqs[i],0.25,0.3,d);
-  });
-}
-
-window.toggleSound=function(){
-  soundEnabled=!soundEnabled;
-  document.getElementById("sound-icon").textContent=soundEnabled?"🔊":"🔇";
-  document.getElementById("sound-label").textContent=soundEnabled?"Sound":"Stumm";
-  document.getElementById("sound-toggle-btn").classList.toggle("muted",!soundEnabled);
-  localStorage.setItem("slf_sound",soundEnabled?"1":"0");
-};
-
-// ─── UTILS ──────────────────────────────────────────────────────
-function setConnStatus(s){
-  const d=document.getElementById("conn-dot"), l=document.getElementById("conn-label");
-  if(!d)return; d.className="conn-dot "+s;
-  l.textContent=s==="ok"?"Verbunden":s==="sync"?"Sync…":"Fehler";
-}
-function showScreen(id){
-  ["join","lobby","playing","results"].forEach(s=>
-    document.getElementById(`screen-${s}`).classList.toggle("hidden",s!==id));
-  document.getElementById("btn-leave").style.display=id==="join"?"none":"block";
-  const hb=document.getElementById("host-badge");
-  if(hb) hb.style.display=(id==="lobby"&&isHost)?"block":"none";
-}
-function showError(msg){
-  const el=document.getElementById("join-error");
-  el.textContent=msg; el.style.display=msg?"block":"none";
-}
-function sanitizeId(s){return s.replace(/[^a-zA-Z0-9]/g,"_");}
-function catsToObj(a){return a.reduce((acc,c,i)=>({...acc,[String(i)]:c}),{});}
-function objToCats(o){
-  if(!o)return[...DEFAULT_CATS];
-  if(Array.isArray(o))return o;
-  return Object.keys(o).sort((a,b)=>Number(a)-Number(b)).map(k=>o[k]);
-}
-async function updateRoomData(patch){
-  setConnStatus("sync"); await update(roomRef(),patch); setConnStatus("ok");
-}
-
-// ─── INIT ────────────────────────────────────────────────────────
-window.addEventListener("DOMContentLoaded",()=>{
-  initThemeAndColors();
-  const savedSound=localStorage.getItem("slf_sound");
-  if(savedSound==="0"){soundEnabled=false;document.getElementById("sound-icon").textContent="🔇";document.getElementById("sound-label").textContent="Stumm";document.getElementById("sound-toggle-btn").classList.add("muted");}
-
-  const n=sessionStorage.getItem("slf_name"),r=sessionStorage.getItem("slf_room"),i=sessionStorage.getItem("slf_id");
-  if(n&&r&&i){document.getElementById("input-name").value=n;document.getElementById("input-room").value=r;myId=i;window.joinRoom();}
-});
-
-// ─── JOIN ────────────────────────────────────────────────────────
-window.joinRoom=async function(){
-  try { getAudioCtx(); } catch(e) {}
-
-  myName=document.getElementById("input-name").value.trim();
-  myRoom=document.getElementById("input-room").value.trim().toUpperCase().replace(/[^A-Z0-9]/g,"");
-  if(!myName||!myRoom){showError("Bitte Name und Raum-Code eingeben.");return;}
-  document.getElementById("btn-connect").disabled=true;
-  showError("Verbinde…");
-  try{
-    const snap=await get(roomRef());
-    let existing=snap.exists()?snap.val():null;
-    if(existing?.createdAt&&Date.now()-existing.createdAt>ROOM_EXPIRY_MS)existing=null;
-    if(!existing){
-      isHost=true;
-      await set(roomRef(),{
-        host:myId, hostName:myName,
-        players:{[myId]:{name:myName,score:0,hb:Date.now()}},
-        cats:catsToObj(DEFAULT_CATS),
-        roundDuration:90,
-        roundLimit:0,
-        usedLetters:[],
-        typingStatus:{},
-        allowBuzzer:true,
-        phase:"lobby", round:0, letter:"",
-        buzzer:null, buzzerTs:null,
-        roundAnswers:{}, rejections:{}, roundStartTs:null,
-        createdAt:Date.now()
-      });
-    }else{
-      isHost=existing.host===myId;
-      await updateRoomData({[`players/${myId}`]:{name:myName,score:existing.players?.[myId]?.score||0,hb:Date.now()}});
+  function updateThemeClasses() {
+    const label = document.getElementById("theme-label");
+    const icon = document.getElementById("theme-icon");
+    if(isChalkboard) {
+      document.body.classList.add("chalkboard-mode");
+      if(label) label.textContent = "Tafel";
+      if(icon) icon.textContent = "🪧";
+    } else {
+      document.body.classList.remove("chalkboard-mode");
+      if(label) label.textContent = "Block";
+      if(icon) icon.textContent = "📝";
     }
-    sessionStorage.setItem("slf_name",myName);
-    sessionStorage.setItem("slf_room",myRoom);
-    sessionStorage.setItem("slf_id",myId);
-    startHeartbeat();
-    if(roomListener)roomListener();
-    prevBuzzerValue=null;
-    roomListener=onValue(roomRef(),snap=>{if(snap.exists())processStateUpdate(snap.val());});
-  }catch(e){showError("Fehler: "+e.message);document.getElementById("btn-connect").disabled=false;}
-};
+    applyAccentColor(currentAccentColor);
+  }
 
-window.leaveRoom=async function(){
-  stopRoundTimer();
-  if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
-  if(myRoom&&myId)try{await update(roomRef(),{[`typingStatus/${myId}`]:null});}catch(e){}
-  if(myRoom&&myId)try{await update(roomRef(),{[`players/${myId}`]:null});}catch(e){}
-  sessionStorage.clear();
-  if(heartbeatInterval)clearInterval(heartbeatInterval);
-  if(roomListener)roomListener();
-  myName="";myRoom="";gameState=null;prevBuzzerValue=null;
-  document.getElementById("btn-connect").disabled=false;
-  document.getElementById("join-error").style.display="none";
-  showScreen("join");
-};
+  /* Audio Synthesizer */
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  function playTone(freq, type, duration, vol=0.15) {
+    if(isMuted) return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    } catch(e){}
+  }
 
-function startHeartbeat(){
-  if(heartbeatInterval)clearInterval(heartbeatInterval);
-  heartbeatInterval=setInterval(async()=>{try{await update(playerRef(),{hb:Date.now()});}catch(e){}},10000);
-}
+  window.toggleSound = function() {
+    isMuted = !isMuted;
+    localStorage.setItem("slf_muted", isMuted);
+    const btn = document.getElementById("sound-toggle-btn");
+    const label = document.getElementById("sound-label");
+    const icon = document.getElementById("sound-icon");
+    if(isMuted) {
+      btn.classList.add("muted");
+      if(label) label.textContent = "Aus";
+      if(icon) icon.textContent = "🔇";
+    } else {
+      btn.classList.remove("muted");
+      if(label) label.textContent = "Sound";
+      if(icon) icon.textContent = "🔊";
+    }
+  };
 
-// ─── STATE PROCESSING ────────────────────────────────────────────
-async function processStateUpdate(newState){
-  const prevPhase=gameState?.phase;
-  const prevBuzzer=prevBuzzerValue;
+  const DEFAULT_CATEGORIES = ["Stadt", "Land", "Fluss", "Name", "Tier", "Beruf"];
+  const PRESET_TIMERS = [0, 30, 45, 60, 90, 120];
+  const PRESET_ROUNDS = [3, 5, 7, 10, 15];
 
-  gameState=newState;
-  isHost=gameState.host===myId;
+  let myRoom = null;
+  let myId = null;
+  let myName = "";
+  let gameState = null;
+  let localAnswers = {};
+  let timerInterval = null;
+  let typingTimeout = null;
 
-  if(isHost){
-    const now=Date.now();
-    const stale=Object.entries(gameState.players||{})
-      .filter(([id,p])=>id!==myId&&now-(p.hb||0)>25000)
-      .map(([id])=>id);
-    if(stale.length>0){
-      const patch={};
-      stale.forEach(id=>{patch[`players/${id}`]=null; patch[`typingStatus/${id}`]=null;});
-      await updateRoomData(patch);
+  try {
+    const saved = sessionStorage.getItem("slf_local_answers");
+    if(saved) localAnswers = JSON.parse(saved);
+  }catch(e){}
+
+  window.onload = function() {
+    updateThemeClasses();
+    renderSwatches();
+    
+    const bMuted = document.getElementById("sound-toggle-btn");
+    if(isMuted && bMuted) {
+      bMuted.classList.add("muted");
+      document.getElementById("sound-label").textContent = "Aus";
+      document.getElementById("sound-icon").textContent = "🔇";
+    }
+    
+    const r = localStorage.getItem("slf_last_room");
+    const n = localStorage.getItem("slf_last_name");
+    if(r) document.getElementById("input-room").value = r;
+    if(n) document.getElementById("input-name").value = n;
+  };
+
+  function sanitizeId(str) {
+    return str.toLowerCase().replace(/[^a-z0-9]/g, "");
+  }
+
+  function objToCats(obj) {
+    if(!obj) return [];
+    return Object.keys(obj).sort((a,b) => obj[a].order - obj[b].order).map(k => obj[k].name);
+  }
+
+  window.joinRoom = async function() {
+    const nameInput = document.getElementById("input-name").value.trim();
+    const roomInput = document.getElementById("input-room").value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+    const errBox = document.getElementById("join-error");
+    
+    if(!nameInput) { showJoinError("Bitte gib einen Namen ein."); return; }
+    if(!roomInput) { showJoinError("Bitte gib einen Raum-Code ein."); return; }
+    errBox.style.display = "none";
+
+    myName = nameInput;
+    myRoom = roomInput;
+    localStorage.setItem("slf_last_room", myRoom);
+    localStorage.setItem("slf_last_name", myName);
+
+    myId = sessionStorage.getItem(`slf_uid_${myRoom}`);
+    if(!myId) {
+      myId = "u_" + Math.random().toString(36).substring(2, 11);
+      sessionStorage.setItem(`slf_uid_${myRoom}`, myId);
+    }
+
+    document.getElementById("btn-connect").disabled = true;
+    document.getElementById("btn-connect").textContent = "Verbinde...";
+
+    const roomRef = ref(db, `rooms/${myRoom}`);
+    
+    try {
+      const snap = await get(roomRef);
+      if(!snap.exists()) {
+        const initialState = {
+          roomCode: myRoom,
+          phase: "lobby",
+          hostId: myId,
+          letter: "",
+          timerDuration: 60,
+          roundsLimit: 5,
+          currentRound: 1,
+          buzzerUser: null,
+          buzzerUsername: null,
+          options: {
+            instantBuzzer: false,
+            preventEmptyRound: true
+          }
+        };
+        await set(roomRef, initialState);
+        
+        const catsRef = ref(db, `rooms/${myRoom}/cats`);
+        const batch = {};
+        DEFAULT_CATEGORIES.forEach((c, idx) => {
+          const cid = sanitizeId(c);
+          batch[cid] = { name: c, order: idx };
+        });
+        await set(catsRef, batch);
+      } else {
+        const data = snap.val();
+        if(data.phase !== "lobby") {
+          const pList = data.players || {};
+          if(!pList[myId]) {
+            showJoinError("Das Spiel läuft bereits. Einstieg nicht möglich.");
+            resetJoinBtn();
+            return;
+          }
+        }
+      }
+
+      await set(ref(db, `rooms/${myRoom}/players/${myId}`), {
+        id: myId,
+        name: myName,
+        score: 0,
+        online: true,
+        lastActive: Date.now()
+      });
+
+      listenToRoom();
+      document.getElementById("btn-leave").style.display = "block";
+    } catch(e) {
+      showJoinError("Fehler beim Verbinden mit Firebase.");
+      resetJoinBtn();
+    }
+  };
+
+  function showJoinError(m) {
+    const e = document.getElementById("join-error");
+    e.textContent = m; e.style.display = "block";
+    playTone(180, "sawtooth", 0.2, 0.1);
+  }
+  function resetJoinBtn() {
+    const b = document.getElementById("btn-connect");
+    b.disabled = false; b.textContent = "Rein da →";
+  }
+
+  function listenToRoom() {
+    const roomRef = ref(db, `rooms/${myRoom}`);
+    onValue(roomRef, (snapshot) => {
+      if(!snapshot.exists()) {
+        window.leaveRoom();
+        return;
+      }
+      gameState = snapshot.val();
+      renderGameState();
+    });
+
+    setInterval(() => {
+      if(myRoom && myId && gameState) {
+        update(ref(db, `rooms/${myRoom}/players/${myId}`), { lastActive: Date.now(), online: true }).catch(()=>{});
+      }
+    }, 10000);
+  }
+
+  window.leaveRoom = function() {
+    if(myRoom && myId) {
+      set(ref(db, `rooms/${myRoom}/players/${myId}`), null).catch(()=>{});
+    }
+    myRoom = null; gameState = null; localAnswers = {};
+    sessionStorage.removeItem("slf_local_answers");
+    if(timerInterval) clearInterval(timerInterval);
+    
+    document.getElementById("screen-join").classList.remove("hidden");
+    document.getElementById("screen-lobby").classList.add("hidden");
+    document.getElementById("screen-playing").classList.add("hidden");
+    document.getElementById("screen-results").classList.add("hidden");
+    document.getElementById("btn-connect").disabled = false;
+    document.getElementById("btn-connect").textContent = "Rein da →";
+    document.getElementById("btn-leave").style.display = "none";
+  };
+
+  function switchScreen(id) {
+    ["screen-join", "screen-lobby", "screen-playing", "screen-results"].forEach(s => {
+      document.getElementById(s).classList.add("hidden");
+    });
+    document.getElementById(id).classList.remove("hidden");
+  }
+
+  let lastPhase = null;
+  function renderGameState() {
+    const phase = gameState.phase;
+    const isHost = gameState.hostId === myId;
+    
+    if(phase !== lastPhase) {
+      if(phase === "playing") playTone(587.33, "sine", 0.4, 0.2);
+      if(phase === "results") playTone(440, "sine", 0.3, 0.15);
+    }
+    lastPhase = phase;
+
+    const lbl = document.getElementById("conn-label");
+    const dot = document.getElementById("conn-dot");
+    if(lbl && dot) {
+      lbl.textContent = gameState.roomCode;
+      dot.className = "conn-dot ok";
+    }
+
+    if(phase === "lobby") {
+      switchScreen("screen-lobby");
+      document.getElementById("display-roomcode").textContent = gameState.roomCode;
+      document.getElementById("host-badge").style.display = isHost ? "block" : "none";
+      
+      renderPlayersList(isHost);
+      renderLobbyCats(isHost);
+      renderLobbyTimer(isHost);
+      renderLobbyRounds(isHost);
+      renderLobbyOptions(isHost);
+      
+      const hostArea = document.getElementById("lobby-host-area");
+      if(isHost) {
+        hostArea.innerHTML = `<button class="btn" onclick="window.startGame()">Spiel starten 🚀</button>`;
+      } else {
+        hostArea.innerHTML = `<p class="hint"><span class="pulse-dot"></span>Warte darauf, dass der Spielleiter das Spiel startet...</p>`;
+      }
+    }
+    else if(phase === "playing") {
+      switchScreen("screen-playing");
+      document.getElementById("round-badge").textContent = `Runde ${gameState.currentRound} von ${gameState.roundsLimit}`;
+      document.getElementById("big-letter").textContent = gameState.letter;
+      
+      renderUsedLetters();
+      renderRoundPips();
+      renderTimerBar();
+      renderPlayingContent();
+      renderBuzzerArea();
+      renderTypingIndicators();
+    }
+    else if(phase === "results") {
+      switchScreen("screen-results");
+      document.getElementById("results-sub").textContent = `Runde ${gameState.currentRound} · Buchstabe ${gameState.letter}`;
+      
+      renderGameoverBanner();
+      renderValidationBanner();
+      renderScoreboard();
+      renderResultsContainer(isHost);
+      renderResultsActions(isHost);
+    }
+  }
+
+  function renderPlayersList(isHost) {
+    const list = document.getElementById("players-list");
+    list.innerHTML = "";
+    const players = gameState.players || {};
+    
+    Object.keys(players).forEach(k => {
+      const p = players[k];
+      const chip = document.createElement("div");
+      chip.className = "player-chip";
+      
+      const isOnline = p.online && (Date.now() - p.lastActive < 20000);
+      const dotColor = isOnline ? "var(--green)" : "var(--pencil)";
+      const suffix = p.id === gameState.hostId ? " (Spielleiter)" : "";
+      
+      chip.innerHTML = `
+        <div class="online-dot" style="background:${dotColor}"></div>
+        <span>${p.name}${suffix}</span>
+        <span class="pts">${p.score || 0} XP</span>
+      `;
+      
+      if(isHost && p.id !== myId) {
+        chip.style.cursor = "pointer";
+        chip.title = "Spieler kicken";
+        chip.onclick = () => {
+          if(confirm(`Möchtest du ${p.name} wirklich aus dem Raum werfen?`)) {
+            set(ref(db, `rooms/${myRoom}/players/${p.id}`), null);
+          }
+        };
+      }
+      list.appendChild(chip);
+    });
+  }
+
+  function renderLobbyCats(isHost) {
+    const area = document.getElementById("lobby-cats-area");
+    const cats = objToCats(gameState.cats);
+    
+    if(!isHost) {
+      area.innerHTML = `<div class="cats-readonly">${cats.map(c => `<span class="cat-tag">${c}</span>`).join("")}</div>`;
       return;
     }
-  }
-
-  if(gameState.phase==="playing" && prevPhase!=="playing"){
-    const backup=sessionStorage.getItem("slf_local_answers");
-    localAnswers=backup?JSON.parse(backup):{};
-    startRoundTimerClient();
-    playSoundRoundStart();
-  }
-  if(gameState.phase!=="playing" && gameState.phase!=="collecting"){
-    stopRoundTimer();
-  }
-
-  if(gameState.buzzer && gameState.buzzer!==prevBuzzer){
-    prevBuzzerValue=gameState.buzzer;
-    playSoundBuzzer();
-    if(gameState.phase==="playing") triggerLocalBuzzerTicker();
-  } else if(!gameState.buzzer){
-    prevBuzzerValue=null;
-  }
-
-  syncUIWithPhase();
-}
-
-function syncUIWithPhase(){
-  if(!gameState)return;
-  const p=gameState.phase;
-  if(p==="lobby"){
-    resetRoundData();
-    showScreen("lobby");
-    renderLobby();
-  } else if(p==="playing"||p==="collecting"){
-    showScreen("playing");
-    renderPlaying();
-    if(p==="collecting"&&!submitted)submitAnswers();
-    if(isHost)checkHostRoundEnd();
-  } else if(p==="results"){
-    stopRoundTimer();
-    if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
-    showScreen("results");
-    renderResults();
-    const limit=gameState.roundLimit||0;
-    if(limit>0&&gameState.round>=limit) playSoundGameOver();
-  }
-}
-
-function resetRoundData(){
-  submitted=false;
-  localAnswers={};
-  stopRoundTimer();
-  sessionStorage.removeItem("slf_local_answers");
-  if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
-  localBuzzerCountdown=null;
-}
-
-// ─── TIMER ───────────────────────────────────────────────────────
-function startRoundTimerClient(){
-  stopRoundTimer();
-  const dur=gameState?.roundDuration||0;
-  if(!dur)return;
-  const elapsed=Math.floor((Date.now()-(gameState?.roundStartTs||Date.now()))/1000);
-  roundTimerSecondsLeft=Math.max(0,dur-elapsed);
-  renderTimerBar();
-  roundTimerInterval=setInterval(async()=>{
-    roundTimerSecondsLeft=Math.max(0,roundTimerSecondsLeft-1);
-    renderTimerBar();
-    if(roundTimerSecondsLeft===10) playSoundTimerUrgent();
-    if(roundTimerSecondsLeft<=0){
-      stopRoundTimer();
-      if(isHost){
-        const c=(await get(roomRef())).val();
-        if(c?.phase==="playing"||c?.phase==="collecting") await forceRoundEnd(c);
-      } else if(!submitted) {
-        window.submitAnswers();
-      }
-    }
-  },1000);
-}
-function stopRoundTimer(){
-  if(roundTimerInterval){clearInterval(roundTimerInterval);roundTimerInterval=null;}
-  const a=document.getElementById("timer-bar-area");if(a)a.innerHTML="";
-}
-function renderTimerBar(){
-  const a=document.getElementById("timer-bar-area");if(!a)return;
-  const dur=gameState?.roundDuration||0;if(!dur){a.innerHTML="";return;}
-  const pct=Math.min(100,Math.max(0,(roundTimerSecondsLeft/dur)*100));
-  const urgent=roundTimerSecondsLeft<=10;
-  const m=Math.floor(roundTimerSecondsLeft/60),s=roundTimerSecondsLeft%60;
-  const ts=m>0?`${m}:${String(s).padStart(2,"0")}`:`${s}s`;
-  a.innerHTML=`
-    <div class="timer-wrap">
-      <div class="timer-head">
-        <span class="timer-label">Zeit</span>
-        <span class="timer-secs ${urgent?"urgent":""}">${ts}</span>
-      </div>
-      <div class="timer-track">
-        <div class="timer-fill ${urgent?"urgent":""}" style="width:${pct}%"></div>
-      </div>
-    </div>`;
-}
-
-// ─── LOBBY ───────────────────────────────────────────────────────
-function renderLobby(){
-  if(!gameState)return;
-  document.getElementById("display-roomcode").textContent=myRoom;
-  const hb=document.getElementById("host-badge");
-  if(hb)hb.style.display=isHost?"block":"none";
-
-  const now=Date.now();
-  const cats=objToCats(gameState.cats);
-  const dur=gameState.roundDuration??90;
-  const roundLimit=gameState.roundLimit??0;
-  const usedLetters=gameState.usedLetters||[];
-  const available=ALL_LETTERS.filter(l=>!usedLetters.includes(l));
-  const allowBuzzer=gameState.allowBuzzer!==false;
-
-  document.getElementById("players-list").innerHTML=Object.entries(gameState.players||{}).map(([id,p])=>{
-    const online=now-(p.hb||0)<25000;
-    return`<div class="player-chip">
-      <div class="online-dot" style="background:${online?"var(--green)":"transparent"}"></div>
-      ${escHtml(p.name)}${id===gameState.host?" ★":""} 
-      <span class="pts">${p.score||0}P</span>
-    </div>`;
-  }).join("");
-
-  const catsArea=document.getElementById("lobby-cats-area");
-  if(isHost){
-    if(!document.getElementById("lobby-cats-list")){
-      catsArea.innerHTML=`
-        <div id="lobby-cats-list"></div>
-        <div style="display:flex;gap:8px;margin-top:12px;align-items:flex-end">
-          <input type="text" id="lobby-cat-input" placeholder="Neue Kategorie…" maxlength="20"
-            onkeydown="if(event.key==='Enter'){event.preventDefault();window.addCat();}"/>
-          <button type="button" class="btn btn-outline btn-sm" onclick="window.addCat()">+ Add</button>
+    
+    let html = `<div style="margin-bottom:12px">`;
+    cats.forEach(c => {
+      html += `
+        <div class="cat-item">
+          <span>${c}</span>
+          <button class="cat-remove" onclick="window.removeCategory('${sanitizeId(c)}')">✕</button>
         </div>`;
-    }
-    document.getElementById("lobby-cats-list").innerHTML=cats.map((c,i)=>
-      `<div class="cat-item">
-        <span>${c}</span>
-        <button type="button" class="cat-remove" onclick="window.removeCat(${i})">✕</button>
-      </div>`).join("");
-  }else{
-    catsArea.innerHTML=`<div class="cats-readonly">${cats.map(c=>`<div class="cat-tag">${c}</div>`).join("")}</div>`;
-  }
-
-  const ta=document.getElementById("lobby-timer-area");
-  if(isHost){
-    ta.innerHTML=`
-      <div class="timer-presets">
-        ${TIMER_PRESETS.map(t=>{
-          const lbl=t===0?"Kein":t<60?`${t}s`:`${t/60}min`;
-          return`<button type="button" class="timer-preset ${dur===t?"active":""}" onclick="window.setTimer(${t})">${lbl}</button>`;
-        }).join("")}
+    });
+    html += `</div>`;
+    html += `
+      <div style="display:flex;gap:10px">
+        <input type="text" id="input-new-cat" placeholder="Zusätzliche Kategorie..." maxlength="25" autocomplete="off" style="font-size:15px;padding:10px 14px;"/>
+        <button class="btn btn-sm" onclick="window.addCategory()">Hinzufügen</button>
       </div>
-      <div style="display:flex;gap:8px;align-items:flex-end;margin-top:10px">
-        <input type="number" id="timer-custom-input" min="10" max="600" placeholder="Eigene Sekunden…"
-          style="max-width:180px"
-          onkeydown="if(event.key==='Enter'){event.preventDefault();window.setCustomTimer();}"
-          value="${!TIMER_PRESETS.includes(dur)&&dur>0?dur:''}"/>
-        <button type="button" class="btn btn-outline btn-sm" onclick="window.setCustomTimer()">OK</button>
-      </div>`;
-  }else{
-    const lbl=dur===0?"Kein Timer":dur<60?`${dur}s`:`${Math.floor(dur/60)}:${String(dur%60).padStart(2,"0")} min`;
-    ta.innerHTML=`<div style="font-size:18px;color:var(--pencil);font-weight:600;">${lbl}</div>`;
-  }
+    `;
+    area.innerHTML = html;
 
-  const ra=document.getElementById("lobby-rounds-area");
-  if(isHost){
-    ra.innerHTML=`
-      <div class="round-presets">
-        ${ROUND_PRESETS.map(r=>{
-          const lbl=r===0?"∞":String(r);
-          return`<button type="button" class="round-preset ${roundLimit===r?"active":""}" onclick="window.setRoundLimit(${r})" title="${r===0?"Unbegrenzt":r+' Runden'}">${lbl}</button>`;
-        }).join("")}
-      </div>
-      <div style="font-size:12px;color:var(--pencil);margin-top:8px;font-family:'Nunito',sans-serif;font-weight:700;">
-        ${roundLimit===0?"Unbegrenzt viele Runden":roundLimit+" Runden insgesamt"}
-        · Noch ${available.length} Buchstaben verfügbar
-      </div>`;
-  }else{
-    const lbl=roundLimit===0?"Unbegrenzt":roundLimit+" Runden";
-    ra.innerHTML=`<div style="font-size:18px;color:var(--pencil);font-weight:600;">${lbl}</div>`;
-  }
-
-  const oa=document.getElementById("lobby-options-area");
-  if(isHost){
-    oa.innerHTML=`
-      <div class="toggle-row">
-        <span>STOPP-Buzzer erlaubt</span>
-        <div class="toggle-switch ${allowBuzzer?"on":""}" onclick="window.toggleBuzzer()"></div>
-      </div>`;
-  }else{
-    oa.innerHTML=`
-      <div class="toggle-row">
-        <span>STOPP-Buzzer</span>
-        <span style="font-size:14px;color:var(--pencil)">${allowBuzzer?"✓ Ja":"✕ Nein"}</span>
-      </div>`;
-  }
-
-  const leftCount=ALL_LETTERS.filter(l=>!(gameState.usedLetters||[]).includes(l)).length;
-  document.getElementById("lobby-host-area").innerHTML=isHost
-    ?`<button type="button" class="btn" onclick="window.startRound()" ${leftCount===0?"disabled":""}>
-        Runde starten → ${gameState.round>0?`(${gameState.round} gespielt)`:""}
-      </button>
-      ${leftCount===0?`<p class="hint" style="margin-top:8px">Alle Buchstaben gespielt! Zurücksetzen um weiterzumachen.</p>`:``}
-      ${gameState.round>0?`<button type="button" class="btn btn-outline" style="margin-top:10px" onclick="window.resetLetters()">Buchstaben zurücksetzen</button>`:""}
-      `
-    :`<div style="font-size:16px;color:var(--pencil);font-weight:600;"><span class="pulse-dot"></span>Warte auf den Spielleiter…</div>`;
-}
-
-window.setTimer=async function(s){await updateRoomData({roundDuration:s});};
-window.setCustomTimer=async function(){
-  const v=parseInt(document.getElementById("timer-custom-input")?.value||"0",10);
-  if(!v||v<10||v>600)return;
-  await updateRoomData({roundDuration:v});
-};
-window.setRoundLimit=async function(r){await updateRoomData({roundLimit:r});};
-window.toggleBuzzer=async function(){
-  await updateRoomData({allowBuzzer:gameState.allowBuzzer===false});
-};
-window.resetLetters=async function(){
-  await updateRoomData({usedLetters:[]});
-};
-window.addCat=async function(){
-  const i=document.getElementById("lobby-cat-input");if(!i)return;
-  const v=i.value.trim();i.value="";if(!v)return;
-  const cats=objToCats(gameState.cats);
-  if(cats.map(c=>c.toLowerCase()).includes(v.toLowerCase()))return;
-  cats.push(v);await updateRoomData({cats:catsToObj(cats)});
-};
-window.removeCat=async function(idx){
-  const cats=objToCats(gameState.cats);if(cats.length<=1)return;
-  cats.splice(idx,1);await updateRoomData({cats:catsToObj(cats)});
-};
-window.startRound=async function(){
-  const usedLetters=gameState.usedLetters||[];
-  const available=ALL_LETTERS.filter(l=>!usedLetters.includes(l));
-  if(available.length===0)return;
-
-  const letter=available[Math.floor(Math.random()*available.length)];
-  const newUsed=[...usedLetters,letter];
-
-  await updateRoomData({
-    phase:"playing",
-    round:(gameState.round||0)+1,
-    letter,
-    usedLetters:newUsed,
-    buzzer:null,
-    buzzerTs:null,
-    roundAnswers:{},
-    rejections:{},
-    roundStartTs:Date.now(),
-    typingStatus:{}
-  });
-};
-
-// ─── PLAYING ─────────────────────────────────────────────────────
-function renderPlaying(){
-  if(!gameState)return;
-  const cats=objToCats(gameState.cats);
-  const usedLetters=gameState.usedLetters||[];
-  const roundLimit=gameState.roundLimit||0;
-
-  document.getElementById("round-badge").textContent=`Runde ${gameState.round}${roundLimit>0?" / "+roundLimit:""}`;
-  document.getElementById("big-letter").textContent=gameState.letter;
-
-  const prevUsed=usedLetters.filter(l=>l!==gameState.letter);
-  document.getElementById("used-letters-display").innerHTML=prevUsed.length>0
-    ?prevUsed.map(l=>`<div class="used-letter-chip">${l}</div>`).join("")
-    :"";
-
-  if(roundLimit>0){
-    document.getElementById("round-progress-pips").innerHTML=Array.from({length:roundLimit},(_,i)=>{
-      const rn=i+1;
-      const cls=rn<gameState.round?"done":rn===gameState.round?"current":"future";
-      return`<div class="round-pip ${cls}"></div>`;
-    }).join("");
-  }else{
-    document.getElementById("round-progress-pips").innerHTML="";
-  }
-
-  const typingStatus=gameState.typingStatus||{};
-  const typingOthers=Object.entries(typingStatus)
-    .filter(([id,ts])=>id!==myId&&Date.now()-ts<4000)
-    .map(([id])=>gameState.players?.[id]?.name)
-    .filter(Boolean);
-
-  const tiEl=document.getElementById("typing-indicators-area");
-  if(tiEl){
-    tiEl.innerHTML=typingOthers.length>0
-      ?`<div class="typing-indicators">${typingOthers.map(name=>
-          `<div class="typing-chip">${escHtml(name)} <div class="typing-dots"><span></span><span></span><span></span></div></div>`
-        ).join("")}</div>`
-      :`<div class="typing-indicators"></div>`;
-  }
-
-  const bEl=document.getElementById("buzzer-container");
-  const cEl=document.getElementById("playing-content");
-
-  if(gameState.phase==="collecting"){
-    bEl.innerHTML=`<div class="buzzer-fired">⌛ Zeit läuft ab — Einsammeln!</div>`;
-    if(submitted){cEl.innerHTML=renderWaiting(); bEl.innerHTML=""; return;}
-  }
-
-  if(gameState.phase==="playing"){
-    if(gameState.buzzer){
-      bEl.innerHTML=`<div class="buzzer-fired" id="buzzer-ticker">🔔 ${escHtml(gameState.buzzer)} hat STOPP gerufen!</div>`;
-    }else if(!submitted && gameState.allowBuzzer!==false){
-      bEl.innerHTML=`<div class="buzzer-wrap"><button type="button" class="buzzer-btn" onclick="window.triggerBuzzer()">STOPP!</button></div>`;
-    }else{
-      bEl.innerHTML="";
+    const inp = document.getElementById("input-new-cat");
+    if(inp && !inp.dataset.listener) {
+      inp.dataset.listener = "true";
+      inp.addEventListener("keydown", e => { if(e.key === "Enter") window.addCategory(); });
     }
   }
 
-  if(submitted){cEl.innerHTML=renderWaiting(); bEl.innerHTML=""; return;}
+  window.addCategory = function() {
+    const inp = document.getElementById("input-new-cat");
+    if(!inp) return;
+    const val = inp.value.trim();
+    if(!val) return;
+    const cid = sanitizeId(val);
+    const cats = gameState.cats || {};
+    if(cats[cid]) { inp.value = ""; return; }
+    
+    const count = Object.keys(cats).length;
+    set(ref(db, `rooms/${myRoom}/cats/${cid}`), { name: val, order: count }).then(() => {
+      inp.value = "";
+    });
+  };
 
-  if(!cEl.querySelector(".answer-form")){
-    cEl.innerHTML=`
-      <div class="answer-form">
-        ${cats.map(cat=>`
-          <div class="answer-row">
-            <span class="ans-cat">${escHtml(cat)}</span>
-            <input type="text" id="ans-${sanitizeId(cat)}"
-              placeholder="${escHtml(cat)} mit ${gameState.letter}…"
-              autocomplete="off"
-              inputmode="text"
-              autocapitalize="words"/>
-          </div>`).join("")}
-      </div>`;
-    cats.forEach(cat=>{
-      if(localAnswers[cat]){
-        const e=document.getElementById(`ans-${sanitizeId(cat)}`);
-        if(e)e.value=localAnswers[cat];
+  window.removeCategory = function(cid) {
+    set(ref(db, `rooms/${myRoom}/cats/${cid}`), null);
+  };
+
+  function renderLobbyTimer(isHost) {
+    const area = document.getElementById("lobby-timer-area");
+    const current = gameState.timerDuration;
+    
+    let html = `<div class="timer-presets">`;
+    PRESET_TIMERS.forEach(t => {
+      const label = t === 0 ? "Kein Limit" : `${t}s`;
+      const activeClass = current === t ? "active" : "";
+      if(isHost) {
+        html += `<button class="timer-preset ${activeClass}" onclick="window.setTimerPreset(${t})">${label}</button>`;
+      } else {
+        if(current === t) html += `<span class="timer-preset active" style="cursor:default">${label}</span>`;
       }
     });
+    html += `</div>`;
+    area.innerHTML = html;
   }
-}
 
-function renderWaiting(){
-  if(!gameState)return"";
-  const ans=gameState.roundAnswers||{};
-  const total=Object.keys(gameState.players||{}).length;
-  const pending=total-Object.keys(ans).length;
-  const chips=Object.entries(gameState.players||{}).map(([id,p])=>
-    `<span class="wait-chip ${ans[id]?"done":"pending"}">${ans[id]?"✓":"…"} ${escHtml(p.name)}</span>`).join("");
-  return`<div class="waiting-block">
-    <div class="waiting-icon">✅</div>
-    <div class="waiting-title">Abgegeben!</div>
-    <div style="font-size:15px;color:var(--pencil);margin-bottom:12px;font-weight:600;">Noch ${Math.max(0,pending)} Spieler…</div>
-    <div class="wait-players">${chips}</div>
-  </div>`;
-}
+  window.setTimerPreset = function(t) {
+    update(ref(db, `rooms/${myRoom}`), { timerDuration: t });
+  };
 
-window.triggerBuzzer=async function(){
-  if(!gameState||gameState.buzzer||gameState.allowBuzzer===false)return;
-  const s=await get(ref(db,`rooms/${myRoom}/buzzer`));
-  if(s.val())return;
-  await updateRoomData({buzzer:myName,buzzerTs:Date.now()});
-};
-
-function triggerLocalBuzzerTicker(){
-  if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
-  let countdown=5;
-  localBuzzerCountdown=setInterval(async()=>{
-    countdown--;
-    const ticker=document.getElementById("buzzer-ticker");
-    if(ticker)ticker.textContent=`🔔 ${gameState.buzzer} hat STOPP gerufen! (${countdown}s)`;
-    if(countdown<=0){
-      clearInterval(localBuzzerCountdown);
-      localBuzzerCountdown=null;
-      if(!submitted)window.submitAnswers();
-      if(isHost){
-        const c=(await get(roomRef())).val();
-        if(c&&c.phase==="playing"){
-          await updateRoomData({phase:"collecting"});
-          setTimeout(async()=>{
-            const f=(await get(roomRef())).val();
-            if(f&&f.phase==="collecting") await forceRoundEnd(f);
-          },2000);
-        }
+  function renderLobbyRounds(isHost) {
+    const area = document.getElementById("lobby-rounds-area");
+    const current = gameState.roundsLimit;
+    
+    let html = `<div class="round-presets">`;
+    PRESET_ROUNDS.forEach(r => {
+      const activeClass = current === r ? "active" : "";
+      if(isHost) {
+        html += `<button class="round-preset ${activeClass}" onclick="window.setRoundsPreset(${r})">${r} Runden</button>`;
+      } else {
+        if(current === r) html += `<span class="round-preset active" style="cursor:default">${r} Runden</span>`;
       }
-    }
-  },1000);
-}
-
-window.submitAnswers=async function(){
-  if(submitted)return;
-  const cats=objToCats(gameState?.cats);
-  const ans={};
-  cats.forEach(cat=>{
-    const e=document.getElementById(`ans-${sanitizeId(cat)}`);
-    ans[cat]=e?e.value.trim():(localAnswers[cat]||"");
-  });
-  submitted=true;
-  try{await update(roomRef(),{[`typingStatus/${myId}`]:null});}catch(e){}
-  await updateRoomData({[`roundAnswers/${myId}`]:ans});
-  playSoundSubmit();
-};
-
-// ─── HOST ROUND END ──────────────────────────────────────────────
-async function checkHostRoundEnd(){
-  if(!isHost)return;
-  const cur=(await get(roomRef())).val();
-  if(!cur||(cur.phase!=="playing"&&cur.phase!=="collecting"))return;
-  const active=Object.entries(cur.players||{})
-    .filter(([id,p])=>Date.now()-(p.hb||0)<25000)
-    .map(([id])=>id);
-  if(active.length>0&&active.every(id=>cur.roundAnswers?.[id]))await forceRoundEnd(cur);
-}
-
-async function forceRoundEnd(cur){
-  if(!cur||cur.phase==="results")return;
-  calculateBaseScores(cur);
-  cur.phase="results";
-  cur.typingStatus={};
-  setConnStatus("sync");await set(roomRef(),cur);setConnStatus("ok");
-}
-
-function calculateBaseScores(state){
-  const cats=objToCats(state.cats);
-  const pids=Object.keys(state.players||{});
-  const rejections=state.rejections||{};
-
-  const roundScores={};
-  pids.forEach(id=>{roundScores[id]=0;});
-
-  cats.forEach(cat=>{
-    const valid=pids.map(id=>{
-      let v=(state.roundAnswers?.[id]?.[cat]||"").trim().toLowerCase();
-      if(rejections[`${id}__${cat}`])v="";
-      if(v&&!v.startsWith(state.letter.toLowerCase()))v="";
-      return{id,v};
     });
-    valid.forEach(({id,v})=>{
-      if(!v)return;
-      const tot=valid.filter(a=>a.v!=="").length;
-      const dup=valid.filter(a=>a.v===v).length;
-      roundScores[id]+=(tot===1?20:dup===1?10:5);
-    });
-  });
-
-  pids.forEach(id=>{
-    state.players[id].score=(state.players[id].score||0)+roundScores[id];
-  });
-}
-
-window.toggleAnswerStrike=async function(pid,cat){
-  if(!isHost||!gameState||gameState.phase!=="results")return;
-  const key=`${pid}__${cat}`;
-  const cur=(await get(roomRef())).val();
-  if(!cur)return;
-  if(!cur.rejections)cur.rejections={};
-  if(cur.rejections[key]){
-    delete cur.rejections[key];
-  }else{
-    cur.rejections[key]=true;
-  }
-  
-  if(cur.preRoundScores){
-    Object.keys(cur.players||{}).forEach(id=>{
-      cur.players[id].score=cur.preRoundScores[id]||0;
-    });
-    calculateBaseScores(cur);
-  } else {
-    Object.keys(cur.players||{}).forEach(id=>{cur.players[id].score=0;});
-    calculateBaseScores(cur);
-  }
-  await set(roomRef(),cur);
-};
-
-// ─── RESULTS ─────────────────────────────────────────────────────
-function renderResults(){
-  if(!gameState)return;
-  const cats=objToCats(gameState.cats);
-  const rejections=gameState.rejections||{};
-  const roundLimit=gameState.roundLimit||0;
-  const isGameOver=roundLimit>0&&gameState.round>=roundLimit;
-
-  document.getElementById("results-sub").textContent=`Runde ${gameState.round}${roundLimit>0?" / "+roundLimit:""} · Buchstabe ${gameState.letter}`;
-
-  const goArea=document.getElementById("gameover-area");
-  if(isGameOver&&goArea){
-    const sorted=Object.entries(gameState.players||{}).sort((a,b)=>(b[1].score||0)-(a[1].score||0));
-    const winner=sorted[0]?.[1]?.name||"?";
-    goArea.innerHTML=`<div class="gameover-banner">
-      <div class="gameover-title">🏆 Spiel vorbei!</div>
-      <div class="gameover-winner">Gewinner: ${escHtml(winner)} · ${sorted[0]?.[1]?.score||0} Punkte</div>
-    </div>`;
-  }else if(goArea){
-    goArea.innerHTML="";
+    html += `</div>`;
+    area.innerHTML = html;
   }
 
-  const banner=document.getElementById("validation-banner-area");
-  if(banner){
-    banner.innerHTML=isHost
-      ?`<div class="val-banner"><div class="val-title">✍️ Du bist der Korrektor!</div><div class="val-sub">Klicke auf falsche Antworten in den Blöcken, um sie per Rotstift zu streichen.</div></div>`
-      :`<div class="val-banner"><div class="val-title">👀 Notenbekanntgabe</div><div class="val-sub">Der Spielleiter prüft die Antworten und zückt bei Bedarf den Rotstift.</div></div>`;
-  }
+  window.setRoundsPreset = function(r) {
+    update(ref(db, `rooms/${myRoom}`), { roundsLimit: r });
+  };
 
-  const sorted=Object.entries(gameState.players||{}).sort((a,b)=>(b[1].score||0)-(a[1].score||0));
-  document.getElementById("scoreboard").innerHTML=sorted.map(([id,p],i)=>`
-    <div class="score-row ${i===0?"gold":""}">
-      <div class="score-name">${["①","②","③"][i]||"  "} ${escHtml(p.name)}</div>
-      <div class="score-pts">${p.score||0} Punkte</div>
-    </div>`).join("");
-
-  document.getElementById("results-container").innerHTML=Object.entries(gameState.players||{}).map(([pid,p])=>{
-    const ans=gameState.roundAnswers?.[pid]||{};
-    return`<div class="result-card">
-      <div class="result-player">${escHtml(p.name)}</div>
-      ${cats.map(cat=>{
-        const word=(ans[cat]||"").trim();
-        const wrongLetter=word&&!word.toLowerCase().startsWith(gameState.letter.toLowerCase());
-        const isRejected=rejections[`${pid}__${cat}`];
-        let disp="",badge="";
-        if(!word){
-          disp=`<i style="color:rgba(107, 100, 92, 0.4)">—</i>`;
-        }else if(wrongLetter){
-          disp=`<s style="color:var(--red)">${escHtml(word)}</s>`;
-          badge=`<span class="stamp stamp-no">Falscher Buchstabe</span>`;
-        }else if(isRejected){
-          disp=`<span style="color:var(--red)">${escHtml(word)}</span>`;
-          badge=`<span class="stamp stamp-no">✕ GESTRICHEN</span>`;
-        }else{
-          disp=`<span style="color:var(--blue)">${escHtml(word)}</span>`;
-          badge=`<span class="stamp stamp-ok">✓ OK</span>`;
-        }
-        const hostClass=isHost&&word&&!wrongLetter?"host-clickable":"";
-        const rejectedClass=isRejected?"rejected":"";
-        return`
-          <div class="result-row ${hostClass} ${rejectedClass}"
-               onclick="window.toggleAnswerStrike('${pid}','${escHtml(cat)}')">
-            <span class="result-cat">${escHtml(cat)}</span>
-            <span class="result-word">${disp}</span>
-            ${badge}
+  function renderLobbyOptions(isHost) {
+    const area = document.getElementById("lobby-options-area");
+    const opt = gameState.options || { instantBuzzer: false, preventEmptyRound: true };
+    
+    const fields = [
+      { key: "preventEmptyRound", title: "Leere Runden verhindern", desc: "Verhindert Buchstaben ohne Treffer" },
+      { key: "instantBuzzer", title: "Direkt-Buzzer aktivieren", desc: "Sofortiger Rundenstopp ohne Timer" }
+    ];
+    
+    let html = "";
+    fields.forEach(f => {
+      const val = opt[f.key] || false;
+      const onClass = val ? "on" : "";
+      if(isHost) {
+        html += `
+          <div class="toggle-row">
+            <div>
+              <div>${f.title}</div>
+              <div style="font-size:12px;color:var(--pencil);font-weight:400">${f.desc}</div>
+            </div>
+            <div class="toggle-switch ${onClass}" onclick="window.toggleLobbyOption('${f.key}', ${!val})"></div>
           </div>`;
-      }).join("")}
-    </div>`;
-  }).join("");
-
-  if(isGameOver){
-    document.getElementById("results-actions").innerHTML=isHost
-      ?`<button type="button" class="btn" onclick="window.newGame()">Neues Spiel →</button>`
-      :`<div style="font-size:16px;color:var(--pencil);font-weight:600;"><span class="pulse-dot"></span>Warte auf den Spielleiter…</div>`;
-  }else{
-    document.getElementById("results-actions").innerHTML=isHost
-      ?`<button type="button" class="btn" onclick="window.nextRound()">Nächste Runde →</button>`
-      :`<div style="font-size:16px;color:var(--pencil);font-weight:600;"><span class="pulse-dot"></span>Warte auf den Spielleiter…</div>`;
+      } else {
+        html += `
+          <div class="toggle-row" style="opacity:0.8">
+            <div>
+              <div>${f.title}</div>
+              <div style="font-size:12px;color:var(--pencil);font-weight:400">${f.desc}</div>
+            </div>
+            <div class="toggle-switch ${onClass}" style="cursor:default"></div>
+          </div>`;
+      }
+    });
+    area.innerHTML = html;
   }
-}
 
-window.nextRound=async function(){
-  const preRoundScores={};
-  Object.entries(gameState.players||{}).forEach(([id,p])=>{preRoundScores[id]=p.score||0;});
-  resetRoundData();
-  await updateRoomData({
-    phase:"lobby",
-    buzzer:null,buzzerTs:null,
-    roundAnswers:{},rejections:{},
-    roundStartTs:null,
-    preRoundScores,
-    typingStatus:{}
-  });
-};
+  window.toggleLobbyOption = function(key, newVal) {
+    update(ref(db, `rooms/${myRoom}/options`), { [key]: newVal });
+  };
 
-window.newGame=async function(){
-  const playerReset={};
-  Object.keys(gameState.players||{}).forEach(id=>{
-    playerReset[`players/${id}/score`]=0;
-  });
-  resetRoundData();
-  await updateRoomData({
-    ...playerReset,
-    phase:"lobby",
-    round:0,
-    buzzer:null,buzzerTs:null,
-    roundAnswers:{},rejections:{},
-    roundStartTs:null,
-    usedLetters:[],
-    preRoundScores:null,
-    typingStatus:{}
-  });
-};
+  window.startGame = async function() {
+    const cats = objToCats(gameState.cats);
+    if(cats.length === 0) { alert("Bitte füge mindestens eine Kategorie hinzu."); return; }
+    
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const used = gameState.usedLetters ? Object.keys(gameState.usedLetters) : [];
+    const available = [...alphabet].filter(l => !used.includes(l));
+    
+    if(available.length === 0) {
+      alert("Alle Buchstaben wurden bereits gespielt!"); return;
+    }
+    
+    const nextLetter = available[Math.floor(Math.random() * available.length)];
+    
+    const players = gameState.players || {};
+    Object.keys(players).forEach(k => {
+      update(ref(db, `rooms/${myRoom}/players/${k}`), { currentAnswers: null, roundPoints: null }).catch(()=>{});
+    });
 
-// ─── TYPING STATUS ────────────────────────────────────────────────
-document.addEventListener("input",e=>{
-  if(e.target.matches(".answer-row input")&&gameState?.cats){
-    const cats=objToCats(gameState.cats);
-    const cat=cats.find(c=>`ans-${sanitizeId(c)}`===e.target.id);
-    if(cat){
-      localAnswers[cat]=e.target.value;
-      sessionStorage.setItem("slf_local_answers",JSON.stringify(localAnswers));
+    const updates = {
+      phase: "playing",
+      letter: nextLetter,
+      timerStartedAt: null,
+      timerEndsAt: null,
+      buzzerUser: null,
+      buzzerUsername: null
+    };
+    updates[`usedLetters/${nextLetter}`] = true;
 
-      const val=e.target.value.trim();
-      if(val.length===0){
-        e.target.classList.remove("typing-ok","typing-bad");
-      }else if(val.toLowerCase().startsWith(gameState.letter.toLowerCase())){
-        e.target.classList.add("typing-ok");
-        e.target.classList.remove("typing-bad");
-      }else{
-        e.target.classList.add("typing-bad");
-        e.target.classList.remove("typing-ok");
+    update(ref(db, `rooms/${myRoom}`), updates);
+  };
+
+  function renderUsedLetters() {
+    const area = document.getElementById("used-letters-display");
+    if(!area) return;
+    area.innerHTML = "";
+    if(gameState.usedLetters) {
+      Object.keys(gameState.usedLetters).sort().forEach(l => {
+        const chip = document.createElement("span");
+        chip.className = "used-letter-chip";
+        chip.textContent = l;
+        area.appendChild(chip);
+      });
+    }
+  }
+
+  function renderRoundPips() {
+    const area = document.getElementById("round-progress-pips");
+    if(!area) return;
+    area.innerHTML = "";
+    const total = gameState.roundsLimit || 5;
+    const cur = gameState.currentRound || 1;
+    for(let i=1; i<=total; i++) {
+      const pip = document.createElement("div");
+      pip.className = `round-pip ${i < cur ? "done" : (i === cur ? "current" : "future")}`;
+      area.appendChild(pip);
+    }
+  }
+
+  function renderTimerBar() {
+    const area = document.getElementById("timer-bar-area");
+    if(!area) return;
+    
+    if(!gameState.timerStartedAt) {
+      area.innerHTML = "";
+      if(timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      return;
+    }
+
+    if(timerInterval) return;
+
+    function updateTimerUi() {
+      if(!gameState || !gameState.timerEndsAt) {
+        clearInterval(timerInterval); timerInterval = null; return;
+      }
+      const now = Date.now();
+      const timeLeft = Math.max(0, Math.ceil((gameState.timerEndsAt - now) / 1000));
+      const total = gameState.timerDuration;
+      const pct = total > 0 ? (timeLeft / total) * 100 : 0;
+      
+      const isUrgent = timeLeft <= 10;
+      const urgentClass = isUrgent ? "urgent" : "";
+      
+      if(isUrgent && timeLeft > 0) playTone(880, "sine", 0.05, 0.05);
+
+      area.innerHTML = `
+        <div class="timer-wrap">
+          <div class="timer-head">
+            <span class="timer-label">${gameState.buzzerUsername ? `${gameState.buzzerUsername} hat gebuzzert!` : "Zeit läuft"}</span>
+            <span class="timer-secs ${urgentClass}">${timeLeft}s</span>
+          </div>
+          <div class="timer-track">
+            <div class="timer-fill ${urgentClass}" style="width:${pct}%"></div>
+          </div>
+        </div>
+      `;
+
+      if(timeLeft <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        if(gameState.hostId === myId) {
+          endRoundAndGoToValidation();
+        }
       }
     }
 
-    if(typingTimeout)clearTimeout(typingTimeout);
-    if(myRoom&&myId&&gameState?.phase==="playing"){
-      update(ref(db,`rooms/${myRoom}/typingStatus`),{[myId]:Date.now()}).catch(()=>{});
-      typingTimeout=setTimeout(()=>{
-        update(ref(db,`rooms/${myRoom}/typingStatus`),{[myId]:null}).catch(()=>{});
-      },3000);
+    timerInterval = setInterval(updateTimerUi, 200);
+    updateTimerUi();
+  }
+
+  function renderPlayingContent() {
+    const area = document.getElementById("playing-content");
+    if(!area) return;
+    
+    if(area.dataset.renderedForLetter === gameState.letter) return;
+    area.dataset.renderedForLetter = gameState.letter;
+
+    const cats = objToCats(gameState.cats);
+    let html = `<div class="answer-form">`;
+    cats.forEach(c => {
+      const cid = sanitizeId(c);
+      const savedVal = localAnswers[c] || "";
+      html += `
+        <div class="answer-row">
+          <div class="ans-cat">${c}</div>
+          <input type="text" id="ans-${cid}" placeholder="..." autocomplete="off" value="${savedVal}"/>
+        </div>`;
+    });
+    html += `</div>`;
+    area.innerHTML = html;
+  }
+
+  function renderBuzzerArea() {
+    const area = document.getElementById("buzzer-container");
+    if(!area) return;
+    
+    if(gameState.buzzerUser) {
+      area.innerHTML = `
+        <div class="buzzer-fired">
+          🛑 Runde pausiert durch <strong>${gameState.buzzerUsername}</strong>!
+        </div>`;
+      return;
+    }
+
+    area.innerHTML = `
+      <div class="buzzer-wrap">
+        <button class="buzzer-btn" onclick="window.fireBuzzer()">STOPP! 🚨</button>
+      </div>`;
+  }
+
+  function renderTypingIndicators() {
+    const area = document.getElementById("typing-indicators-area");
+    if(!area) return;
+    area.innerHTML = "";
+    
+    const status = gameState.typingStatus || {};
+    const players = gameState.players || {};
+    const now = Date.now();
+    
+    Object.keys(status).forEach(uid => {
+      if(uid !== myId && status[uid] && (now - status[uid] < 4000)) {
+        const pName = players[uid]?.name || "Jemand";
+        const chip = document.createElement("div");
+        chip.className = "typing-chip";
+        chip.innerHTML = `<span>${pName} schreibt</span><div class="typing-dots"><span></span><span></span><span></span></div>`;
+        area.appendChild(chip);
+      }
+    });
+  }
+
+  window.fireBuzzer = function() {
+    if(gameState.buzzerUser) return;
+    playTone(220, "sawtooth", 0.3, 0.2);
+
+    const cats = objToCats(gameState.cats);
+    const answersPayload = {};
+    cats.forEach(c => {
+      const el = document.getElementById(`ans-${sanitizeId(c)}`);
+      answersPayload[sanitizeId(c)] = el ? el.value.trim() : "";
+    });
+
+    update(ref(db, `rooms/${myRoom}/players/${myId}`), { currentAnswers: answersPayload }).then(() => {
+      const isInstant = gameState.options?.instantBuzzer || false;
+      if(isInstant) {
+        if(gameState.hostId === myId) {
+          update(ref(db, `rooms/${myRoom}`), {
+            buzzerUser: myId,
+            buzzerUsername: myName,
+            phase: "results"
+          }).then(() => { evaluateRoundPoints(); });
+        } else {
+          update(ref(db, `rooms/${myRoom}`), {
+            buzzerUser: myId,
+            buzzerUsername: myName
+          });
+        }
+      } else {
+        const duration = gameState.timerDuration || 60;
+        if(duration === 0) {
+          if(gameState.hostId === myId) {
+            update(ref(db, `rooms/${myRoom}`), { buzzerUser: myId, buzzerUsername: myName, phase: "results" }).then(() => { evaluateRoundPoints(); });
+          } else {
+            update(ref(db, `rooms/${myRoom}`), { buzzerUser: myId, buzzerUsername: myName });
+          }
+        } else {
+          const now = Date.now();
+          update(ref(db, `rooms/${myRoom}`), {
+            buzzerUser: myId,
+            buzzerUsername: myName,
+            timerStartedAt: now,
+            timerEndsAt: now + (duration * 1000)
+          });
+        }
+      }
+    });
+  };
+
+  function endRoundAndGoToValidation() {
+    if(timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    
+    const cats = objToCats(gameState.cats);
+    const el = document.getElementById(`ans-${sanitizeId(cats[0])}`);
+    if(el) {
+      const answersPayload = {};
+      cats.forEach(c => {
+        const inp = document.getElementById(`ans-${sanitizeId(c)}`);
+        answersPayload[sanitizeId(c)] = inp ? inp.value.trim() : "";
+      });
+      update(ref(db, `rooms/${myRoom}/players/${myId}`), { currentAnswers: answersPayload }).catch(()=>{});
+    }
+
+    update(ref(db, `rooms/${myRoom}`), { phase: "results" }).then(() => {
+      setTimeout(() => { evaluateRoundPoints(); }, 800);
+    });
+  }
+
+  function evaluateRoundPoints() {
+    if(gameState.hostId !== myId) return;
+    
+    const players = gameState.players || {};
+    const cats = objToCats(gameState.cats);
+    const uids = Object.keys(players);
+    
+    const roundWords = {};
+    cats.forEach(c => { roundWords[sanitizeId(c)] = {}; });
+
+    uids.forEach(uid => {
+      const ans = players[uid].currentAnswers || {};
+      cats.forEach(c => {
+        const cid = sanitizeId(c);
+        let w = (ans[cid] || "").trim().toLowerCase();
+        if(w.startsWith(gameState.letter.toLowerCase()) && w.length > 0) {
+          if(!roundWords[cid][w]) roundWords[cid][w] = [];
+          roundWords[cid][w].push(uid);
+        }
+      });
+    });
+
+    const valBatch = {};
+    const pointsBatch = {};
+    uids.forEach(uid => {
+      pointsBatch[uid] = {};
+      cats.forEach(c => { pointsBatch[uid][sanitizeId(c)] = 0; });
+    });
+
+    let globalTotalAnswersCount = 0;
+
+    cats.forEach(c => {
+      const cid = sanitizeId(c);
+      const wordMap = roundWords[cid];
+      const uniqueWords = Object.keys(wordMap);
+      
+      let activePlayersInCatCount = 0;
+      uniqueWords.forEach(w => { activePlayersInCatCount += wordMap[w].length; });
+
+      uniqueWords.forEach(w => {
+        const users = wordMap[w];
+        users.forEach(uid => {
+          valBatch[`validation/${cid}/${uid}`] = {
+            word: players[uid].currentAnswers[cid],
+            status: "approved"
+          };
+          globalTotalAnswersCount++;
+
+          if(users.length > 1) {
+            pointsBatch[uid][cid] = 5;
+          } else {
+            if(activePlayersInCatCount === users.length) {
+              pointsBatch[uid][cid] = 20;
+            } else {
+              pointsBatch[uid][cid] = 10;
+            }
+          }
+        });
+      });
+
+      uids.forEach(uid => {
+        const ans = players[uid].currentAnswers || {};
+        const w = (ans[cid] || "").trim();
+        if(!w || !w.toLowerCase().startsWith(gameState.letter.toLowerCase())) {
+          valBatch[`validation/${cid}/${uid}`] = { word: w || "—", status: "empty" };
+        }
+      });
+    });
+
+    uids.forEach(uid => {
+      let sum = 0;
+      cats.forEach(c => { sum += (pointsBatch[uid][sanitizeId(c)] || 0); });
+      valBatch[`players/${uid}/roundPoints`] = sum;
+    });
+
+    const isPreventEmpty = gameState.options?.preventEmptyRound || false;
+    if(isPreventEmpty && globalTotalAnswersCount === 0) {
+      valBatch[`usedLetters/${gameState.letter}`] = null;
+      valBatch[`phase`] = "playing";
+      valBatch[`timerStartedAt`] = null;
+      valBatch[`timerEndsAt`] = null;
+      valBatch[`buzzerUser`] = null;
+      valBatch[`buzzerUsername`] = null;
+      
+      const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const used = gameState.usedLetters ? Object.keys(gameState.usedLetters) : [];
+      const filteredUsed = used.filter(x => x !== gameState.letter);
+      const available = [...alphabet].filter(l => !filteredUsed.includes(l));
+      if(available.length > 0) {
+        const nextLetter = available[Math.floor(Math.random() * available.length)];
+        valBatch[`letter`] = nextLetter;
+        valBatch[`usedLetters/${nextLetter}`] = true;
+      }
+    }
+
+    update(ref(db, `rooms/${myRoom}`), valBatch);
+  }
+
+  function renderGameoverBanner() {
+    const area = document.getElementById("gameover-area");
+    if(!area) return;
+    
+    const isOver = gameState.currentRound >= gameState.roundsLimit && gameState.isGameOverFinalized;
+    if(!isOver) { area.innerHTML = ""; return; }
+
+    const players = gameState.players || {};
+    let high = -1; let winner = "Niemand";
+    Object.keys(players).forEach(k => {
+      if((players[k].score || 0) > high) { high = players[k].score; winner = players[k].name; }
+    });
+
+    area.innerHTML = `
+      <div class="gameover-banner">
+        <div class="gameover-title">🏆 SPIELENDE 🏆</div>
+        <div class="gameover-winner">Gesamtsieger: <strong>${winner}</strong> mit ${high} XP!</div>
+      </div>`;
+  }
+
+  function renderValidationBanner() {
+    const area = document.getElementById("validation-banner-area");
+    if(!area) return;
+    
+    const isOver = gameState.currentRound >= gameState.roundsLimit && gameState.isGameOverFinalized;
+    if(isOver) { area.innerHTML = ""; return; }
+
+    area.innerHTML = `
+      <div class="val-banner">
+        <div class="val-title">🧐 Korrekturphase</div>
+        <div class="val-sub">Tippe auf falsche Wörter, um sie zu streichen! (Nur Spielleiter)</div>
+      </div>`;
+  }
+
+  function renderScoreboard() {
+    const area = document.getElementById("scoreboard");
+    if(!area) return;
+    area.innerHTML = "";
+    
+    const players = gameState.players || {};
+    const sorted = Object.keys(players).map(k => players[k]).sort((a,b) => (b.score || 0) - (a.score || 0));
+    const highestScore = sorted[0]?.score || 0;
+
+    sorted.forEach(p => {
+      const isGold = p.score === highestScore && highestScore > 0;
+      const goldClass = isGold ? "gold" : "";
+      const rPts = p.roundPoints !== undefined && p.roundPoints !== null ? ` (+${p.roundPoints})` : "";
+      
+      const row = document.createElement("div");
+      row.className = `score-row ${goldClass}`;
+      row.innerHTML = `
+        <span class="score-name">${p.name}</span>
+        <span class="score-pts">${p.score || 0} XP <span style="font-size:11px;opacity:0.7">${rPts}</span></span>
+      `;
+      area.appendChild(row);
+    });
+  }
+
+  function renderResultsContainer(isHost) {
+    const area = document.getElementById("results-container");
+    if(!area) return;
+    area.innerHTML = "";
+    
+    const players = gameState.players || {};
+    const cats = objToCats(gameState.cats);
+    const valData = gameState.validation || {};
+
+    Object.keys(players).forEach(uid => {
+      const p = players[uid];
+      const card = document.createElement("div");
+      card.className = "result-card";
+      
+      let html = `<div class="result-player">${p.name}</div>`;
+      
+      cats.forEach(c => {
+        const cid = sanitizeId(c);
+        const item = valData[cid]?.[uid] || { word: "—", status: "empty" };
+        
+        let stampHtml = "";
+        let rowClass = "";
+        
+        if(item.status === "approved") {
+          stampHtml = `<span class="stamp stamp-ok">OK</span>`;
+        } else if(item.status === "rejected") {
+          stampHtml = `<span class="stamp stamp-no">NEIN</span>`;
+          rowClass = "rejected";
+        }
+        
+        if(isHost && item.status !== "empty" && !(gameState.currentRound >= gameState.roundsLimit && gameState.isGameOverFinalized)) {
+          rowClass += " host-clickable";
+          html += `
+            <div class="result-row ${rowClass}" onclick="window.toggleWordStatus('${cid}','${uid}','${item.status}')">
+              <span class="result-cat">${c}</span>
+              <span class="result-word">${item.word}</span>
+              ${stampHtml}
+            </div>`;
+        } else {
+          html += `
+            <div class="result-row ${rowClass}">
+              <span class="result-cat">${c}</span>
+              <span class="result-word">${item.word}</span>
+              ${stampHtml}
+            </div>`;
+        }
+      });
+      
+      card.innerHTML = html;
+      area.appendChild(card);
+    });
+  }
+
+  window.toggleWordStatus = function(cid, uid, oldStatus) {
+    if(gameState.hostId !== myId) return;
+    playTone(350, "sine", 0.1, 0.1);
+    
+    const nextStatus = oldStatus === "approved" ? "rejected" : "approved";
+    update(ref(db, `rooms/${myRoom}/validation/${cid}/${uid}`), { status: nextStatus }).then(() => {
+      recalculateScoresLive();
+    });
+  };
+
+  function recalculateScoresLive() {
+    const players = gameState.players || {};
+    const cats = objToCats(gameState.cats);
+    const valData = gameState.validation || {};
+    const uids = Object.keys(players);
+
+    const roundWords = {};
+    cats.forEach(c => { roundWords[sanitizeId(c)] = {}; });
+
+    uids.forEach(uid => {
+      cats.forEach(c => {
+        const cid = sanitizeId(c);
+        const item = valData[cid]?.[uid] || {};
+        if(item.status === "approved" && item.word) {
+          const w = item.word.trim().toLowerCase();
+          if(!roundWords[cid][w]) roundWords[cid][w] = [];
+          roundWords[cid][w].push(uid);
+        }
+      });
+    });
+
+    const updates = {};
+    uids.forEach(uid => {
+      let roundSum = 0;
+      cats.forEach(c => {
+        const cid = sanitizeId(c);
+        const item = valData[cid]?.[uid] || {};
+        if(item.status === "approved" && item.word) {
+          const w = item.word.trim().toLowerCase();
+          const users = roundWords[cid][w] || [];
+          
+          let activePlayersInCatCount = 0;
+          Object.keys(roundWords[cid]).forEach(wordKey => {
+            activePlayersInCatCount += roundWords[cid][wordKey].length;
+          });
+
+          if(users.length > 1) {
+            roundSum += 5;
+          } else {
+            if(activePlayersInCatCount === users.length) {
+              roundSum += 20;
+            } else {
+              roundSum += 10;
+            }
+          }
+        }
+      });
+      updates[`players/${uid}/roundPoints`] = roundSum;
+    });
+
+    update(ref(db, `rooms/${myRoom}`), updates);
+  }
+
+  function renderResultsActions(isHost) {
+    const area = document.getElementById("results-actions");
+    if(!area) return;
+    area.innerHTML = "";
+    
+    const isLastRound = gameState.currentRound >= gameState.roundsLimit;
+    const isFinalized = gameState.isGameOverFinalized || false;
+
+    if(!isHost) {
+      if(isLastRound && isFinalized) {
+        area.innerHTML = `<button class="btn btn-outline" onclick="window.leaveRoom()">Zurück zum Hauptmenü</button>`;
+      } else {
+        area.innerHTML = `<p class="hint"><span class="pulse-dot"></span>Warte auf den Spielleiter...</p>`;
+      }
+      return;
+    }
+
+    if(isLastRound) {
+      if(!isFinalized) {
+        area.innerHTML = `<button class="btn" onclick="window.finalizeGame()">Punkte eintragen & Spiel beenden 🏁</button>`;
+      } else {
+        area.innerHTML = `
+          <button class="btn" onclick="window.restartGameEntirely()">Neues Spiel starten (gleicher Raum) 🔄</button>
+          <button class="btn btn-outline" onclick="window.leaveRoom()" style="margin-top:12px">Raum auflösen</button>
+        `;
+      }
+    } else {
+      area.innerHTML = `<button class="btn" onclick="window.nextRound()">Nächste Runde starten ➡️</button>`;
     }
   }
-});
 
-document.getElementById("input-room").addEventListener("input",e=>{
-  e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,"");
-});
+  window.finalizeGame = function() {
+    if(gameState.hostId !== myId) return;
+    
+    const players = gameState.players || {};
+    const updates = {};
+    
+    Object.keys(players).forEach(uid => {
+      const p = players[uid];
+      const newScore = (p.score || 0) + (p.roundPoints || 0);
+      updates[`players/${uid}/score`] = newScore;
+    });
+    
+    updates[`isGameOverFinalized`] = true;
+    update(ref(db, `rooms/${myRoom}`), updates);
+    playTone(659.25, "sine", 0.5, 0.2);
+  };
 
-// ─── HELPERS ──────────────────────────────────────────────────────
-function escHtml(s){
-  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-}
+  window.nextRound = function() {
+    if(gameState.hostId !== myId) return;
+
+    const players = gameState.players || {};
+    const updates = {};
+    
+    Object.keys(players).forEach(uid => {
+      const p = players[uid];
+      const newScore = (p.score || 0) + (p.roundPoints || 0);
+      updates[`players/${uid}/score`] = newScore;
+      updates[`players/${uid}/currentAnswers`] = null;
+      updates[`players/${uid}/roundPoints`] = null;
+    });
+
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const used = gameState.usedLetters ? Object.keys(gameState.usedLetters) : [];
+    const available = [...alphabet].filter(l => !used.includes(l));
+    
+    if(available.length === 0) {
+      alert("Keine Buchstaben mehr übrig!");
+      updates[`phase`] = "results";
+      updates[`currentRound`] = gameState.roundsLimit;
+      updates[`isGameOverFinalized`] = true;
+      update(ref(db, `rooms/${myRoom}`), updates);
+      return;
+    }
+
+    const nextLetter = available[Math.floor(Math.random() * available.length)];
+    
+    updates[`currentRound`] = (gameState.currentRound || 1) + 1;
+    updates[`phase`] = "playing";
+    updates[`letter`] = nextLetter;
+    updates[`timerStartedAt`] = null;
+    updates[`timerEndsAt`] = null;
+    updates[`buzzerUser`] = null;
+    updates[`buzzerUsername`] = null;
+    updates[`validation`] = null;
+    updates[`typingStatus`] = null;
+    updates[`usedLetters/${nextLetter}`] = true;
+
+    localAnswers = {};
+    sessionStorage.removeItem("slf_local_answers");
+
+    update(ref(db, `rooms/${myRoom}`), updates);
+  };
+
+  window.restartGameEntirely = function() {
+    if(gameState.hostId !== myId) return;
+    
+    const players = gameState.players || {};
+    const updates = {
+      phase: "lobby",
+      currentRound: 1,
+      letter: "",
+      timerStartedAt: null,
+      timerEndsAt: null,
+      buzzerUser: null,
+      buzzerUsername: null,
+      validation: null,
+      typingStatus: null,
+      usedLetters: null,
+      isGameOverFinalized: null
+    };
+
+    Object.keys(players).forEach(uid => {
+      updates[`players/${uid}/score`] = 0;
+      updates[`players/${uid}/currentAnswers`] = null;
+      updates[`players/${uid}/roundPoints`] = null;
+    });
+
+    localAnswers = {};
+    sessionStorage.removeItem("slf_local_answers");
+
+    set(ref(db, `rooms/${myRoom}`), {
+      ...gameState,
+      ...updates
+    });
+  };
+
+  /* Input-Sperren & Event-Listener */
+  document.addEventListener("input", e => {
+    if(e.target.matches(".answer-row input") && gameState?.cats) {
+      const cats = objToCats(gameState.cats);
+      const cat = cats.find(c => `ans-${sanitizeId(c)}` === e.target.id);
+      if(cat) {
+        localAnswers[cat] = e.target.value;
+        sessionStorage.setItem("slf_local_answers", JSON.stringify(localAnswers));
+
+        const val = e.target.value.trim();
+        if(val.length === 0) {
+          e.target.classList.remove("typing-ok", "typing-bad");
+        } else if(val.toLowerCase().startsWith(gameState.letter.toLowerCase())) {
+          e.target.classList.add("typing-ok");
+          e.target.classList.remove("typing-bad");
+        } else {
+          e.target.classList.add("typing-bad");
+          e.target.classList.remove("typing-ok");
+        }
+      }
+
+      if(typingTimeout) clearTimeout(typingTimeout);
+      if(myRoom && myId && gameState?.phase === "playing") {
+        update(ref(db, `rooms/${myRoom}/typingStatus`), { [myId]: Date.now() }).catch(()=>{});
+        typingTimeout = setTimeout(() => {
+          update(ref(db, `rooms/${myRoom}/typingStatus`), { [myId]: null }).catch(()=>{});
+        }, 3000);
+      }
+    }
+  });
+
+  document.getElementById("input-room").addEventListener("input", e => {
+    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  });
 </script>
 </body>
 </html>
