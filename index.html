@@ -8,19 +8,19 @@
   <style>
     :root {
       /* Natürliches, gedecktes Waldgrün als Akzentfarbe */
-      --primary-accent: #4a7c59;
+      --primary-accent: #7dd99a;
       
       --paper:        #fdfbf7;
       --paper-white:  #ffffff;
       --paper2:       #f0ede6;
       --grid:         rgba(100, 130, 190, 0.12);
-      --margin:       rgba(74, 124, 89, 0.35);   /* Grüner Randstrich links */
+      --margin:       rgba(125, 217, 154, 0.35);   /* Grüner Randstrich links */
       --ink:          #343a40;
-      --red:          #4a7c59;
+      --red:          #7dd99a;
       --blue:         #339af0;
       --pencil:       #868e96;
-      --stamp:        #4a7c59;
-      --green:        #4a7c59;
+      --stamp:        #7dd99a;
+      --green:        #7dd99a;
       --tape:         rgba(255, 243, 191, 0.9);
       --highlight:    #ffec99;
     }
@@ -155,8 +155,8 @@
       border-color: var(--primary-accent);
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-accent) 15%, transparent);
     }
-    input.typing-ok { border-color: var(--green) !important; box-shadow: 0 0 0 4px rgba(74, 124, 89, 0.15) !important;}
-    input.typing-bad { border-color: var(--red) !important; box-shadow: 0 0 0 4px rgba(74, 124, 89, 0.15) !important;}
+    input.typing-ok { border-color: var(--green) !important; box-shadow: 0 0 0 4px rgba(125, 217, 154, 0.15) !important;}
+    input.typing-bad { border-color: var(--red) !important; box-shadow: 0 0 0 4px rgba(125, 217, 154, 0.15) !important;}
 
     .field-label {
       font-family: 'Nunito', sans-serif;
@@ -194,9 +194,9 @@
     
     .btn-red {
       background: var(--red); color: white;
-      box-shadow: 0 4px 12px rgba(74, 124, 89, 0.25);
+      box-shadow: 0 4px 12px rgba(125, 217, 154, 0.25);
     }
-    .btn-red:hover { background: #3a6347; }
+    .btn-red:hover { background: #65c985; }
     
     .btn-sm {
       width: auto; padding: 10px 16px; font-size: 0.95rem;
@@ -525,14 +525,14 @@
       border-radius: 13px; cursor: pointer; transition: background 0.3s, border-color 0.3s;
       flex-shrink: 0;
     }
-    .toggle-switch.on { background: var(--green); border-color: #4a7c59; }
+    .toggle-switch.on { background: var(--green); border-color: #7dd99a; }
     .toggle-switch::after {
       content: ''; position: absolute; top: 2px; left: 2px;
       width: 18px; height: 18px; border-radius: 50%;
       background: white; border: 1.5px solid var(--pencil);
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    .toggle-switch.on::after { transform: translateX(22px); border-color: #4a7c59; }
+    .toggle-switch.on::after { transform: translateX(22px); border-color: #7dd99a; }
   </style>
 </head>
 <body>
