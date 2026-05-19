@@ -363,7 +363,7 @@
       transition: width 1s linear; border-radius: 6px;
     }
     .timer-fill.urgent { background: var(--red); }
-    .buzzer-wrap { width: 100%; max-width: 480px; margin-bottom: 20px; }
+    .buzzer-wrap { width: 100%; max-width: 480px; margin-bottom: 20px; margin-top: 14px; }
     .buzzer-btn {
       width: 100%; padding: 20px;
       border: 3.5px solid var(--ink); background: var(--red); color: var(--paper);
@@ -382,7 +382,7 @@
       border: 2.5px solid var(--ink); background: var(--highlight); color: var(--ink);
       border-radius: 12px;
       font-family: 'Permanent Marker', cursive; font-size: 1.3rem;
-      text-align: center; margin-bottom: 20px;
+      text-align: center; margin-bottom: 20px; margin-top: 14px;
       box-shadow: 3px 3px 0 rgba(0,0,0,0.05);
     }
     .answer-form { width: 100%; max-width: 480px; }
@@ -704,8 +704,8 @@
     <div class="round-progress" id="round-progress-pips"></div>
   </div>
   <div id="typing-indicators-area"></div>
-  <div id="buzzer-container"></div>
   <div id="playing-content"></div>
+  <div id="buzzer-container"></div>
 </div>
 
 <div id="screen-results" class="screen hidden">
@@ -753,7 +753,7 @@ let heartbeatInterval=null, roomListener=null;
 let roundTimerInterval=null, roundTimerSecondsLeft=0;
 let soundEnabled=true;
 let typingTimeout=null;
-let prevBuzzerValue=null; // BUG FIX: track separately from gameState
+let prevBuzzerValue=null;
 
 const roomRef   = () => ref(db,`rooms/${myRoom}`);
 const playerRef = () => ref(db,`rooms/${myRoom}/players/${myId}`);
@@ -783,19 +783,16 @@ function playTone(type, freq, duration, gain=0.3, delay=0){
   }catch(e){}
 }
 function playSoundBuzzer(){
-  // Classic buzzer: descending notes
   playTone('square',880,0.08,0.35,0);
   playTone('square',660,0.08,0.35,0.1);
   playTone('square',440,0.15,0.4,0.2);
 }
 function playSoundRoundStart(){
-  // Ascending fanfare
   playTone('sine',440,0.1,0.25,0);
   playTone('sine',550,0.1,0.25,0.12);
   playTone('sine',660,0.15,0.3,0.24);
 }
 function playSoundSubmit(){
-  // Short happy ding
   playTone('sine',880,0.08,0.2,0);
   playTone('sine',1100,0.1,0.15,0.09);
 }
@@ -803,7 +800,6 @@ function playSoundTimerUrgent(){
   playTone('sine',440,0.05,0.15,0);
 }
 function playSoundGameOver(){
-  // Victory fanfare
   [0,0.15,0.3,0.5].forEach((d,i)=>{
     const freqs=[440,550,660,880];
     playTone('sine',freqs[i],0.25,0.3,d);
@@ -848,7 +844,6 @@ async function updateRoomData(patch){
 
 // ─── INIT ────────────────────────────────────────────────────────
 window.addEventListener("DOMContentLoaded",()=>{
-  // Restore sound preference
   const savedSound=localStorage.getItem("slf_sound");
   if(savedSound==="0"){soundEnabled=false;document.getElementById("sound-icon").textContent="🔇";document.getElementById("sound-label").textContent="Stumm";document.getElementById("sound-toggle-btn").classList.add("muted");}
 
@@ -858,7 +853,6 @@ window.addEventListener("DOMContentLoaded",()=>{
 
 // ─── JOIN ────────────────────────────────────────────────────────
 window.joinRoom=async function(){
-  // Änderung 2: AudioContext direkt über Benutzerinteraktion freischalten
   try { getAudioCtx(); } catch(e) {}
 
   myName=document.getElementById("input-name").value.trim();
@@ -877,7 +871,7 @@ window.joinRoom=async function(){
         players:{[myId]:{name:myName,score:0,hb:Date.now()}},
         cats:catsToObj(DEFAULT_CATS),
         roundDuration:90,
-        roundLimit:0,      // 0 = unbegrenzt
+        roundLimit:0,
         usedLetters:[],
         typingStatus:{},
         allowBuzzer:true,
@@ -903,7 +897,6 @@ window.joinRoom=async function(){
 window.leaveRoom=async function(){
   stopRoundTimer();
   if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
-  // Clear typing status
   if(myRoom&&myId)try{await update(roomRef(),{[`typingStatus/${myId}`]:null});}catch(e){}
   if(myRoom&&myId)try{await update(roomRef(),{[`players/${myId}`]:null});}catch(e){}
   sessionStorage.clear();
@@ -917,24 +910,21 @@ window.leaveRoom=async function(){
 
 function startHeartbeat(){
   if(heartbeatInterval)clearInterval(heartbeatInterval);
-  // Änderung 3: Intervall von 3000ms auf 10000ms verlangsamt (Schonung des Firebase-Free-Tiers)
   heartbeatInterval=setInterval(async()=>{try{await update(playerRef(),{hb:Date.now()});}catch(e){}},10000);
 }
 
 // ─── STATE PROCESSING ────────────────────────────────────────────
 async function processStateUpdate(newState){
   const prevPhase=gameState?.phase;
-  // BUG FIX: capture buzzer BEFORE overwriting gameState
   const prevBuzzer=prevBuzzerValue;
 
   gameState=newState;
   isHost=gameState.host===myId;
 
-  // BUG FIX: host stale cleanup — proper patch object spread
   if(isHost){
     const now=Date.now();
     const stale=Object.entries(gameState.players||{})
-      .filter(([id,p])=>id!==myId&&now-(p.hb||0)>25000) // Änderung 3: Timeout-Schwelle auf 25 Sekunden erhöht
+      .filter(([id,p])=>id!==myId&&now-(p.hb||0)>25000)
       .map(([id])=>id);
     if(stale.length>0){
       const patch={};
@@ -954,7 +944,6 @@ async function processStateUpdate(newState){
     stopRoundTimer();
   }
 
-  // BUG FIX: compare against separately tracked prevBuzzer, then update tracker
   if(gameState.buzzer && gameState.buzzer!==prevBuzzer){
     prevBuzzerValue=gameState.buzzer;
     playSoundBuzzer();
@@ -983,7 +972,6 @@ function syncUIWithPhase(){
     if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
     showScreen("results");
     renderResults();
-    // Game over sound if final round
     const limit=gameState.roundLimit||0;
     if(limit>0&&gameState.round>=limit) playSoundGameOver();
   }
@@ -1009,7 +997,6 @@ function startRoundTimerClient(){
   roundTimerInterval=setInterval(async()=>{
     roundTimerSecondsLeft=Math.max(0,roundTimerSecondsLeft-1);
     renderTimerBar();
-    // Urgent sound at 10s
     if(roundTimerSecondsLeft===10) playSoundTimerUrgent();
     if(roundTimerSecondsLeft<=0){
       stopRoundTimer();
@@ -1060,17 +1047,15 @@ function renderLobby(){
   const available=ALL_LETTERS.filter(l=>!usedLetters.includes(l));
   const allowBuzzer=gameState.allowBuzzer!==false;
 
-  // Players
   document.getElementById("players-list").innerHTML=Object.entries(gameState.players||{}).map(([id,p])=>{
-    const online=now-(p.hb||0)<25000; // Änderung 3: Online-Status-Schwellenwert auf 25 Sekunden erhöht
+    const online=now-(p.hb||0)<25000;
     return`<div class="player-chip">
       <div class="online-dot" style="background:${online?"var(--green)":"transparent"}"></div>
       ${escHtml(p.name)}${id===gameState.host?" ★":""} 
       <span class="pts">${p.score||0}P</span>
-    </div>`; // Änderung 1: escHtml() schützt nun den Spielernamen vor XSS
+    </div>`;
   }).join("");
 
-  // Categories
   const catsArea=document.getElementById("lobby-cats-area");
   if(isHost){
     if(!document.getElementById("lobby-cats-list")){
@@ -1091,7 +1076,6 @@ function renderLobby(){
     catsArea.innerHTML=`<div class="cats-readonly">${cats.map(c=>`<div class="cat-tag">${c}</div>`).join("")}</div>`;
   }
 
-  // Timer
   const ta=document.getElementById("lobby-timer-area");
   if(isHost){
     ta.innerHTML=`
@@ -1113,7 +1097,6 @@ function renderLobby(){
     ta.innerHTML=`<div style="font-size:18px;color:var(--pencil);font-weight:600;">${lbl}</div>`;
   }
 
-  // Round limit
   const ra=document.getElementById("lobby-rounds-area");
   if(isHost){
     ra.innerHTML=`
@@ -1132,7 +1115,6 @@ function renderLobby(){
     ra.innerHTML=`<div style="font-size:18px;color:var(--pencil);font-weight:600;">${lbl}</div>`;
   }
 
-  // Options (buzzer toggle etc.)
   const oa=document.getElementById("lobby-options-area");
   if(isHost){
     oa.innerHTML=`
@@ -1148,7 +1130,6 @@ function renderLobby(){
       </div>`;
   }
 
-  // Host actions
   const leftCount=ALL_LETTERS.filter(l=>!(gameState.usedLetters||[]).includes(l)).length;
   document.getElementById("lobby-host-area").innerHTML=isHost
     ?`<button type="button" class="btn btn-red" onclick="window.startRound()" ${leftCount===0?"disabled":""}>
@@ -1189,12 +1170,9 @@ window.startRound=async function(){
   const available=ALL_LETTERS.filter(l=>!usedLetters.includes(l));
   if(available.length===0)return;
 
-  // Pick random letter from available pool
   const letter=available[Math.floor(Math.random()*available.length)];
   const newUsed=[...usedLetters,letter];
 
-  // BUG FIX: resetRoundData is called client-side only AFTER the DB write triggers processStateUpdate
-  // Do NOT call it here before the write — it would clear local state before the new phase starts
   await updateRoomData({
     phase:"playing",
     round:(gameState.round||0)+1,
@@ -1219,13 +1197,11 @@ function renderPlaying(){
   document.getElementById("round-badge").textContent=`Runde ${gameState.round}${roundLimit>0?" / "+roundLimit:""}`;
   document.getElementById("big-letter").textContent=gameState.letter;
 
-  // Used letters display
   const prevUsed=usedLetters.filter(l=>l!==gameState.letter);
   document.getElementById("used-letters-display").innerHTML=prevUsed.length>0
     ?prevUsed.map(l=>`<div class="used-letter-chip">${l}</div>`).join("")
     :"";
 
-  // Round progress pips
   if(roundLimit>0){
     document.getElementById("round-progress-pips").innerHTML=Array.from({length:roundLimit},(_,i)=>{
       const rn=i+1;
@@ -1236,7 +1212,6 @@ function renderPlaying(){
     document.getElementById("round-progress-pips").innerHTML="";
   }
 
-  // Typing indicators (other players)
   const typingStatus=gameState.typingStatus||{};
   const typingOthers=Object.entries(typingStatus)
     .filter(([id,ts])=>id!==myId&&Date.now()-ts<4000)
@@ -1245,7 +1220,6 @@ function renderPlaying(){
 
   const tiEl=document.getElementById("typing-indicators-area");
   if(tiEl){
-    // Änderung 1: Namen in den Typing-Chips über escHtml() vor XSS schützen
     tiEl.innerHTML=typingOthers.length>0
       ?`<div class="typing-indicators">${typingOthers.map(name=>
           `<div class="typing-chip">${escHtml(name)} <div class="typing-dots"><span></span><span></span><span></span></div></div>`
@@ -1258,7 +1232,7 @@ function renderPlaying(){
 
   if(gameState.phase==="collecting"){
     bEl.innerHTML=`<div class="buzzer-fired">⌛ Zeit läuft ab — Einsammeln!</div>`;
-    if(submitted){cEl.innerHTML=renderWaiting();return;}
+    if(submitted){cEl.innerHTML=renderWaiting(); bEl.innerHTML=""; return;}
   }
 
   if(gameState.phase==="playing"){
@@ -1271,7 +1245,7 @@ function renderPlaying(){
     }
   }
 
-  if(submitted){cEl.innerHTML=renderWaiting();return;}
+  if(submitted){cEl.innerHTML=renderWaiting(); bEl.innerHTML=""; return;}
 
   if(!cEl.querySelector(".answer-form")){
     cEl.innerHTML=`
@@ -1285,7 +1259,6 @@ function renderPlaying(){
               inputmode="text"
               autocapitalize="words"/>
           </div>`).join("")}
-        <button type="button" class="btn btn-green" style="margin-top:14px" onclick="window.submitAnswers()">Fertig ✓</button>
       </div>`;
     cats.forEach(cat=>{
       if(localAnswers[cat]){
@@ -1332,7 +1305,6 @@ function triggerLocalBuzzerTicker(){
       if(isHost){
         const c=(await get(roomRef())).val();
         if(c&&c.phase==="playing"){
-          // BUG FIX: Don't mutate `c` directly for phase, use update to avoid race
           await updateRoomData({phase:"collecting"});
           setTimeout(async()=>{
             const f=(await get(roomRef())).val();
@@ -1353,7 +1325,6 @@ window.submitAnswers=async function(){
     ans[cat]=e?e.value.trim():(localAnswers[cat]||"");
   });
   submitted=true;
-  // Clear typing indicator on submit
   try{await update(roomRef(),{[`typingStatus/${myId}`]:null});}catch(e){}
   await updateRoomData({[`roundAnswers/${myId}`]:ans});
   playSoundSubmit();
@@ -1365,7 +1336,7 @@ async function checkHostRoundEnd(){
   const cur=(await get(roomRef())).val();
   if(!cur||(cur.phase!=="playing"&&cur.phase!=="collecting"))return;
   const active=Object.entries(cur.players||{})
-    .filter(([id,p])=>Date.now()-(p.hb||0)<25000) // Änderung 3: Schwellenwert auf 25s erhöht
+    .filter(([id,p])=>Date.now()-(p.hb||0)<25000)
     .map(([id])=>id);
   if(active.length>0&&active.every(id=>cur.roundAnswers?.[id]))await forceRoundEnd(cur);
 }
@@ -1374,7 +1345,6 @@ async function forceRoundEnd(cur){
   if(!cur||cur.phase==="results")return;
   calculateBaseScores(cur);
   cur.phase="results";
-  // Clear typing status
   cur.typingStatus={};
   setConnStatus("sync");await set(roomRef(),cur);setConnStatus("ok");
 }
@@ -1384,7 +1354,6 @@ function calculateBaseScores(state){
   const pids=Object.keys(state.players||{});
   const rejections=state.rejections||{};
 
-  // BUG FIX: scores are CUMULATIVE across rounds — we only add this round's delta
   const roundScores={};
   pids.forEach(id=>{roundScores[id]=0;});
 
@@ -1403,7 +1372,6 @@ function calculateBaseScores(state){
     });
   });
 
-  // Add round scores to cumulative scores
   pids.forEach(id=>{
     state.players[id].score=(state.players[id].score||0)+roundScores[id];
   });
@@ -1443,7 +1411,6 @@ function renderResults(){
 
   document.getElementById("results-sub").textContent=`Runde ${gameState.round}${roundLimit>0?" / "+roundLimit:""} · Buchstabe ${gameState.letter}`;
 
-  // Game over banner
   const goArea=document.getElementById("gameover-area");
   if(isGameOver&&goArea){
     const sorted=Object.entries(gameState.players||{}).sort((a,b)=>(b[1].score||0)-(a[1].score||0));
@@ -1516,7 +1483,6 @@ function renderResults(){
 }
 
 window.nextRound=async function(){
-  // Save pre-round scores before resetting
   const preRoundScores={};
   Object.entries(gameState.players||{}).forEach(([id,p])=>{preRoundScores[id]=p.score||0;});
   resetRoundData();
@@ -1531,7 +1497,6 @@ window.nextRound=async function(){
 };
 
 window.newGame=async function(){
-  // Full reset: scores and letters
   const playerReset={};
   Object.keys(gameState.players||{}).forEach(id=>{
     playerReset[`players/${id}/score`]=0;
@@ -1559,7 +1524,6 @@ document.addEventListener("input",e=>{
       localAnswers[cat]=e.target.value;
       sessionStorage.setItem("slf_local_answers",JSON.stringify(localAnswers));
 
-      // Visual letter feedback
       const val=e.target.value.trim();
       if(val.length===0){
         e.target.classList.remove("typing-ok","typing-bad");
@@ -1572,7 +1536,6 @@ document.addEventListener("input",e=>{
       }
     }
 
-    // Broadcast typing status (throttled)
     if(typingTimeout)clearTimeout(typingTimeout);
     if(myRoom&&myId&&gameState?.phase==="playing"){
       update(ref(db,`rooms/${myRoom}/typingStatus`),{[myId]:Date.now()}).catch(()=>{});
