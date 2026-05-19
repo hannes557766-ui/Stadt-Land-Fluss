@@ -7,20 +7,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Special+Elite&family=Permanent+Marker&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      /* Farbpalette leicht modernisiert für bessere Kontraste */
-      --paper:        #f8f9fa;
+      /* NEU: Anpassbare Akzentfarbe (Standard: ein freundliches Lila) */
+      --primary-accent: #7950f2;
+      
+      /* Farbpalette freundlicher und wärmer gemacht */
+      --paper:        #fdfbf7; /* Wärmeres Papier */
       --paper-white:  #ffffff;
-      --paper2:       #f1f3f5;
-      --grid:         rgba(100, 140, 200, 0.15);
-      --margin:       rgba(220, 50, 50, 0.4);
-      --ink:          #212529;
-      --red:          #fa5252;
-      --blue:         #228be6;
+      --paper2:       #f0ede6; /* Sanfteres Grau-Beige für Felder */
+      --grid:         rgba(100, 130, 190, 0.12); /* Etwas weicheres Karomuster */
+      --margin:       rgba(235, 100, 100, 0.3); /* Sanftere rote Linie */
+      --ink:          #343a40; /* Weniger hartes Schwarz für Text */
+      --red:          #ff6b6b; /* Weicheres Rot für Fehler/Stempel */
+      --blue:         #339af0;
       --pencil:       #868e96;
-      --stamp:        #e03131;
-      --green:        #40c057;
+      --stamp:        #fa5252;
+      --green:        #51cf66; /* Freundlicheres Grün */
       --tape:         rgba(255, 243, 191, 0.9);
-      --highlight:    #ffe066;
+      --highlight:    #ffec99; /* Zarteres Gelb */
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -37,7 +40,7 @@
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
     }
-    /* Die rote Randlinie */
+    
     body::before {
       content: '';
       position: fixed;
@@ -78,7 +81,8 @@
       display: inline-block;
       mix-blend-mode: multiply;
     }
-    .game-title .slash { color: var(--red); }
+    /* Slashes nutzen jetzt die Akzentfarbe */
+    .game-title .slash { color: var(--primary-accent); }
     
     .game-sub {
       font-family: 'Special Elite', monospace;
@@ -112,15 +116,14 @@
       padding-bottom: 6px;
     }
     
-    /* Cleanere Boxen, die sich vom Hintergrund abheben */
     .block {
       background: var(--paper-white);
       border: 1.5px solid var(--ink);
-      border-radius: 16px;
+      border-radius: 20px; /* Etwas runder */
       width: 100%; max-width: 480px;
       padding: 32px 28px;
       position: relative;
-      box-shadow: 0 10px 30px rgba(33, 37, 41, 0.08);
+      box-shadow: 0 12px 36px rgba(33, 37, 41, 0.05); /* Weicherer Schatten */
     }
     
     .block-title {
@@ -131,12 +134,11 @@
       margin-bottom: 24px;
     }
 
-    /* Moderne, gut klickbare Eingabefelder */
     input[type=text], input[type=number] {
       width: 100%;
       background: var(--paper2);
       border: 1.5px solid transparent;
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 12px 16px;
       font-family: 'Nunito', sans-serif;
       font-size: 18px;
@@ -152,11 +154,11 @@
     }
     input[type=text]:focus, input[type=number]:focus {
       background: var(--paper-white);
-      border-color: var(--blue);
-      box-shadow: 0 0 0 4px rgba(34, 139, 230, 0.15);
+      border-color: var(--primary-accent);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-accent) 15%, transparent);
     }
-    input.typing-ok { border-color: var(--green) !important; box-shadow: 0 0 0 4px rgba(64, 192, 87, 0.15) !important;}
-    input.typing-bad { border-color: var(--red) !important; box-shadow: 0 0 0 4px rgba(250, 82, 82, 0.15) !important;}
+    input.typing-ok { border-color: var(--green) !important; box-shadow: 0 0 0 4px rgba(81, 207, 102, 0.15) !important;}
+    input.typing-bad { border-color: var(--red) !important; box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.15) !important;}
 
     .field-label {
       font-family: 'Nunito', sans-serif;
@@ -166,38 +168,39 @@
     }
     .field-label:first-child { margin-top: 0; }
     
-    /* Buttons entschlackt */
+    /* Haupt-Buttons nutzen die Akzentfarbe */
     .btn {
       width: 100%; padding: 14px 20px;
-      border: 1.5px solid var(--ink);
-      border-radius: 12px;
-      background: var(--ink); color: var(--paper-white);
+      border: none;
+      border-radius: 14px;
+      background: var(--primary-accent); color: white;
       font-family: 'Nunito', sans-serif; font-weight: 800;
       font-size: 1.1rem; letter-spacing: 0.5px;
       cursor: pointer;
       margin-top: 28px;
-      transition: all 0.15s ease;
-      box-shadow: 0 4px 12px rgba(33, 37, 41, 0.15);
+      transition: all 0.2s ease;
+      box-shadow: 0 6px 16px color-mix(in srgb, var(--primary-accent) 30%, transparent);
     }
-    .btn:hover { background: #343a40; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(33, 37, 41, 0.2); }
-    .btn:active { transform: translateY(0); box-shadow: 0 2px 4px rgba(33, 37, 41, 0.1); }
+    .btn:hover { 
+      filter: brightness(1.1); 
+      transform: translateY(-2px); 
+      box-shadow: 0 8px 20px color-mix(in srgb, var(--primary-accent) 40%, transparent); 
+    }
+    .btn:active { transform: translateY(0); box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-accent) 20%, transparent); }
     
     .btn-outline {
       background: var(--paper-white); color: var(--ink);
+      border: 1.5px solid var(--ink);
       box-shadow: 0 2px 8px rgba(33, 37, 41, 0.05);
     }
-    .btn-outline:hover { background: var(--paper2); }
+    .btn-outline:hover { background: var(--paper2); filter: none; }
     
     .btn-red {
-      background: var(--red); border-color: #c92a2a; color: white;
-      box-shadow: 0 4px 12px rgba(250, 82, 82, 0.25);
+      background: var(--red); color: white;
+      box-shadow: 0 4px 12px rgba(255, 107, 107, 0.25);
     }
-    .btn-red:hover { background: #f03e3e; }
+    .btn-red:hover { background: #fa5252; }
     
-    .btn-green {
-      background: var(--green); border-color: #2b8a3e; color: white;
-      box-shadow: 0 4px 12px rgba(64, 192, 87, 0.25);
-    }
     .btn-sm {
       width: auto; padding: 10px 16px; font-size: 0.95rem;
       margin-top: 0;
@@ -207,7 +210,7 @@
       background: var(--paper2); color: var(--ink);
       padding: 24px; margin-bottom: 28px;
       position: relative;
-      border-radius: 12px;
+      border-radius: 16px;
       border: 1.5px dashed var(--pencil);
       text-align: center;
     }
@@ -233,7 +236,7 @@
       background: var(--highlight); color: var(--ink);
       border: 1.5px solid var(--ink);
       padding: 4px 10px; transform: rotate(8deg);
-      border-radius: 6px;
+      border-radius: 8px;
       box-shadow: 2px 2px 0 var(--ink);
     }
     
@@ -249,7 +252,7 @@
     .player-chip .online-dot { width: 8px; height: 8px; border-radius: 50%; }
     .player-chip .pts {
       font-family: 'Nunito', sans-serif; font-weight: 800;
-      font-size: 12px; color: var(--red); margin-left: 4px;
+      font-size: 12px; color: var(--primary-accent); margin-left: 4px;
     }
     
     .cat-item {
@@ -268,7 +271,7 @@
     .cats-readonly { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
     .cat-tag {
       background: var(--paper2);
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 6px 14px;
       font-size: 15px; font-weight: 700; color: var(--ink);
     }
@@ -282,8 +285,11 @@
       cursor: pointer; transition: all 0.2s;
     }
     .timer-preset:hover, .round-preset:hover { border-color: var(--ink); color: var(--ink); }
-    .timer-preset.active { background: var(--red); color: white; border-color: var(--red); }
-    .round-preset.active { background: var(--blue); color: white; border-color: var(--blue); }
+    .timer-preset.active, .round-preset.active { 
+      background: var(--primary-accent); 
+      color: white; 
+      border-color: var(--primary-accent); 
+    }
 
     .letter-stage { text-align: center; margin: 0 0 30px; width: 100%; max-width: 480px; }
     .round-tag {
@@ -303,8 +309,9 @@
     }
     .big-letter::after {
       content: '';
-      position: absolute; left: 0; bottom: 5px; width: 100%; height: 12px;
-      background: rgba(250, 82, 82, 0.2);
+      position: absolute; left: 0; bottom: 5px; width: 100%; height: 16px;
+      background: var(--primary-accent);
+      opacity: 0.2;
       z-index: -1; transform: rotate(1deg);
     }
     
@@ -312,7 +319,7 @@
     .used-letter-chip {
       font-family: 'Nunito', sans-serif; font-weight: 800;
       font-size: 14px; color: var(--pencil);
-      background: var(--paper2); border-radius: 6px;
+      background: var(--paper2); border-radius: 8px;
       padding: 4px 10px;
       opacity: 0.7; text-decoration: line-through;
     }
@@ -333,28 +340,32 @@
     @keyframes pulseScale { from { transform: scale(1); } to { transform: scale(1.05); } }
     
     .timer-track { width: 100%; height: 12px; background: var(--paper2); border-radius: 10px; overflow: hidden; }
-    .timer-fill { height: 100%; background: var(--ink); transition: width 1s linear; border-radius: 10px; }
+    .timer-fill { height: 100%; background: var(--primary-accent); transition: width 1s linear; border-radius: 10px; }
     .timer-fill.urgent { background: var(--red); }
     
     .buzzer-wrap { width: 100%; max-width: 480px; margin-bottom: 20px; margin-top: 20px; }
     .buzzer-btn {
       width: 100%; padding: 24px;
-      border: none; background: var(--red); color: white;
+      border: none; 
+      background: var(--primary-accent); color: white;
       border-radius: 20px;
       font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.6rem;
       letter-spacing: 2px; cursor: pointer;
-      box-shadow: 0 8px 0 #c92a2a, 0 15px 20px rgba(250, 82, 82, 0.4);
+      box-shadow: 0 8px 0 rgba(0,0,0,0.15), 0 15px 20px color-mix(in srgb, var(--primary-accent) 40%, transparent);
       transition: transform 0.1s, box-shadow 0.1s;
     }
-    .buzzer-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #c92a2a, 0 5px 10px rgba(250, 82, 82, 0.4); }
+    .buzzer-btn:active { 
+      transform: translateY(8px); 
+      box-shadow: 0 0 0 rgba(0,0,0,0.15), 0 5px 10px color-mix(in srgb, var(--primary-accent) 40%, transparent); 
+    }
     
     .buzzer-fired {
       width: 100%; max-width: 480px; padding: 20px;
       border: 1.5px solid var(--ink); background: var(--highlight); color: var(--ink);
-      border-radius: 12px;
+      border-radius: 16px;
       font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.2rem;
       text-align: center; margin-bottom: 20px; margin-top: 14px;
-      box-shadow: 0 8px 24px rgba(255, 224, 102, 0.4);
+      box-shadow: 0 8px 24px rgba(255, 236, 153, 0.4);
       animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
     }
     @keyframes shake {
@@ -392,8 +403,8 @@
     .waiting-block {
       width: 100%; max-width: 480px;
       background: var(--paper-white); border: 1.5px solid var(--ink);
-      border-radius: 16px; padding: 40px 24px; text-align: center;
-      box-shadow: 0 10px 30px rgba(33, 37, 41, 0.08);
+      border-radius: 20px; padding: 40px 24px; text-align: center;
+      box-shadow: 0 12px 36px rgba(33, 37, 41, 0.05);
     }
     .waiting-icon { font-size: 3rem; margin-bottom: 16px; }
     .waiting-title { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.8rem; margin-bottom: 16px; }
@@ -407,18 +418,18 @@
       display: flex; align-items: center; justify-content: space-between;
       border: 1.5px solid var(--ink); padding: 14px 20px;
       margin-bottom: 10px; background: var(--paper-white);
-      border-radius: 12px;
+      border-radius: 14px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
-    .score-row.gold { background: var(--highlight); border-left: 6px solid var(--red); box-shadow: 0 6px 16px rgba(255, 224, 102, 0.3); }
+    .score-row.gold { background: var(--highlight); border-left: 6px solid var(--primary-accent); box-shadow: 0 6px 16px rgba(255, 236, 153, 0.4); }
     .score-name { font-size: 17px; font-weight: 800; }
-    .score-pts { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: var(--red); }
+    .score-pts { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: var(--primary-accent); }
     
     .result-card {
       width: 100%; max-width: 480px;
       border: 1.5px solid var(--ink); background: var(--paper-white);
-      border-radius: 16px; padding: 24px; margin-bottom: 20px;
-      box-shadow: 0 8px 24px rgba(33, 37, 41, 0.06);
+      border-radius: 20px; padding: 24px; margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(33, 37, 41, 0.04);
     }
     .result-player {
       font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.4rem;
@@ -433,12 +444,11 @@
     .result-cat { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; color: var(--pencil); text-transform: uppercase; }
     .result-word { font-size: 17px; color: var(--blue); font-weight: 700; }
     
-    /* Gestylte Stempel mit Animation */
     .stamp {
       font-family: 'Special Elite', monospace; font-size: 10px;
       letter-spacing: 0.5px; padding: 4px 8px; white-space: nowrap;
       text-transform: uppercase; font-weight: bold;
-      border-radius: 4px; transform: rotate(-2deg);
+      border-radius: 6px; transform: rotate(-2deg);
       mix-blend-mode: multiply;
       animation: stampIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
     }
@@ -449,17 +459,17 @@
     .val-banner {
       width: 100%; max-width: 480px;
       border: 1.5px solid var(--ink); background: var(--highlight); color: var(--ink);
-      border-radius: 12px; padding: 16px 20px; margin-bottom: 28px; text-align: center;
-      box-shadow: 0 8px 24px rgba(255, 224, 102, 0.4);
+      border-radius: 16px; padding: 16px 20px; margin-bottom: 28px; text-align: center;
+      box-shadow: 0 8px 24px rgba(255, 236, 153, 0.4);
     }
     .val-title { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: 4px; }
     .val-sub { font-size: 13px; font-weight: 600; color: #5c5336; }
 
     .gameover-banner {
       width: 100%; max-width: 480px;
-      border: 1.5px solid var(--ink); background: var(--red); color: white;
-      border-radius: 16px; padding: 24px; margin-bottom: 28px; text-align: center;
-      box-shadow: 0 10px 30px rgba(250, 82, 82, 0.3);
+      border: none; background: var(--primary-accent); color: white;
+      border-radius: 20px; padding: 24px; margin-bottom: 28px; text-align: center;
+      box-shadow: 0 10px 30px color-mix(in srgb, var(--primary-accent) 30%, transparent);
     }
     .gameover-title { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 2rem; margin-bottom: 8px; }
     .gameover-winner { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
@@ -467,7 +477,7 @@
     .round-progress { display: flex; gap: 6px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
     .round-pip { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--pencil); }
     .round-pip.done { background: var(--pencil); }
-    .round-pip.current { background: var(--red); border-color: var(--red); }
+    .round-pip.current { background: var(--primary-accent); border-color: var(--primary-accent); }
     .round-pip.future { background: transparent; }
 
     .conn-indicator {
@@ -495,6 +505,25 @@
     .sound-toggle:hover { background: var(--paper2); }
     .sound-toggle.muted { opacity: 0.6; }
 
+    /* NEU: Farbwähler UI */
+    .color-picker-container {
+      position: fixed; top: 104px; right: 16px; z-index: 100;
+      background: var(--paper-white); border: 1px solid var(--paper2);
+      border-radius: 20px; padding: 4px 12px;
+      font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      transition: all 0.2s;
+    }
+    .color-picker-container:hover { background: var(--paper2); }
+    .color-picker-input {
+      border: none; width: 22px; height: 22px; padding: 0;
+      cursor: pointer; background: transparent;
+      border-radius: 50%; overflow: hidden;
+    }
+    .color-picker-input::-webkit-color-swatch-wrapper { padding: 0; }
+    .color-picker-input::-webkit-color-swatch { border: 1.5px solid var(--ink); border-radius: 50%; }
+
     .leave-btn {
       position: fixed; top: 16px; left: 16px; z-index: 100;
       background: var(--paper-white); border: 1px solid var(--paper2);
@@ -518,14 +547,14 @@
       border-radius: 13px; cursor: pointer; transition: background 0.3s, border-color 0.3s;
       flex-shrink: 0;
     }
-    .toggle-switch.on { background: var(--green); border-color: #2b8a3e; }
+    .toggle-switch.on { background: var(--green); border-color: #51cf66; }
     .toggle-switch::after {
       content: ''; position: absolute; top: 2px; left: 2px;
       width: 18px; height: 18px; border-radius: 50%;
       background: white; border: 1.5px solid var(--pencil);
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    .toggle-switch.on::after { transform: translateX(22px); border-color: #2b8a3e; }
+    .toggle-switch.on::after { transform: translateX(22px); border-color: #51cf66; }
   </style>
 </head>
 <body>
@@ -541,6 +570,11 @@
   <span id="sound-icon">🔊</span>
   <span id="sound-label">Sound</span>
 </button>
+
+<div class="color-picker-container">
+  <label for="theme-color-picker" style="cursor: pointer;">Farbe</label>
+  <input type="color" id="theme-color-picker" class="color-picker-input" value="#7950f2">
+</div>
 
 <div id="screen-join" class="screen">
   <div class="game-header">
@@ -633,6 +667,20 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+
+// ─── NEU: FARBAUSWAHL LOGIK ──────────────────────────────────────
+const colorPicker = document.getElementById('theme-color-picker');
+const savedColor = localStorage.getItem('slf_accent_color');
+if (savedColor) {
+  colorPicker.value = savedColor;
+  document.documentElement.style.setProperty('--primary-accent', savedColor);
+}
+colorPicker.addEventListener('input', (e) => {
+  const newColor = e.target.value;
+  document.documentElement.style.setProperty('--primary-accent', newColor);
+  localStorage.setItem('slf_accent_color', newColor);
+});
+// ─────────────────────────────────────────────────────────────────
 
 const DEFAULT_CATS = ["Stadt","Land","Fluss","Tier","Beruf"];
 const ALL_LETTERS = "ABCDEFGHIKLMNOPRSTW".split("");
@@ -1027,7 +1075,7 @@ function renderLobby(){
 
   const leftCount=ALL_LETTERS.filter(l=>!(gameState.usedLetters||[]).includes(l)).length;
   document.getElementById("lobby-host-area").innerHTML=isHost
-    ?`<button type="button" class="btn btn-red" onclick="window.startRound()" ${leftCount===0?"disabled":""}>
+    ?`<button type="button" class="btn" onclick="window.startRound()" ${leftCount===0?"disabled":""}>
         Runde starten → ${gameState.round>0?`(${gameState.round} gespielt)`:""}
       </button>
       ${leftCount===0?`<p class="hint" style="margin-top:8px">Alle Buchstaben gespielt! Zurücksetzen um weiterzumachen.</p>`:``}
