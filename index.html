@@ -762,6 +762,9 @@ const playerRef = () => ref(db,`rooms/${myRoom}/players/${myId}`);
 let audioCtx = null;
 function getAudioCtx(){
   if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume().catch(()=>{});
+  }
   return audioCtx;
 }
 function playTone(type, freq, duration, gain=0.3, delay=0){
@@ -855,6 +858,9 @@ window.addEventListener("DOMContentLoaded",()=>{
 
 // ─── JOIN ────────────────────────────────────────────────────────
 window.joinRoom=async function(){
+  // Änderung 2: AudioContext direkt über Benutzerinteraktion freischalten
+  try { getAudioCtx(); } catch(e) {}
+
   myName=document.getElementById("input-name").value.trim();
   myRoom=document.getElementById("input-room").value.trim().toUpperCase().replace(/[^A-Z0-9]/g,"");
   if(!myName||!myRoom){showError("Bitte Name und Raum-Code eingeben.");return;}
@@ -911,7 +917,8 @@ window.leaveRoom=async function(){
 
 function startHeartbeat(){
   if(heartbeatInterval)clearInterval(heartbeatInterval);
-  heartbeatInterval=setInterval(async()=>{try{await update(playerRef(),{hb:Date.now()});}catch(e){}},3000);
+  // Änderung 3: Intervall von 3000ms auf 10000ms verlangsamt (Schonung des Firebase-Free-Tiers)
+  heartbeatInterval=setInterval(async()=>{try{await update(playerRef(),{hb:Date.now()});}catch(e){}},10000);
 }
 
 // ─── STATE PROCESSING ────────────────────────────────────────────
@@ -927,7 +934,7 @@ async function processStateUpdate(newState){
   if(isHost){
     const now=Date.now();
     const stale=Object.entries(gameState.players||{})
-      .filter(([id,p])=>id!==myId&&now-(p.hb||0)>10000)
+      .filter(([id,p])=>id!==myId&&now-(p.hb||0)>25000) // Änderung 3: Timeout-Schwelle auf 25 Sekunden erhöht
       .map(([id])=>id);
     if(stale.length>0){
       const patch={};
@@ -1055,12 +1062,12 @@ function renderLobby(){
 
   // Players
   document.getElementById("players-list").innerHTML=Object.entries(gameState.players||{}).map(([id,p])=>{
-    const online=now-(p.hb||0)<10000;
+    const online=now-(p.hb||0)<25000; // Änderung 3: Online-Status-Schwellenwert auf 25 Sekunden erhöht
     return`<div class="player-chip">
       <div class="online-dot" style="background:${online?"var(--green)":"transparent"}"></div>
-      ${p.name}${id===gameState.host?" ★":""}
+      ${escHtml(p.name)}${id===gameState.host?" ★":""} 
       <span class="pts">${p.score||0}P</span>
-    </div>`;
+    </div>`; // Änderung 1: escHtml() schützt nun den Spielernamen vor XSS
   }).join("");
 
   // Categories
@@ -1238,9 +1245,10 @@ function renderPlaying(){
 
   const tiEl=document.getElementById("typing-indicators-area");
   if(tiEl){
+    // Änderung 1: Namen in den Typing-Chips über escHtml() vor XSS schützen
     tiEl.innerHTML=typingOthers.length>0
       ?`<div class="typing-indicators">${typingOthers.map(name=>
-          `<div class="typing-chip">${name} <div class="typing-dots"><span></span><span></span><span></span></div></div>`
+          `<div class="typing-chip">${escHtml(name)} <div class="typing-dots"><span></span><span></span><span></span></div></div>`
         ).join("")}</div>`
       :`<div class="typing-indicators"></div>`;
   }
@@ -1357,7 +1365,7 @@ async function checkHostRoundEnd(){
   const cur=(await get(roomRef())).val();
   if(!cur||(cur.phase!=="playing"&&cur.phase!=="collecting"))return;
   const active=Object.entries(cur.players||{})
-    .filter(([id,p])=>Date.now()-(p.hb||0)<12000)
+    .filter(([id,p])=>Date.now()-(p.hb||0)<25000) // Änderung 3: Schwellenwert auf 25s erhöht
     .map(([id])=>id);
   if(active.length>0&&active.every(id=>cur.roundAnswers?.[id]))await forceRoundEnd(cur);
 }
@@ -1377,9 +1385,6 @@ function calculateBaseScores(state){
   const rejections=state.rejections||{};
 
   // BUG FIX: scores are CUMULATIVE across rounds — we only add this round's delta
-  // The old code reset scores to 0 every round, wiping previous rounds!
-  // We need to add to existing scores, not replace them.
-  // Store round scores separately and add them in.
   const roundScores={};
   pids.forEach(id=>{roundScores[id]=0;});
 
@@ -1415,18 +1420,13 @@ window.toggleAnswerStrike=async function(pid,cat){
   }else{
     cur.rejections[key]=true;
   }
-  // Recalculate from scratch for this round
-  // Reset to pre-round scores first (subtract this round's contribution)
-  // Since we store cumulative, we need to re-derive: save pre-round base and recompute
-  // Simplest approach: store roundBaseScores snapshot when round ends
-  // For now: full recalc by resetting to preRoundScores if available
+  
   if(cur.preRoundScores){
     Object.keys(cur.players||{}).forEach(id=>{
       cur.players[id].score=cur.preRoundScores[id]||0;
     });
     calculateBaseScores(cur);
   } else {
-    // Fallback: just recalc (may double-count, but keeps existing behavior)
     Object.keys(cur.players||{}).forEach(id=>{cur.players[id].score=0;});
     calculateBaseScores(cur);
   }
