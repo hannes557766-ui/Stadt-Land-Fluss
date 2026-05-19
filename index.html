@@ -7,43 +7,42 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Special+Elite&family=Permanent+Marker&family=Caveat:wght@600&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      /* Standard-Akzentfarbe von rot/violett auf grün geändert */
-      --primary-accent: #51cf66;
+      /* Standard-Akzentfarbe */
+      --primary-accent: #7950f2;
       
       /* Helles Heft-Theme */
       --paper:        #fdfbf7; 
       --paper-white:  #ffffff;
       --paper2:       #f0ede6; 
       --grid:         rgba(100, 130, 190, 0.12); 
-      --margin:       rgba(81, 207, 102, 0.3); /* Von rot auf grün geändert */
+      --margin:       rgba(81, 207, 102, 0.3); /* ROT ZU GRÜN: Linke Heftlinie */
       --ink:          #343a40; 
-      --red:          #51cf66; /* Von rot auf grün geändert */
+      --red:          #51cf66; /* ROT ZU GRÜN: Standardmäßig auf grünes Feedback geändert */
       --blue:         #339af0;
       --pencil:       #868e96;
-      --stamp:        #51cf66; /* Von rot auf grün geändert */
+      --stamp:        #51cf66; /* ROT ZU GRÜN */
       --green:        #51cf66; 
       --tape:         rgba(255, 243, 191, 0.9);
-      --highlight:    #ffec99; 
+      --highlight:    #e2fcd4; /* ROT ZU GRÜN: Gelb-Rot-Banner zu zartem Grün */
       --input-font:   'Caveat', cursive;
       --doodle-opacity: 0.04;
     }
 
     /* Tafel-Modus (Dark Theme) */
     body.chalkboard-mode {
-      --primary-accent: #69db7c;
       --paper:        #2b303a; 
-      --paper-white:  #343a40;
+      --paper-white: #343a40;
       --paper2:       #212529; 
       --grid:         rgba(255, 255, 255, 0.07); 
-      --margin:       rgba(105, 219, 124, 0.4); /* Von rot auf grün geändert */
+      --margin:       rgba(105, 219, 124, 0.4); /* ROT ZU GRÜN */
       --ink:          #f8f9fa; 
-      --red:          #69db7c; /* Von rot auf grün geändert */
+      --red:          #69db7c; /* ROT ZU GRÜN */
       --blue:         #74c0fc;
       --pencil:       #adb5bd;
-      --stamp:        #69db7c; /* Von rot auf grün geändert */
+      --stamp:        #69db7c; /* ROT ZU GRÜN */
       --green:        #69db7c; 
       --tape:         rgba(103, 115, 130, 0.6);
-      --highlight:    #e5dbff; 
+      --highlight:    #2b4c33; /* ROT ZU GRÜN */
       --doodle-opacity: 0.12;
     }
     
@@ -84,7 +83,7 @@
       pointer-events: none;
     }
 
-    /* Dekorative Doodles im Hintergrund */
+    /* Dekorative Doodles im Hintergrund (Punkt 1) */
     .doodle-bg {
       position: fixed;
       font-family: 'Permanent Marker', cursive;
@@ -197,6 +196,7 @@
       -webkit-appearance: none;
     }
     
+    /* Handschriftliche Eingaben für die echten Antworten (Punkt 1) */
     .answer-row input[type=text] {
       font-family: var(--input-font);
       font-size: 24px;
@@ -215,12 +215,13 @@
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-accent) 15%, transparent);
     }
     
+    /* Sanftes Pulsieren bei korrektem Anfangsbuchstaben (Punkt 2) */
     input.typing-ok { 
       border-color: var(--green) !important; 
       box-shadow: 0 0 0 4px rgba(81, 207, 102, 0.15) !important;
       animation: pulseSuccess 0.3s ease-in-out 1;
     }
-    input.typing-bad { border-color: var(--red) !important; box-shadow: 0 0 0 4px rgba(81, 207, 102, 0.15) !important;}
+    input.typing-bad { border-color: var(--green) !important; box-shadow: 0 0 0 4px rgba(81, 207, 102, 0.15) !important;}
 
     @keyframes pulseSuccess {
       0% { transform: scale(1); }
@@ -263,7 +264,7 @@
     .btn-outline:hover { background: var(--paper2); filter: none; }
     
     .btn-red {
-      background: var(--green); color: white; /* Aus Rot wird Grün */
+      background: var(--green); color: white; /* ROT ZU GRÜN */
       box-shadow: 0 4px 12px rgba(81, 207, 102, 0.25);
     }
     .btn-red:hover { background: #40c057; }
@@ -333,7 +334,7 @@
       color: var(--pencil); font-size: 18px;
       transition: color 0.2s, transform 0.2s;
     }
-    .cat-remove:hover { color: var(--red); transform: scale(1.1) rotate(5deg); }
+    .cat-remove:hover { color: var(--green); transform: scale(1.1) rotate(5deg); } /* ROT ZU GRÜN */
     
     .cats-readonly { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
     .cat-tag {
@@ -404,12 +405,12 @@
     .timer-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .timer-label { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--pencil); }
     .timer-secs { font-family: 'Permanent Marker', cursive; font-size: 2rem; color: var(--ink); line-height: 1; }
-    .timer-secs.urgent { color: var(--red); animation: pulseScale 0.5s infinite alternate; }
+    .timer-secs.urgent { color: var(--green); animation: pulseScale 0.5s infinite alternate; } /* ROT ZU GRÜN */
     @keyframes pulseScale { from { transform: scale(1); } to { transform: scale(1.05); } }
     
     .timer-track { width: 100%; height: 12px; background: var(--paper2); border-radius: 10px; overflow: hidden; }
     .timer-fill { height: 100%; background: var(--primary-accent); transition: width 1s linear; border-radius: 10px; }
-    .timer-fill.urgent { background: var(--red); }
+    .timer-fill.urgent { background: var(--green); } /* ROT ZU GRÜN */
     
     .buzzer-wrap { width: 100%; max-width: 480px; margin-bottom: 20px; margin-top: 20px; }
     .buzzer-btn {
@@ -433,7 +434,7 @@
       border-radius: 16px;
       font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.2rem;
       text-align: center; margin-bottom: 20px; margin-top: 14px;
-      box-shadow: 0 8px 24px rgba(255, 236, 153, 0.4);
+      box-shadow: 0 8px 24px rgba(162, 240, 130, 0.4);
       animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
     }
     @keyframes shake {
@@ -489,7 +490,7 @@
       border-radius: 14px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
-    .score-row.gold { background: var(--highlight); border-left: 6px solid var(--primary-accent); box-shadow: 0 6px 16px rgba(255, 236, 153, 0.4); color: #343a40; }
+    .score-row.gold { background: var(--highlight); border-left: 6px solid var(--primary-accent); box-shadow: 0 6px 16px rgba(162, 240, 130, 0.4); color: #343a40; }
     body.chalkboard-mode .score-row.gold { color: #343a40; }
     .score-name { font-size: 17px; font-weight: 800; }
     .score-pts { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: var(--primary-accent); }
@@ -508,11 +509,12 @@
     .result-row { display: grid; grid-template-columns: 90px 1fr auto; align-items: center; gap: 16px; padding: 10px 0; border-bottom: 1px dashed var(--paper2); }
     .result-row.host-clickable { cursor: pointer; transition: background 0.2s; border-radius: 8px; margin: 0 -8px; padding: 10px 8px; }
     .result-row.host-clickable:hover { background: var(--paper2); }
-    .result-row.rejected .result-word { text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: var(--red); opacity: 0.6; }
+    .result-row.rejected .result-word { text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: var(--green); opacity: 0.6; } /* ROT ZU GRÜN */
     .result-row:last-child { border-bottom: none; }
     .result-cat { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; color: var(--pencil); text-transform: uppercase; }
     .result-word { font-size: 22px; color: var(--blue); font-weight: 700; font-family: var(--input-font); }
     
+    /* Verzögerte, satte Stempel-Animation (Punkt 2) */
     .stamp {
       font-family: 'Special Elite', monospace; font-size: 10px;
       letter-spacing: 0.5px; padding: 4px 8px; white-space: nowrap;
@@ -530,16 +532,16 @@
       100% { opacity: 1; transform: scale(1) rotate(-2deg); } 
     }
     .stamp-ok { border: 2px solid var(--green); color: var(--green); }
-    .stamp-no { border: 2px solid var(--red); color: var(--red); }
+    .stamp-no { border: 2px solid var(--green); color: var(--green); } /* ROT ZU GRÜN */
     
     .val-banner {
       width: 100%; max-width: 480px;
       border: 1.5px solid var(--ink); background: var(--highlight); color: #343a40;
       border-radius: 16px; padding: 16px 20px; margin-bottom: 28px; text-align: center;
-      box-shadow: 0 8px 24px rgba(255, 236, 153, 0.4);
+      box-shadow: 0 8px 24px rgba(162, 240, 130, 0.4);
     }
     .val-title { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: 4px; }
-    .val-sub { font-size: 13px; font-weight: 600; color: #5c5336; }
+    .val-sub { font-size: 13px; font-weight: 600; color: #3b5c36; }
 
     .gameover-banner {
       width: 100%; max-width: 480px;
@@ -566,7 +568,7 @@
     }
     .conn-dot { width: 8px; height: 8px; border-radius: 50%; }
     .conn-dot.ok { background: var(--green); }
-    .conn-dot.sync { background: var(--highlight); animation: blink 1s infinite; }
+    .conn-dot.sync { background: var(--green); animation: blink 1s infinite; } /* ROT ZU GRÜN: Sync blinkt nun grün */
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
     .sound-toggle {
@@ -581,6 +583,7 @@
     .sound-toggle:hover { background: var(--paper2); }
     .sound-toggle.muted { opacity: 0.6; }
 
+    /* Theme-Umschalter (Punkt 5) */
     .theme-toggle-btn {
       position: fixed; top: 104px; right: 16px; z-index: 100;
       background: var(--paper-white); border: 1px solid var(--paper2);
@@ -592,6 +595,7 @@
     }
     .theme-toggle-btn:hover { background: var(--paper2); }
 
+    /* Aufgewerteter Farbwähler mit Farb-Swatches (Punkt 2) */
     .color-picker-container {
       position: fixed; top: 148px; right: 16px; z-index: 100;
       background: var(--paper-white); border: 1px solid var(--paper2);
@@ -612,13 +616,13 @@
       position: fixed; top: 16px; left: 16px; z-index: 100;
       background: var(--paper-white); border: 1px solid var(--paper2);
       border-radius: 20px; padding: 8px 16px;
-      font-size: 13px; font-weight: 800; color: var(--red); cursor: pointer;
+      font-size: 13px; font-weight: 800; color: var(--green); cursor: pointer; /* ROT ZU GRÜN: Schriftzug links oben */
       display: none; transition: all 0.2s;
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
-    .leave-btn:hover { background: var(--paper2); }
+    .leave-btn:hover { background: var(--paper2); border-color: var(--green); }
     
-    .error-msg { color: var(--red); font-size: 14px; margin-top: 12px; font-weight: 700; text-align: center; }
+    .error-msg { color: var(--green); font-size: 14px; margin-top: 12px; font-weight: 700; text-align: center; } /* ROT ZU GRÜN */
     .hint { font-size: 13px; color: var(--pencil); text-align: center; margin-top: 16px; font-weight: 600; }
     .divider { border: none; border-top: 1.5px solid var(--paper2); margin: 24px 0; width: 100%; max-width: 480px; }
     .pulse-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--green); margin-right: 8px; animation: blink 2s infinite; }
@@ -681,7 +685,7 @@
     <div class="game-title">Stadt<span class="slash">/</span>Land<span class="slash">/</span>Fluss</div>
     <div class="game-sub">Multiplayer · Klassischer Spielblock</div>
   </div>
-  
+
   <div class="block">
     <div class="block-title">Mitspielen</div>
     
@@ -704,50 +708,50 @@
     <div class="tape-strip"></div>
     <div class="game-title" style="font-size:2.6rem;transform:rotate(-1deg)">Warteraum</div>
   </div>
-  
+
   <div class="block">
     <div class="code-box">
       <div class="the-code" id="display-roomcode">—</div>
       <span class="host-stamp" id="host-badge" style="display:none">HOST</span>
     </div>
-    
+
     <div class="field-label">Spieler</div>
     <div class="players-list" id="players-list"></div>
-    
+
     <hr class="divider" style="margin:20px -28px;width:calc(100% + 56px)"/>
-    
+
     <div class="field-label">Kategorien</div>
     <div id="lobby-cats-area"></div>
-    
+
     <hr class="divider" style="margin:20px -28px;width:calc(100% + 56px)"/>
-    
+
     <div class="field-label">Rundentimer</div>
     <div id="lobby-timer-area"></div>
-    
+
     <hr class="divider" style="margin:20px -28px;width:calc(100% + 56px)"/>
-    
+
     <div class="field-label">Runden-Limit</div>
     <div id="lobby-rounds-area"></div>
-    
+
     <hr class="divider" style="margin:20px -28px;width:calc(100% + 56px)"/>
-    
+
     <div class="field-label">Spieloptionen</div>
     <div id="lobby-options-area"></div>
-    
+
     <div id="lobby-host-area" style="margin-top:28px"></div>
   </div>
 </div>
 
 <div id="screen-playing" class="screen hidden">
   <div id="timer-bar-area" style="position: fixed; top: 15px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; z-index: 200; padding: 0 15px; pointer-events: none;"></div>
-  
+
   <div class="letter-stage" style="margin-top: 80px;">
     <span class="round-tag" id="round-badge">Runde 1</span>
     <div class="big-letter" id="big-letter">A</div>
     <div class="used-letters" id="used-letters-display"></div>
     <div class="round-progress" id="round-progress-pips"></div>
   </div>
-  
+
   <div id="typing-indicators-area"></div>
   <div id="playing-content"></div>
   <div id="buzzer-container"></div>
@@ -759,16 +763,16 @@
     <div class="game-title" style="font-size:2.4rem;transform:rotate(-1deg)">Auswertung</div>
     <div class="game-sub" id="results-sub"></div>
   </div>
-  
+
   <div id="gameover-area"></div>
   <div id="validation-banner-area"></div>
-  
+
   <div class="section-label">Punkte gesamt</div>
   <div class="scoreboard" id="scoreboard"></div>
-  
+
   <div class="section-label">Antworten dieser Runde</div>
   <div id="results-container" style="width:100%;max-width:480px"></div>
-  
+
   <div style="width:100%;max-width:480px;margin-top:24px" id="results-actions"></div>
 </div>
 
@@ -789,64 +793,80 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  /* Grün ist nun die erste Option und der Default-Wert im Array */
-  const PRESET_COLORS = ["#51cf66", "#339af0", "#7950f2", "#22b8cf", "#f06595", "#ff922b", "#343a40"];
-  let currentAccentColor = localStorage.getItem("slf_accent_color") || PRESET_COLORS[0];
-  let isChalkboard = localStorage.getItem("slf_chalkboard") === "true";
-  let isMuted = localStorage.getItem("slf_muted") === "true";
+  // ─── THEME & FARBWÄHLER ─────────────────────────────────────────
+  const PRESET_COLORS = ["#7950f2", "#339af0", "#51cf66", "#f76707", "#f06595", "#343a40"];
+  let currentAccentColor = localStorage.getItem("slf_accent") || "#7950f2";
 
-  function applyAccentColor(color) {
-    document.documentElement.style.setProperty('--primary-accent', color);
-    currentAccentColor = color;
-    localStorage.setItem("slf_accent_color", color);
-    renderSwatches();
+  function applyAccentColor(hex) {
+    currentAccentColor = hex;
+    localStorage.setItem("slf_accent", hex);
+    document.documentElement.style.setProperty("--primary-accent", hex);
+    renderColorSwatches();
   }
 
-  function renderSwatches() {
+  function renderColorSwatches() {
     const container = document.getElementById("color-swatches-container");
     if(!container) return;
     container.innerHTML = "";
     PRESET_COLORS.forEach(c => {
-      const s = document.createElement("div");
-      s.className = `swatch ${c.toLowerCase() === currentAccentColor.toLowerCase() ? "active" : ""}`;
-      s.style.backgroundColor = c;
-      s.onclick = () => applyAccentColor(c);
-      container.appendChild(s);
+      const sw = document.createElement("div");
+      sw.className = "swatch" + (c === currentAccentColor ? " active" : "");
+      sw.style.backgroundColor = c;
+      sw.onclick = () => applyAccentColor(c);
+      container.appendChild(sw);
     });
   }
 
   window.toggleTheme = function() {
-    isChalkboard = !isChalkboard;
-    localStorage.setItem("slf_chalkboard", isChalkboard);
-    updateThemeClasses();
+    const isDark = document.body.classList.toggle("chalkboard-mode");
+    localStorage.setItem("slf_theme", isDark ? "dark" : "light");
+    document.getElementById("theme-icon").innerText = isDark ? " Chalkboard-Mode " : "📝";
+    document.getElementById("theme-label").innerText = isDark ? "Tafel" : "Block";
   };
 
-  function updateThemeClasses() {
-    const label = document.getElementById("theme-label");
-    const icon = document.getElementById("theme-icon");
-    if(isChalkboard) {
+  function initTheme() {
+    const saved = localStorage.getItem("slf_theme");
+    const preferDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    if (saved === "dark" || (!saved && preferDark)) {
       document.body.classList.add("chalkboard-mode");
-      if(label) label.textContent = "Tafel";
-      if(icon) icon.textContent = "🪧";
-    } else {
-      document.body.classList.remove("chalkboard-mode");
-      if(label) label.textContent = "Block";
-      if(icon) icon.textContent = "📝";
+      document.getElementById("theme-icon").innerText = " Chalkboard-Mode ";
+      document.getElementById("theme-label").innerText = "Tafel";
     }
     applyAccentColor(currentAccentColor);
   }
 
-  /* Audio Synthesizer */
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  function playTone(freq, type, duration, vol=0.15) {
-    if(isMuted) return;
+  // ─── SOUND ENGINE ─────────────────────────────────────────────
+  let soundMuted = localStorage.getItem("slf_muted") === "true";
+  let audioCtx = null;
+
+  window.toggleSound = function() {
+    soundMuted = !soundMuted;
+    localStorage.setItem("slf_muted", soundMuted);
+    updateSoundUI();
+  };
+
+  function updateSoundUI() {
+    document.getElementById("sound-icon").innerText = soundMuted ? "🔇" : "🔊";
+    document.getElementById("sound-label").innerText = soundMuted ? "Aus" : "Sound";
+    const btn = document.getElementById("sound-toggle-btn");
+    if(btn) {
+      if(soundMuted) btn.classList.add("muted");
+      else btn.classList.remove("muted");
+    }
+  }
+
+  function playTone(freq, type, duration, vol=0.1) {
+    if (soundMuted) return;
     try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === "suspended") audioCtx.resume();
+      
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = type;
       osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
       gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+      gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
       osc.start();
@@ -854,1074 +874,863 @@
     } catch(e){}
   }
 
-  window.toggleSound = function() {
-    isMuted = !isMuted;
-    localStorage.setItem("slf_muted", isMuted);
-    const btn = document.getElementById("sound-toggle-btn");
-    const label = document.getElementById("sound-label");
-    const icon = document.getElementById("sound-icon");
-    if(isMuted) {
-      btn.classList.add("muted");
-      if(label) label.textContent = "Aus";
-      if(icon) icon.textContent = "🔇";
-    } else {
-      btn.classList.remove("muted");
-      if(label) label.textContent = "Sound";
-      if(icon) icon.textContent = "🔊";
-    }
-  };
+  function playClick() { playTone(600, "triangle", 0.05, 0.15); }
+  function playSuccess() { playTone(523.25, "sine", 0.1, 0.15); setTimeout(()=>playTone(659.25, "sine", 0.15, 0.15), 80); }
+  function playBuzzer() { playTone(180, "sawtooth", 0.3, 0.2); }
+  function playTick() { playTone(800, "triangle", 0.03, 0.05); }
 
-  const DEFAULT_CATEGORIES = ["Stadt", "Land", "Fluss", "Name", "Tier", "Beruf"];
-  const PRESET_TIMERS = [0, 30, 45, 60, 90, 120];
-  const PRESET_ROUNDS = [3, 5, 7, 10, 15];
-
+  // ─── GAME STATE & VARIABLES ───────────────────────────────────
   let myRoom = null;
   let myId = null;
   let myName = "";
   let gameState = null;
+  let isHost = false;
   let localAnswers = {};
-  let timerInterval = null;
   let typingTimeout = null;
 
-  try {
-    const saved = sessionStorage.getItem("slf_local_answers");
-    if(saved) localAnswers = JSON.parse(saved);
-  }catch(e){}
+  const ALL_PRESET_CATS = [
+    "Stadt", "Land", "Fluss", "Name", "Tier", "Beruf", "Pflanze", "Lebensmittel", 
+    "Promi", "Marke", "Film/Serie", "Möbelstück", "Kleidungsstück", "Hobby", "Auto-Modell"
+  ];
+  const DEFAULT_CATS = ["Stadt", "Land", "Fluss", "Name", "Tier"];
 
-  window.onload = function() {
-    updateThemeClasses();
-    renderSwatches();
-    
-    const bMuted = document.getElementById("sound-toggle-btn");
-    if(isMuted && bMuted) {
-      bMuted.classList.add("muted");
-      document.getElementById("sound-label").textContent = "Aus";
-      document.getElementById("sound-icon").textContent = "🔇";
-    }
-    
-    const r = localStorage.getItem("slf_last_room");
-    const n = localStorage.getItem("slf_last_name");
-    if(r) document.getElementById("input-room").value = r;
-    if(n) document.getElementById("input-name").value = n;
-  };
-
+  // ─── INTERNALS & DOM HELPERS ──────────────────────────────────
   function sanitizeId(str) {
-    return str.toLowerCase().replace(/[^a-z0-9]/g, "");
+    return encodeURIComponent(str).replace(/%/g, "_");
   }
-
   function objToCats(obj) {
     if(!obj) return [];
-    return Object.keys(obj).sort((a,b) => obj[a].order - obj[b].order).map(k => obj[k].name);
+    if(Array.isArray(obj)) return obj.filter(Boolean);
+    return Object.values(obj).filter(Boolean);
   }
 
-  window.joinRoom = async function() {
-    const nameInput = document.getElementById("input-name").value.trim();
-    const roomInput = document.getElementById("input-room").value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
-    const errBox = document.getElementById("join-error");
+  function showScreen(id) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.add("hidden"));
+    document.getElementById(id).classList.remove("hidden");
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    if(!nameInput) { showJoinError("Bitte gib einen Namen ein."); return; }
-    if(!roomInput) { showJoinError("Bitte gib einen Raum-Code ein."); return; }
-    errBox.style.display = "none";
+    const leaveBtn = document.getElementById("btn-leave");
+    if(id === "screen-join") leaveBtn.style.display = "none";
+    else leaveBtn.style.display = "block";
+  }
 
-    myName = nameInput;
-    myRoom = roomInput;
-    localStorage.setItem("slf_last_room", myRoom);
-    localStorage.setItem("slf_last_name", myName);
+  function setConnectionStatus(status, label) {
+    const dot = document.getElementById("conn-dot");
+    const lbl = document.getElementById("conn-label");
+    if(!dot || !lbl) return;
+    dot.className = "conn-dot " + status;
+    lbl.innerText = label;
+  }
 
-    myId = sessionStorage.getItem(`slf_uid_${myRoom}`);
+  // ─── JOIN & ROOM CREATION ─────────────────────────────────────
+  window.joinRoom = async function() {
+    playClick();
+    const nameInput = document.getElementById("input-name");
+    const roomInput = document.getElementById("input-room");
+    const errDiv = document.getElementById("join-error");
+
+    myName = nameInput.value.trim();
+    let roomCode = roomInput.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+
+    if(!myName) {
+      errDiv.innerText = "Bitte gib einen Namen ein.";
+      errDiv.style.display = "block";
+      return;
+    }
+    if(!roomCode) {
+      errDiv.innerText = "Bitte gib einen Raum-Code ein.";
+      errDiv.style.display = "block";
+      return;
+    }
+    errDiv.style.display = "none";
+
+    myRoom = roomCode;
+    myId = localStorage.getItem("slf_uid");
     if(!myId) {
       myId = "u_" + Math.random().toString(36).substring(2, 11);
-      sessionStorage.setItem(`slf_uid_${myRoom}`, myId);
+      localStorage.setItem("slf_uid", myId);
     }
 
-    document.getElementById("btn-connect").disabled = true;
-    document.getElementById("btn-connect").textContent = "Verbinde...";
-
-    const roomRef = ref(db, `rooms/${myRoom}`);
+    setConnectionStatus("sync", "verbinde..."); /* ROT ZU GRÜN: Signalisiert durch angepasste Klassen */
     
     try {
+      const roomRef = ref(db, `rooms/${myRoom}`);
       const snap = await get(roomRef);
+      
       if(!snap.exists()) {
-        const initialState = {
-          roomCode: myRoom,
+        // Neuen Raum initialisieren
+        const initialRoom = {
+          code: myRoom,
+          host: myId,
           phase: "lobby",
-          hostId: myId,
-          letter: "",
-          timerDuration: 60,
-          roundsLimit: 5,
-          currentRound: 1,
-          buzzerUser: null,
-          buzzerUsername: null,
-          options: {
-            instantBuzzer: false,
-            preventEmptyRound: true
-          }
+          roundsLimit: 3,
+          timerPreset: 60,
+          currentRound: 0,
+          buzzerActive: true,
+          cats: DEFAULT_CATS
         };
-        await set(roomRef, initialState);
-        
-        const catsRef = ref(db, `rooms/${myRoom}/cats`);
-        const batch = {};
-        DEFAULT_CATEGORIES.forEach((c, idx) => {
-          const cid = sanitizeId(c);
-          batch[cid] = { name: c, order: idx };
-        });
-        await set(catsRef, batch);
-      } else {
-        const data = snap.val();
-        if(data.phase !== "lobby") {
-          const pList = data.players || {};
-          if(!pList[myId]) {
-            showJoinError("Das Spiel läuft bereits. Einstieg nicht möglich.");
-            resetJoinBtn();
-            return;
-          }
-        }
+        await set(roomRef, initialRoom);
       }
-
+      
+      // Spieler in Raum eintragen
       await set(ref(db, `rooms/${myRoom}/players/${myId}`), {
-        id: myId,
         name: myName,
-        score: 0,
+        points: 0,
         online: true,
-        lastActive: Date.now()
+        lastSeen: Date.now()
       });
 
-      listenToRoom();
-      document.getElementById("btn-leave").style.display = "block";
+      // Heartbeat starten
+      setInterval(() => {
+        set(ref(db, `rooms/${myRoom}/players/${myId}/lastSeen`), Date.now()).catch(()=>{});
+      }, 5000);
+
+      // Listener auf Raum setzen
+      onValue(roomRef, (snapshot) => {
+        if(snapshot.exists()) {
+          handleRoomUpdate(snapshot.val());
+        } else {
+          window.leaveRoom();
+        }
+      });
+
     } catch(e) {
-      showJoinError("Fehler beim Verbinden mit Firebase.");
-      resetJoinBtn();
+      setConnectionStatus("sync", "Fehler");
+      errDiv.innerText = "Verbindung fehlgeschlagen. Bitte erneut versuchen.";
+      errDiv.style.display = "block";
     }
   };
-
-  function showJoinError(m) {
-    const e = document.getElementById("join-error");
-    e.textContent = m; e.style.display = "block";
-    playTone(180, "sawtooth", 0.2, 0.1);
-  }
-  function resetJoinBtn() {
-    const b = document.getElementById("btn-connect");
-    b.disabled = false; b.textContent = "Rein da →";
-  }
-
-  function listenToRoom() {
-    const roomRef = ref(db, `rooms/${myRoom}`);
-    onValue(roomRef, (snapshot) => {
-      if(!snapshot.exists()) {
-        window.leaveRoom();
-        return;
-      }
-      gameState = snapshot.val();
-      renderGameState();
-    });
-
-    setInterval(() => {
-      if(myRoom && myId && gameState) {
-        update(ref(db, `rooms/${myRoom}/players/${myId}`), { lastActive: Date.now(), online: true }).catch(()=>{});
-      }
-    }, 10000);
-  }
 
   window.leaveRoom = function() {
+    playClick();
     if(myRoom && myId) {
-      set(ref(db, `rooms/${myRoom}/players/${myId}`), null).catch(()=>{});
+      set(ref(db, `rooms/${myRoom}/players/${myId}/online`), false).catch(()=>{});
     }
-    myRoom = null; gameState = null; localAnswers = {};
-    sessionStorage.removeItem("slf_local_answers");
-    if(timerInterval) clearInterval(timerInterval);
-    
-    document.getElementById("screen-join").classList.remove("hidden");
-    document.getElementById("screen-lobby").classList.add("hidden");
-    document.getElementById("screen-playing").classList.add("hidden");
-    document.getElementById("screen-results").classList.add("hidden");
-    document.getElementById("btn-connect").disabled = false;
-    document.getElementById("btn-connect").textContent = "Rein da →";
-    document.getElementById("btn-leave").style.display = "none";
+    myRoom = null;
+    gameState = null;
+    isHost = false;
+    localAnswers = {};
+    showScreen("screen-join");
+    setConnectionStatus("sync", "Bereit");
   };
 
-  function switchScreen(id) {
-    ["screen-join", "screen-lobby", "screen-playing", "screen-results"].forEach(s => {
-      document.getElementById(s).classList.add("hidden");
-    });
-    document.getElementById(id).classList.remove("hidden");
-  }
-
-  let lastPhase = null;
-  function renderGameState() {
-    const phase = gameState.phase;
-    const isHost = gameState.hostId === myId;
+  // ─── MAIN ENGINE / STATE ROUTER ───────────────────────────────
+  function handleRoomUpdate(data) {
+    gameState = data;
+    isHost = (data.host === myId);
     
-    if(phase !== lastPhase) {
-      if(phase === "playing") playTone(587.33, "sine", 0.4, 0.2);
-      if(phase === "results") playTone(440, "sine", 0.3, 0.15);
+    if(!data.players || !data.players[myId] || !data.players[myId].online) {
+      setConnectionStatus("sync", "Getrennt");
+      return;
     }
-    lastPhase = phase;
+    setConnectionStatus("ok", "Verbunden");
 
-    const lbl = document.getElementById("conn-label");
-    const dot = document.getElementById("conn-dot");
-    if(lbl && dot) {
-      lbl.textContent = gameState.roomCode;
-      dot.className = "conn-dot ok";
-    }
-
-    if(phase === "lobby") {
-      switchScreen("screen-lobby");
-      document.getElementById("display-roomcode").textContent = gameState.roomCode;
-      document.getElementById("host-badge").style.display = isHost ? "block" : "none";
-      
-      renderPlayersList(isHost);
-      renderLobbyCats(isHost);
-      renderLobbyTimer(isHost);
-      renderLobbyRounds(isHost);
-      renderLobbyOptions(isHost);
-      
-      const hostArea = document.getElementById("lobby-host-area");
-      if(isHost) {
-        hostArea.innerHTML = `<button class="btn" onclick="window.startGame()">Spiel starten 🚀</button>`;
-      } else {
-        hostArea.innerHTML = `<p class="hint"><span class="pulse-dot"></span>Warte darauf, dass der Spielleiter das Spiel startet...</p>`;
-      }
-    }
-    else if(phase === "playing") {
-      switchScreen("screen-playing");
-      document.getElementById("round-badge").textContent = `Runde ${gameState.currentRound} von ${gameState.roundsLimit}`;
-      document.getElementById("big-letter").textContent = gameState.letter;
-      
-      renderUsedLetters();
-      renderRoundPips();
-      renderTimerBar();
-      renderPlayingContent();
-      renderBuzzerArea();
-      renderTypingIndicators();
-    }
-    else if(phase === "results") {
-      switchScreen("screen-results");
-      document.getElementById("results-sub").textContent = `Runde ${gameState.currentRound} · Buchstabe ${gameState.letter}`;
-      
-      renderGameoverBanner();
-      renderValidationBanner();
-      renderScoreboard();
-      renderResultsContainer(isHost);
-      renderResultsActions(isHost);
+    // Phase routen
+    if(data.phase === "lobby") {
+      renderLobby();
+    } else if(data.phase === "playing") {
+      renderPlaying();
+    } else if(data.phase === "results") {
+      renderResults();
     }
   }
 
-  function renderPlayersList(isHost) {
+  // ─── LOBBY VIEW ───────────────────────────────────────────────
+  function renderLobby() {
+    showScreen("screen-lobby");
+    document.getElementById("display-roomcode").innerText = gameState.code;
+    document.getElementById("host-badge").style.display = isHost ? "block" : "none";
+
+    // Spielerliste
     const list = document.getElementById("players-list");
     list.innerHTML = "";
-    const players = gameState.players || {};
-    
-    Object.keys(players).forEach(k => {
-      const p = players[k];
+    const now = Date.now();
+    for(let pid in gameState.players) {
+      const p = gameState.players[pid];
+      const isOnline = p.online && (now - p.lastSeen < 12000);
+      if(!isOnline) continue;
+
       const chip = document.createElement("div");
       chip.className = "player-chip";
       
-      const isOnline = p.online && (Date.now() - p.lastActive < 20000);
-      const dotColor = isOnline ? "var(--green)" : "var(--pencil)";
-      const suffix = p.id === gameState.hostId ? " (Spielleiter)" : "";
+      const dot = document.createElement("div");
+      dot.className = "online-dot";
+      dot.style.backgroundColor = (pid === gameState.host) ? "var(--primary-accent)" : "var(--green)";
       
-      chip.innerHTML = `
-        <div class="online-dot" style="background:${dotColor}"></div>
-        <span>${p.name}${suffix}</span>
-        <span class="pts">${p.score || 0} XP</span>
-      `;
+      chip.appendChild(dot);
+      chip.appendChild(document.createTextNode(p.name + (pid === myId ? " (Du)" : "")));
       
-      if(isHost && p.id !== myId) {
-        chip.style.cursor = "pointer";
-        chip.title = "Spieler kicken";
-        chip.onclick = () => {
-          if(confirm(`Möchtest du ${p.name} wirklich aus dem Raum werfen?`)) {
-            set(ref(db, `rooms/${myRoom}/players/${p.id}`), null);
-          }
-        };
+      if(pid === gameState.host) {
+        const hs = document.createElement("span");
+        hs.style.fontSize = "10px"; hs.style.opacity = "0.6"; hs.style.marginLeft = "4px";
+        hs.innerText = "👑";
+        chip.appendChild(hs);
       }
       list.appendChild(chip);
-    });
+    }
+
+    // Kategorien verwalten
+    const catsArea = document.getElementById("lobby-cats-area");
+    const currentCats = objToCats(gameState.cats);
+    
+    if(isHost) {
+      catsArea.innerHTML = `
+        <div class="cats-readonly" style="margin-bottom:14px">
+          ${currentCats.map(c => `<span class="cat-tag">${c} <button class="cat-remove" onclick="window.removeCategory('${c}')">×</button></span>`).join("")}
+        </div>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="add-cat-input" placeholder="Eigene Kategorie..." maxlength="20" style="padding:8px 12px;font-size:15px"/>
+          <button class="btn btn-sm btn-outline" onclick="window.addCategory()">+</button>
+        </div>
+        <div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:6px;">
+          ${ALL_PRESET_CATS.filter(x => !currentCats.includes(x)).slice(0,6).map(x => `
+            <button class="timer-preset" style="padding:4px 10px; font-size:12px" onclick="window.addPresetCategory('${x}')">+ ${x}</button>
+          `).join("")}
+        </div>
+      `;
+    } else {
+      catsArea.innerHTML = `
+        <div class="cats-readonly">
+          ${currentCats.map(c => `<span class="cat-tag">${c}</span>`).join("")}
+        </div>
+      `;
+    }
+
+    // Timer Einstellungen
+    const timerArea = document.getElementById("lobby-timer-area");
+    const tPresets = [30, 45, 60, 90, 120, 0];
+    const tLabels = ["30s", "45s", "60s", "90s", "2 Min", "Kein Limit"];
+    
+    if(isHost) {
+      timerArea.innerHTML = `<div class="timer-presets">
+        ${tPresets.map((t, idx) => `
+          <button class="timer-preset ${gameState.timerPreset === t ? 'active' : ''}" onclick="window.setTimerPreset(${t})">${tLabels[idx]}</button>
+        `).join("")}
+      </div>`;
+    } else {
+      const currentT = tPresets.indexOf(gameState.timerPreset);
+      timerArea.innerHTML = `<span class="cat-tag">⏱ ${tLabels[currentT !== -1 ? currentT : 2]}</span>`;
+    }
+
+    // Rundenlimit Einstellungen
+    const roundsArea = document.getElementById("lobby-rounds-area");
+    const rPresets = [1, 2, 3, 5, 7, 10];
+    
+    if(isHost) {
+      roundsArea.innerHTML = `<div class="round-presets">
+        ${rPresets.map(r => `
+          <button class="round-preset ${gameState.roundsLimit === r ? 'active' : ''}" onclick="window.setRoundsLimit(${r})">${r} Runden</button>
+        `).join("")}
+      </div>`;
+    } else {
+      roundsArea.innerHTML = `<span class="cat-tag">🏁 ${gameState.roundsLimit} Runden</span>`;
+    }
+
+    // Spieloptionen (z.B. Buzzer erlauben)
+    const optionsArea = document.getElementById("lobby-options-area");
+    const bActive = gameState.buzzerActive !== false;
+    if(isHost) {
+      optionsArea.innerHTML = `
+        <div class="toggle-row">
+          <span>Stopp-Buzzer aktivieren</span>
+          <div class="toggle-switch ${bActive ? 'on' : ''}" onclick="window.toggleBuzzerOption()"></div>
+        </div>
+      `;
+    } else {
+      optionsArea.innerHTML = `<span class="cat-tag">${bActive ? '🔊 Buzzer Aktiviert' : '🔇 Ohne Buzzer (Nur Timer)'}</span>`;
+    }
+
+    // Host Start-Bereich
+    const hostArea = document.getElementById("lobby-host-area");
+    if(isHost) {
+      hostArea.innerHTML = `<button class="btn" style="margin-top:0" onclick="window.startFirstRound()">Spiel starten 🚀</button>`;
+    } else {
+      hostArea.innerHTML = `<p class="hint" style="margin-top:0"><span class="pulse-dot"></span>Warte darauf, dass der Spielleiter das Spiel startet...</p>`;
+    }
   }
 
-  function renderLobbyCats(isHost) {
-    const area = document.getElementById("lobby-cats-area");
-    const cats = objToCats(gameState.cats);
-    
-    if(!isHost) {
-      area.innerHTML = `<div class="cats-readonly">${cats.map(c => `<span class="cat-tag">${c}</span>`).join("")}</div>`;
-      return;
-    }
-    
-    let html = `<div style="margin-bottom:12px">`;
-    cats.forEach(c => {
-      html += `
-        <div class="cat-item">
-          <span>${c}</span>
-          <button class="cat-remove" onclick="window.removeCategory('${sanitizeId(c)}')">✕</button>
-        </div>`;
-    });
-    html += `</div>`;
-    html += `
-      <div style="display:flex;gap:10px">
-        <input type="text" id="input-new-cat" placeholder="Zusätzliche Kategorie..." maxlength="25" autocomplete="off" style="font-size:15px;padding:10px 14px;"/>
-        <button class="btn btn-sm" onclick="window.addCategory()">Hinzufügen</button>
-      </div>
-    `;
-    area.innerHTML = html;
-
-    const inp = document.getElementById("input-new-cat");
-    if(inp && !inp.dataset.listener) {
-      inp.dataset.listener = "true";
-      inp.addEventListener("keydown", e => { if(e.key === "Enter") window.addCategory(); });
-    }
-  }
-
+  // HOST ACTIONS FOR LOBBY
   window.addCategory = function() {
-    const inp = document.getElementById("input-new-cat");
+    const inp = document.getElementById("add-cat-input");
     if(!inp) return;
     const val = inp.value.trim();
     if(!val) return;
-    const cid = sanitizeId(val);
-    const cats = gameState.cats || {};
-    if(cats[cid]) { inp.value = ""; return; }
-    
-    const count = Object.keys(cats).length;
-    set(ref(db, `rooms/${myRoom}/cats/${cid}`), { name: val, order: count }).then(() => {
-      inp.value = "";
-    });
+    playClick();
+    let arr = objToCats(gameState.cats);
+    if(!arr.includes(val)) {
+      arr.push(val);
+      update(ref(db, `rooms/${myRoom}`), { cats: arr });
+    }
+    inp.value = "";
   };
-
-  window.removeCategory = function(cid) {
-    set(ref(db, `rooms/${myRoom}/cats/${cid}`), null);
+  window.addPresetCategory = function(cat) {
+    playClick();
+    let arr = objToCats(gameState.cats);
+    if(!arr.includes(cat)) {
+      arr.push(cat);
+      update(ref(db, `rooms/${myRoom}`), { cats: arr });
+    }
   };
-
-  function renderLobbyTimer(isHost) {
-    const area = document.getElementById("lobby-timer-area");
-    const current = gameState.timerDuration;
-    
-    let html = `<div class="timer-presets">`;
-    PRESET_TIMERS.forEach(t => {
-      const label = t === 0 ? "Kein Limit" : `${t}s`;
-      const activeClass = current === t ? "active" : "";
-      if(isHost) {
-        html += `<button class="timer-preset ${activeClass}" onclick="window.setTimerPreset(${t})">${label}</button>`;
-      } else {
-        if(current === t) html += `<span class="timer-preset active" style="cursor:default">${label}</span>`;
-      }
-    });
-    html += `</div>`;
-    area.innerHTML = html;
-  }
-
-  window.setTimerPreset = function(t) {
-    update(ref(db, `rooms/${myRoom}`), { timerDuration: t });
+  window.removeCategory = function(cat) {
+    playClick();
+    let arr = objToCats(gameState.cats).filter(x => x !== cat);
+    update(ref(db, `rooms/${myRoom}`), { cats: arr });
   };
-
-  function renderLobbyRounds(isHost) {
-    const area = document.getElementById("lobby-rounds-area");
-    const current = gameState.roundsLimit;
-    
-    let html = `<div class="round-presets">`;
-    PRESET_ROUNDS.forEach(r => {
-      const activeClass = current === r ? "active" : "";
-      if(isHost) {
-        html += `<button class="round-preset ${activeClass}" onclick="window.setRoundsPreset(${r})">${r} Runden</button>`;
-      } else {
-        if(current === r) html += `<span class="round-preset active" style="cursor:default">${r} Runden</span>`;
-      }
-    });
-    html += `</div>`;
-    area.innerHTML = html;
-  }
-
-  window.setRoundsPreset = function(r) {
+  window.setTimerPreset = function(secs) {
+    playClick();
+    update(ref(db, `rooms/${myRoom}`), { timerPreset: secs });
+  };
+  window.setRoundsLimit = function(r) {
+    playClick();
     update(ref(db, `rooms/${myRoom}`), { roundsLimit: r });
   };
-
-  function renderLobbyOptions(isHost) {
-    const area = document.getElementById("lobby-options-area");
-    const opt = gameState.options || { instantBuzzer: false, preventEmptyRound: true };
-    
-    const fields = [
-      { key: "preventEmptyRound", title: "Leere Runden verhindern", desc: "Verhindert Buchstaben ohne Treffer" },
-      { key: "instantBuzzer", title: "Direkt-Buzzer aktivieren", desc: "Sofortiger Rundenstopp ohne Timer" }
-    ];
-    
-    let html = "";
-    fields.forEach(f => {
-      const val = opt[f.key] || false;
-      const onClass = val ? "on" : "";
-      if(isHost) {
-        html += `
-          <div class="toggle-row">
-            <div>
-              <div>${f.title}</div>
-              <div style="font-size:12px;color:var(--pencil);font-weight:400">${f.desc}</div>
-            </div>
-            <div class="toggle-switch ${onClass}" onclick="window.toggleLobbyOption('${f.key}', ${!val})"></div>
-          </div>`;
-      } else {
-        html += `
-          <div class="toggle-row" style="opacity:0.8">
-            <div>
-              <div>${f.title}</div>
-              <div style="font-size:12px;color:var(--pencil);font-weight:400">${f.desc}</div>
-            </div>
-            <div class="toggle-switch ${onClass}" style="cursor:default"></div>
-          </div>`;
-      }
-    });
-    area.innerHTML = html;
-  }
-
-  window.toggleLobbyOption = function(key, newVal) {
-    update(ref(db, `rooms/${myRoom}/options`), { [key]: newVal });
+  window.toggleBuzzerOption = function() {
+    playClick();
+    const current = gameState.buzzerActive !== false;
+    update(ref(db, `rooms/${myRoom}`), { buzzerActive: !current });
   };
 
-  window.startGame = async function() {
-    const cats = objToCats(gameState.cats);
-    if(cats.length === 0) { alert("Bitte füge mindestens eine Kategorie hinzu."); return; }
-    
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const used = gameState.usedLetters ? Object.keys(gameState.usedLetters) : [];
-    const available = [...alphabet].filter(l => !used.includes(l));
-    
-    if(available.length === 0) {
-      alert("Alle Buchstaben wurden bereits gespielt!"); return;
-    }
-    
-    const nextLetter = available[Math.floor(Math.random() * available.length)];
-    
-    const players = gameState.players || {};
-    Object.keys(players).forEach(k => {
-      update(ref(db, `rooms/${myRoom}/players/${k}`), { currentAnswers: null, roundPoints: null }).catch(()=>{});
-    });
-
-    const updates = {
-      phase: "playing",
-      letter: nextLetter,
-      timerStartedAt: null,
-      timerEndsAt: null,
-      buzzerUser: null,
-      buzzerUsername: null
-    };
-    updates[`usedLetters/${nextLetter}`] = true;
-
-    update(ref(db, `rooms/${myRoom}`), updates);
-  };
-
-  function renderUsedLetters() {
-    const area = document.getElementById("used-letters-display");
-    if(!area) return;
-    area.innerHTML = "";
-    if(gameState.usedLetters) {
-      Object.keys(gameState.usedLetters).sort().forEach(l => {
-        const chip = document.createElement("span");
-        chip.className = "used-letter-chip";
-        chip.textContent = l;
-        area.appendChild(chip);
-      });
-    }
-  }
-
-  function renderRoundPips() {
-    const area = document.getElementById("round-progress-pips");
-    if(!area) return;
-    area.innerHTML = "";
-    const total = gameState.roundsLimit || 5;
-    const cur = gameState.currentRound || 1;
-    for(let i=1; i<=total; i++) {
-      const pip = document.createElement("div");
-      pip.className = `round-pip ${i < cur ? "done" : (i === cur ? "current" : "future")}`;
-      area.appendChild(pip);
-    }
-  }
-
-  function renderTimerBar() {
-    const area = document.getElementById("timer-bar-area");
-    if(!area) return;
-    
-    if(!gameState.timerStartedAt) {
-      area.innerHTML = "";
-      if(timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  window.startFirstRound = function() {
+    playClick();
+    const currentCats = objToCats(gameState.cats);
+    if(currentCats.length === 0) {
+      alert("Füge mindestens eine Kategorie hinzu!");
       return;
     }
+    
+    // Zufälligen Anfangsbuchstaben generieren (ohne bereits verwendete)
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWZ".split("");
+    const chosen = possible[Math.floor(Math.random() * possible.length)];
 
-    if(timerInterval) return;
+    // Antworten im Raum säubern
+    update(ref(db, `rooms/${myRoom}`), {
+      phase: "playing",
+      currentRound: 1,
+      letter: chosen,
+      usedLetters: [chosen],
+      roundStartedAt: Date.now(),
+      buzzerFiredBy: null,
+      answers: null,
+      validations: null
+    });
+  };
 
-    function updateTimerUi() {
-      if(!gameState || !gameState.timerEndsAt) {
-        clearInterval(timerInterval); timerInterval = null; return;
-      }
-      const now = Date.now();
-      const timeLeft = Math.max(0, Math.ceil((gameState.timerEndsAt - now) / 1000));
-      const total = gameState.timerDuration;
-      const pct = total > 0 ? (timeLeft / total) * 100 : 0;
-      
-      const isUrgent = timeLeft <= 10;
-      const urgentClass = isUrgent ? "urgent" : "";
-      
-      if(isUrgent && timeLeft > 0) playTone(880, "sine", 0.05, 0.05);
+  // ─── PLAYING VIEW ─────────────────────────────────────────────
+  let localTimerInterval = null;
+  let lastLoggedSecs = -1;
 
-      area.innerHTML = `
-        <div class="timer-wrap">
-          <div class="timer-head">
-            <span class="timer-label">${gameState.buzzerUsername ? `${gameState.buzzerUsername} hat gebuzzert!` : "Zeit läuft"}</span>
-            <span class="timer-secs ${urgentClass}">${timeLeft}s</span>
-          </div>
-          <div class="timer-track">
-            <div class="timer-fill ${urgentClass}" style="width:${pct}%"></div>
-          </div>
-        </div>
-      `;
+  function renderPlaying() {
+    showScreen("screen-playing");
+    
+    // Header & Buchstaben-Anzeige
+    document.getElementById("round-badge").innerText = `Runde ${gameState.currentRound} / ${gameState.roundsLimit}`;
+    document.getElementById("big-letter").innerText = gameState.letter;
+    
+    // Bereits verwendete Buchstaben
+    const usedArea = document.getElementById("used-letters-display");
+    if(gameState.usedLetters) {
+      usedArea.innerHTML = gameState.usedLetters.map(l => `<span class="used-letter-chip">${l}</span>`).join("");
+    } else { usedArea.innerHTML = ""; }
 
-      if(timeLeft <= 0) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-        if(gameState.hostId === myId) {
-          endRoundAndGoToValidation();
-        }
+    // Rundenpips (Fortschritt)
+    const pipsArea = document.getElementById("round-progress-pips");
+    pipsArea.innerHTML = "";
+    for(let r=1; r<=gameState.roundsLimit; r++) {
+      const pip = document.createElement("div");
+      pip.className = "round-pip " + (r < gameState.currentRound ? "done" : r === gameState.currentRound ? "current" : "future");
+      pipsArea.appendChild(pip);
+    }
+
+    // Spielfeld generieren (Kategorien)
+    const content = document.getElementById("playing-content");
+    const cats = objToCats(gameState.cats);
+    
+    // SessionStorage für lokale Antworten laden falls leer
+    if(Object.keys(localAnswers).length === 0) {
+      const saved = sessionStorage.getItem("slf_local_answers");
+      if(saved) {
+        try { localAnswers = JSON.parse(saved); } catch(e){}
       }
     }
 
-    timerInterval = setInterval(updateTimerUi, 200);
-    updateTimerUi();
-  }
-
-  function renderPlayingContent() {
-    const area = document.getElementById("playing-content");
-    if(!area) return;
-    
-    if(area.dataset.renderedForLetter === gameState.letter) return;
-    area.dataset.renderedForLetter = gameState.letter;
-
-    const cats = objToCats(gameState.cats);
     let html = `<div class="answer-form">`;
-    cats.forEach(c => {
-      const cid = sanitizeId(c);
-      const savedVal = localAnswers[c] || "";
+    cats.forEach(cat => {
+      const cId = `ans-${sanitizeId(cat)}`;
+      const val = localAnswers[cat] || "";
+      
+      let statusClass = "";
+      if(val.trim().length > 0) {
+        statusClass = val.toLowerCase().startsWith(gameState.letter.toLowerCase()) ? "typing-ok" : "typing-bad";
+      }
+
       html += `
         <div class="answer-row">
-          <div class="ans-cat">${c}</div>
-          <input type="text" id="ans-${cid}" placeholder="..." autocomplete="off" value="${savedVal}"/>
-        </div>`;
+          <div class="ans-cat">${cat}</div>
+          <input type="text" id="${cId}" class="${statusClass}" value="${escapeHtml(val)}" placeholder="${gameState.letter}... " autocomplete="off" stroke="none"/>
+        </div>
+      `;
     });
     html += `</div>`;
-    area.innerHTML = html;
-  }
+    content.innerHTML = html;
 
-  function renderBuzzerArea() {
-    const area = document.getElementById("buzzer-container");
-    if(!area) return;
-    
-    if(gameState.buzzerUser) {
-      area.innerHTML = `
-        <div class="buzzer-fired">
-          🛑 Runde pausiert durch <strong>${gameState.buzzerUsername}</strong>!
-        </div>`;
-      return;
+    // Timer-Leiste & Ablauf-Logik
+    const timerBarArea = document.getElementById("timer-bar-area");
+    if(gameState.timerPreset > 0) {
+      timerBarArea.innerHTML = `
+        <div class="timer-wrap">
+          <div class="timer-head">
+            <span class="timer-label">Verbleibende Zeit</span>
+            <span class="timer-secs" id="timer-countdown">—</span>
+          </div>
+          <div class="timer-track"><div class="timer-fill" id="timer-progress" style="width:100%"></div></div>
+        </div>
+      `;
+      
+      if(localTimerInterval) clearInterval(localTimerInterval);
+      localTimerInterval = setInterval(updateLocalTimer, 200);
+      updateLocalTimer();
+    } else {
+      timerBarArea.innerHTML = "";
+      if(localTimerInterval) { clearInterval(localTimerInterval); localTimerInterval = null; }
     }
 
-    area.innerHTML = `
-      <div class="buzzer-wrap">
-        <button class="buzzer-btn" onclick="window.fireBuzzer()">STOPP! 🚨</button>
-      </div>`;
+    // Stopp-Buzzer Logik
+    const buzzerContainer = document.getElementById("buzzer-container");
+    const bOption = gameState.buzzerActive !== false;
+    
+    if(gameState.buzzerFiredBy) {
+      const nameOfBuzzer = gameState.players[gameState.buzzerFiredBy]?.name || "Jemand";
+      buzzerContainer.innerHTML = `
+        <div class="buzzer-fired">
+          🛑 <strong>${nameOfBuzzer}</strong> hat den Buzzer gedrückt!<br/>
+          Runde stoppt gleich...
+        </div>
+      `;
+    } else if(bOption) {
+      buzzerContainer.innerHTML = `
+        <div class="buzzer-wrap">
+          <button class="buzzer-btn" onclick="window.fireBuzzer()">STOPP! 🛑</button>
+        </div>
+      `;
+    } else {
+      buzzerContainer.innerHTML = "";
+    }
+
+    // Schreibindikatoren rendern
+    renderTypingIndicators();
   }
+
+  function updateLocalTimer() {
+    if(!gameState || gameState.phase !== "playing" || gameState.timerPreset <= 0) {
+      if(localTimerInterval) clearInterval(localTimerInterval);
+      return;
+    }
+    const elapsed = (Date.now() - gameState.roundStartedAt) / 1000;
+    let total = gameState.timerPreset;
+    
+    if(gameState.buzzerFiredBy) {
+      // Wenn der Buzzer gedrückt wurde, bekommt jeder noch exakt 5 Sekunden ab Buzzer-Zeitpunkt
+      const buzzerElapsed = (gameState.buzzerFiredAt - gameState.roundStartedAt) / 1000;
+      total = buzzerElapsed + 6; // 5-6 Sekunden Kulanzzeit
+    }
+
+    let remain = Math.max(0, Math.ceil(total - elapsed));
+    
+    const cd = document.getElementById("timer-countdown");
+    const prog = document.getElementById("timer-progress");
+    if(!cd || !prog) return;
+
+    cd.innerText = remain + "s";
+    const pct = Math.max(0, Math.min(100, (remain / total) * 100));
+    prog.style.width = pct + "%";
+
+    if(remain <= 10) {
+      cd.classList.add("urgent");
+      prog.classList.add("urgent");
+      if(remain !== lastLoggedSecs && remain > 0) {
+        playTick();
+        lastLoggedSecs = remain;
+      }
+    } else {
+      cd.classList.remove("urgent");
+      prog.classList.remove("urgent");
+    }
+
+    // Zeit abgelaufen? -> Antworten einreichen (nur einmal steuern)
+    if(remain <= 0 && isHost && !gameState.transitioning) {
+      update(ref(db, `rooms/${myRoom}`), { transitioning: true });
+      finishRound();
+    }
+  }
+
+  window.fireBuzzer = function() {
+    if(gameState?.buzzerFiredBy) return;
+    playBuzzer();
+    update(ref(db, `rooms/${myRoom}`), {
+      buzzerFiredBy: myId,
+      buzzerFiredAt: Date.now()
+    });
+    // Lokales Einreichen vorbereiten
+    setTimeout(submitMyAnswers, 4000);
+  };
 
   function renderTypingIndicators() {
     const area = document.getElementById("typing-indicators-area");
     if(!area) return;
-    area.innerHTML = "";
+    if(!gameState.typingStatus) { area.innerHTML = ""; return; }
     
-    const status = gameState.typingStatus || {};
-    const players = gameState.players || {};
     const now = Date.now();
-    
-    Object.keys(status).forEach(uid => {
-      if(uid !== myId && status[uid] && (now - status[uid] < 4000)) {
-        const pName = players[uid]?.name || "Jemand";
-        const chip = document.createElement("div");
-        chip.className = "typing-chip";
-        chip.innerHTML = `<span>${pName} schreibt</span><div class="typing-dots"><span></span><span></span><span></span></div>`;
-        area.appendChild(chip);
+    let typingPlayers = [];
+    for(let pid in gameState.typingStatus) {
+      if(pid === myId) continue;
+      const t = gameState.typingStatus[pid];
+      if(t && (now - t < 3500)) {
+        const name = gameState.players[pid]?.name || "Jemand";
+        typingPlayers.push(name);
       }
-    });
-  }
-
-  window.fireBuzzer = function() {
-    if(gameState.buzzerUser) return;
-    playTone(220, "sawtooth", 0.3, 0.2);
-
-    const cats = objToCats(gameState.cats);
-    const answersPayload = {};
-    cats.forEach(c => {
-      const el = document.getElementById(`ans-${sanitizeId(c)}`);
-      answersPayload[sanitizeId(c)] = el ? el.value.trim() : "";
-    });
-
-    update(ref(db, `rooms/${myRoom}/players/${myId}`), { currentAnswers: answersPayload }).then(() => {
-      const isInstant = gameState.options?.instantBuzzer || false;
-      if(isInstant) {
-        if(gameState.hostId === myId) {
-          update(ref(db, `rooms/${myRoom}`), {
-            buzzerUser: myId,
-            buzzerUsername: myName,
-            phase: "results"
-          }).then(() => { evaluateRoundPoints(); });
-        } else {
-          update(ref(db, `rooms/${myRoom}`), {
-            buzzerUser: myId,
-            buzzerUsername: myName
-          });
-        }
-      } else {
-        const duration = gameState.timerDuration || 60;
-        if(duration === 0) {
-          if(gameState.hostId === myId) {
-            update(ref(db, `rooms/${myRoom}`), { buzzerUser: myId, buzzerUsername: myName, phase: "results" }).then(() => { evaluateRoundPoints(); });
-          } else {
-            update(ref(db, `rooms/${myRoom}`), { buzzerUser: myId, buzzerUsername: myName });
-          }
-        } else {
-          const now = Date.now();
-          update(ref(db, `rooms/${myRoom}`), {
-            buzzerUser: myId,
-            buzzerUsername: myName,
-            timerStartedAt: now,
-            timerEndsAt: now + (duration * 1000)
-          });
-        }
-      }
-    });
-  };
-
-  function endRoundAndGoToValidation() {
-    if(timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-    
-    const cats = objToCats(gameState.cats);
-    const el = document.getElementById(`ans-${sanitizeId(cats[0])}`);
-    if(el) {
-      const answersPayload = {};
-      cats.forEach(c => {
-        const inp = document.getElementById(`ans-${sanitizeId(c)}`);
-        answersPayload[sanitizeId(c)] = inp ? inp.value.trim() : "";
-      });
-      update(ref(db, `rooms/${myRoom}/players/${myId}`), { currentAnswers: answersPayload }).catch(()=>{});
     }
 
-    update(ref(db, `rooms/${myRoom}`), { phase: "results" }).then(() => {
-      setTimeout(() => { evaluateRoundPoints(); }, 800);
-    });
+    if(typingPlayers.length === 0) {
+      area.innerHTML = "";
+    } else {
+      area.innerHTML = `
+        <div class="typing-indicators">
+          ${typingPlayers.map(n => `
+            <div class="typing-chip">
+              <span>✏️ ${n} schreibt</span>
+              <div class="typing-dots"><span></span><span></span><span></span></div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
   }
 
-  function evaluateRoundPoints() {
-    if(gameState.hostId !== myId) return;
-    
-    const players = gameState.players || {};
+  // Antworten abschicken
+  function submitMyAnswers() {
+    if(!myRoom || !myId || gameState?.phase !== "playing") return;
     const cats = objToCats(gameState.cats);
-    const uids = Object.keys(players);
-    
-    const roundWords = {};
-    cats.forEach(c => { roundWords[sanitizeId(c)] = {}; });
-
-    uids.forEach(uid => {
-      const ans = players[uid].currentAnswers || {};
-      cats.forEach(c => {
-        const cid = sanitizeId(c);
-        let w = (ans[cid] || "").trim().toLowerCase();
-        if(w.startsWith(gameState.letter.toLowerCase()) && w.length > 0) {
-          if(!roundWords[cid][w]) roundWords[cid][w] = [];
-          roundWords[cid][w].push(uid);
-        }
-      });
+    let out = {};
+    cats.forEach(cat => {
+      out[sanitizeId(cat)] = (localAnswers[cat] || "").trim();
     });
+    set(ref(db, `rooms/${myRoom}/answers/${gameState.currentRound}/${myId}`), out).catch(()=>{});
+  }
 
-    const valBatch = {};
-    const pointsBatch = {};
-    uids.forEach(uid => {
-      pointsBatch[uid] = {};
-      cats.forEach(c => { pointsBatch[uid][sanitizeId(c)] = 0; });
-    });
-
-    let globalTotalAnswersCount = 0;
-
-    cats.forEach(c => {
-      const cid = sanitizeId(c);
-      const wordMap = roundWords[cid];
-      const uniqueWords = Object.keys(wordMap);
+  async function finishRound() {
+    submitMyAnswers();
+    // Kurze Verzögerung für die Übermittlung aller Clients
+    setTimeout(async () => {
+      // Alle Antworten einsammeln, Autovalidierung fahren
+      const snap = await get(ref(db, `rooms/${myRoom}`));
+      const data = snap.val();
       
-      let activePlayersInCatCount = 0;
-      uniqueWords.forEach(w => { activePlayersInCatCount += wordMap[w].length; });
-
-      uniqueWords.forEach(w => {
-        const users = wordMap[w];
-        users.forEach(uid => {
-          valBatch[`validation/${cid}/${uid}`] = {
-            word: players[uid].currentAnswers[cid],
-            status: "approved"
-          };
-          globalTotalAnswersCount++;
-
-          if(users.length > 1) {
-            pointsBatch[uid][cid] = 5;
+      const r = data.currentRound;
+      const cats = objToCats(data.cats);
+      const answersMatrix = data.answers?.[r] || {};
+      
+      // Valide Felder vorbereiten
+      let validations = data.validations?.[r] || {};
+      
+      // Automatische Prüfung (Stimmt der Anfangsbuchstabe?)
+      for(let pid in data.players) {
+        if(!validations[pid]) validations[pid] = {};
+        cats.forEach(cat => {
+          const cId = sanitizeId(cat);
+          const ans = (answersMatrix[pid]?.[cId] || "").trim();
+          if(ans.length === 0) {
+            validations[pid][cId] = false; // Leer ist immer falsch
+          } else if(ans.toLowerCase().startsWith(data.letter.toLowerCase())) {
+            validations[pid][cId] = true;  // Buchstabe passt -> Vorläufig wahr
           } else {
-            if(activePlayersInCatCount === users.length) {
-              pointsBatch[uid][cid] = 20;
-            } else {
-              pointsBatch[uid][cid] = 10;
-            }
+            validations[pid][cId] = false; // Falscher Buchstabe
           }
         });
-      });
-
-      uids.forEach(uid => {
-        const ans = players[uid].currentAnswers || {};
-        const w = (ans[cid] || "").trim();
-        if(!w || !w.toLowerCase().startsWith(gameState.letter.toLowerCase())) {
-          valBatch[`validation/${cid}/${uid}`] = { word: w || "—", status: "empty" };
-        }
-      });
-    });
-
-    uids.forEach(uid => {
-      let sum = 0;
-      cats.forEach(c => { sum += (pointsBatch[uid][sanitizeId(c)] || 0); });
-      valBatch[`players/${uid}/roundPoints`] = sum;
-    });
-
-    const isPreventEmpty = gameState.options?.preventEmptyRound || false;
-    if(isPreventEmpty && globalTotalAnswersCount === 0) {
-      valBatch[`usedLetters/${gameState.letter}`] = null;
-      valBatch[`phase`] = "playing";
-      valBatch[`timerStartedAt`] = null;
-      valBatch[`timerEndsAt`] = null;
-      valBatch[`buzzerUser`] = null;
-      valBatch[`buzzerUsername`] = null;
-      
-      const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-      const used = gameState.usedLetters ? Object.keys(gameState.usedLetters) : [];
-      const filteredUsed = used.filter(x => x !== gameState.letter);
-      const available = [...alphabet].filter(l => !filteredUsed.includes(l));
-      if(available.length > 0) {
-        const nextLetter = available[Math.floor(Math.random() * available.length)];
-        valBatch[`letter`] = nextLetter;
-        valBatch[`usedLetters/${nextLetter}`] = true;
       }
+
+      // Punkteberechnung für die aktuelle Runde einleiten
+      calculateScoresForRound(data, r, validations);
+
+      // Phase auf Results setzen
+      update(ref(db, `rooms/${myRoom}`), {
+        phase: "results",
+        validations: validations,
+        transitioning: null
+      });
+      
+      // Lokale Zwischenspeicher bereinigen
+      localAnswers = {};
+      sessionStorage.removeItem("slf_local_answers");
+    }, 1500);
+  }
+
+  function calculateScoresForRound(roomData, round, validations) {
+    const cats = objToCats(roomData.cats);
+    const answersMatrix = roomData.answers?.[round] || {};
+    
+    // Punktestand auf Basis aller vorherigen Runden + Autovalidierung neu berechnen
+    let playersScore = {};
+    for(let pid in roomData.players) {
+      playersScore[pid] = 0;
     }
 
-    update(ref(db, `rooms/${myRoom}`), valBatch);
+    // Wir laufen über alle bisherigen Runden (1 bis aktuelle)
+    for(let currR = 1; currR <= round; currR++) {
+      const rAnswers = roomData.answers?.[currR] || {};
+      const rValidations = (currR === round) ? validations : (roomData.validations?.[currR] || {});
+
+      cats.forEach(cat => {
+        const cId = sanitizeId(cat);
+        
+        // 1. Wie viele haben in dieser Kategorie überhaupt eine valide Antwort?
+        let validAnswersForCat = {};
+        for(let pid in roomData.players) {
+          const isValid = rValidations[pid]?.[cId] !== false;
+          const ans = (rAnswers[pid]?.[cId] || "").trim().toLowerCase();
+          if(isValid && ans.length > 0) {
+            validAnswersForCat[pid] = ans;
+          }
+        }
+
+        const totalValidCount = Object.keys(validAnswersForCat).length;
+
+        // 2. Bepunktung anhand der exklusiven Werte verteilen
+        for(let pid in roomData.players) {
+          if(!validAnswersForCat[pid]) continue; // Keine Punkte wenn invalide/leer
+
+          const myAns = validAnswersForCat[pid];
+          
+          // Gibt es jemanden, der dieselbe Antwort hat?
+          let isUnique = true;
+          for(let otherId in validAnswersForCat) {
+            if(otherId !== pid && validAnswersForCat[otherId] === myAns) {
+              isUnique = false; break;
+            }
+          }
+
+          if(totalValidCount === 1) {
+            // Einzige korrekte Antwort in der Kategorie überhaupt
+            playersScore[pid] += 20;
+          } else if(isUnique) {
+            // Eigene Antwort ist einzigartig
+            playersScore[pid] += 10;
+          } else {
+            // Antwort wurde dupliziert
+            playersScore[pid] += 5;
+          }
+        }
+      });
+    }
+
+    // Gesamtpunkte in der Datenbank aktualisieren
+    for(let pid in roomData.players) {
+      update(ref(db, `rooms/${myRoom}/players/${pid}`), { points: playersScore[pid] }).catch(()=>{});
+    }
   }
 
-  function renderGameoverBanner() {
-    const area = document.getElementById("gameover-area");
-    if(!area) return;
+  // ─── RESULTS VIEW ─────────────────────────────────────────────
+  function renderResults() {
+    showScreen("screen-results");
+    if(localTimerInterval) { clearInterval(localTimerInterval); localTimerInterval = null; }
     
-    const isOver = gameState.currentRound >= gameState.roundsLimit && gameState.isGameOverFinalized;
-    if(!isOver) { area.innerHTML = ""; return; }
+    document.getElementById("results-sub").innerText = `Runde ${gameState.currentRound} · Buchstabe ${gameState.letter}`;
 
-    const players = gameState.players || {};
-    let high = -1; let winner = "Niemand";
-    Object.keys(players).forEach(k => {
-      if((players[k].score || 0) > high) { high = players[k].score; winner = players[k].name; }
-    });
-
-    area.innerHTML = `
-      <div class="gameover-banner">
-        <div class="gameover-title">🏆 SPIELENDE 🏆</div>
-        <div class="gameover-winner">Gesamtsieger: <strong>${winner}</strong> mit ${high} XP!</div>
-      </div>`;
-  }
-
-  function renderValidationBanner() {
-    const area = document.getElementById("validation-banner-area");
-    if(!area) return;
-    
-    const isOver = gameState.currentRound >= gameState.roundsLimit && gameState.isGameOverFinalized;
-    if(isOver) { area.innerHTML = ""; return; }
-
-    area.innerHTML = `
-      <div class="val-banner">
-        <div class="val-title">🧐 Korrekturphase</div>
-        <div class="val-sub">Tippe auf falsche Wörter, um sie zu streichen! (Nur Spielleiter)</div>
-      </div>`;
-  }
-
-  function renderScoreboard() {
-    const area = document.getElementById("scoreboard");
-    if(!area) return;
-    area.innerHTML = "";
-    
-    const players = gameState.players || {};
-    const sorted = Object.keys(players).map(k => players[k]).sort((a,b) => (b.score || 0) - (a.score || 0));
-    const highestScore = sorted[0]?.score || 0;
-
-    sorted.forEach(p => {
-      const isGold = p.score === highestScore && highestScore > 0;
-      const goldClass = isGold ? "gold" : "";
-      const rPts = p.roundPoints !== undefined && p.roundPoints !== null ? ` (+${p.roundPoints})` : "";
-      
-      const row = document.createElement("div");
-      row.className = `score-row ${goldClass}`;
-      row.innerHTML = `
-        <span class="score-name">${p.name}</span>
-        <span class="score-pts">${p.score || 0} XP <span style="font-size:11px;opacity:0.7">${rPts}</span></span>
+    // Validierungsbanner für die Mitspieler
+    const valBanner = document.getElementById("validation-banner-area");
+    if(isHost) {
+      valBanner.innerHTML = `
+        <div class="val-banner">
+          <div class="val-title">Du bist der Prüfer! 👑</div>
+          <div class="val-sub">Tippe auf die Wörter der Spieler, um sie als richtig/falsch zu stempeln. Die Punkte passen sich live an!</div>
+        </div>
       `;
-      area.appendChild(row);
-    });
-  }
+    } else {
+      valBanner.innerHTML = `
+        <div class="val-banner" style="background:var(--paper2);border-color:var(--pencil)">
+          <div class="val-title" style="color:var(--ink)">Prüfungsphase...</div>
+          <div class="val-sub" style="color:var(--pencil)">Der Spielleiter korrigiert gerade die Antworten.</div>
+        </div>
+      `;
+    }
 
-  function renderResultsContainer(isHost) {
-    const area = document.getElementById("results-container");
-    if(!area) return;
-    area.innerHTML = "";
+    // Rangliste (Scoreboard)
+    const scoreboard = document.getElementById("scoreboard");
+    scoreboard.innerHTML = "";
     
-    const players = gameState.players || {};
-    const cats = objToCats(gameState.cats);
-    const valData = gameState.validation || {};
+    // Sortieren nach Punkten
+    let sortedPlayers = Object.keys(gameState.players).map(pid => ({ id: pid, ...gameState.players[pid] }));
+    sortedPlayers.sort((a,b) => b.points - a.points);
 
-    Object.keys(players).forEach(uid => {
-      const p = players[uid];
+    const highestScore = sortedPlayers[0]?.points || 0;
+
+    sortedPlayers.forEach((p, index) => {
+      const isGold = p.points === highestScore && p.points > 0;
+      const row = document.createElement("div");
+      row.className = "score-row" + (isGold ? " gold" : "");
+      row.innerHTML = `
+        <div class="score-name">${index+1}. ${escapeHtml(p.name)} ${p.id === myId ? " (Du)":""}</div>
+        <div class="score-pts">${p.points} Pkt</div>
+      `;
+      scoreboard.appendChild(row);
+    });
+
+    // Ist das Spiel vollständig vorbei?
+    const isGameOver = gameState.currentRound >= gameState.roundsLimit;
+    const goArea = document.getElementById("gameover-area");
+    if(isGameOver) {
+      const winnerName = sortedPlayers[0]?.points > 0 ? sortedPlayers[0].name : "Niemand";
+      goArea.innerHTML = `
+        <div class="gameover-banner">
+          <div class="gameover-title">🏆 SPIEL VORBEI 🏆</div>
+          <div class="gameover-winner">Sieger: <strong>${winnerName}</strong> mit ${sortedPlayers[0]?.points || 0} Punkten!</div>
+        </div>
+      `;
+    } else {
+      goArea.innerHTML = "";
+    }
+
+    // Antworten-Auflistung dieser Runde generieren
+    const resContainer = document.getElementById("results-container");
+    resContainer.innerHTML = "";
+
+    const r = gameState.currentRound;
+    const cats = objToCats(gameState.cats);
+    const rAnswers = gameState.answers?.[r] || {};
+    const rValidations = gameState.validations?.[r] || {};
+
+    // Wir iterieren über jeden Spieler, um dessen Block anzuzeigen
+    for(let pid in gameState.players) {
+      if(!gameState.players[pid].online) continue;
+      
       const card = document.createElement("div");
       card.className = "result-card";
       
-      let html = `<div class="result-player">${p.name}</div>`;
+      let inner = `<div class="result-player">${escapeHtml(gameState.players[pid].name)}</div>`;
       
-      cats.forEach(c => {
-        const cid = sanitizeId(c);
-        const item = valData[cid]?.[uid] || { word: "—", status: "empty" };
-        
-        let stampHtml = "";
-        let rowClass = "";
-        
-        if(item.status === "approved") {
-          stampHtml = `<span class="stamp stamp-ok">OK</span>`;
-        } else if(item.status === "rejected") {
-          stampHtml = `<span class="stamp stamp-no">NEIN</span>`;
-          rowClass = "rejected";
-        }
-        
-        if(isHost && item.status !== "empty" && !(gameState.currentRound >= gameState.roundsLimit && gameState.isGameOverFinalized)) {
-          rowClass += " host-clickable";
-          html += `
-            <div class="result-row ${rowClass}" onclick="window.toggleWordStatus('${cid}','${uid}','${item.status}')">
-              <span class="result-cat">${c}</span>
-              <span class="result-word">${item.word}</span>
-              ${stampHtml}
-            </div>`;
-        } else {
-          html += `
-            <div class="result-row ${rowClass}">
-              <span class="result-cat">${c}</span>
-              <span class="result-word">${item.word}</span>
-              ${stampHtml}
-            </div>`;
-        }
+      cats.forEach(cat => {
+        const cId = sanitizeId(cat);
+        const ans = (rAnswers[pid]?.[cId] || "").trim();
+        const isValid = rValidations[pid]?.[cId] !== false;
+
+        const rowClass = "result-row" + (isHost ? " host-clickable" : "") + (isValid ? "" : " rejected");
+        const stampText = isValid ? "OK" : "NEIN";
+        const stampClass = isValid ? "stamp-ok" : "stamp-no";
+
+        inner += `
+          <div class="${rowClass}" onclick="window.toggleValidation('${pid}', '${cId}')">
+            <div class="result-cat">${cat}</div>
+            <div class="result-word">${ans ? escapeHtml(ans) : "—"}</div>
+            <div>
+              <span class="stamp ${stampClass}">${stampText}</span>
+            </div>
+          </div>
+        `;
       });
-      
-      card.innerHTML = html;
-      area.appendChild(card);
-    });
-  }
 
-  window.toggleWordStatus = function(cid, uid, oldStatus) {
-    if(gameState.hostId !== myId) return;
-    playTone(350, "sine", 0.1, 0.1);
-    
-    const nextStatus = oldStatus === "approved" ? "rejected" : "approved";
-    update(ref(db, `rooms/${myRoom}/validation/${cid}/${uid}`), { status: nextStatus }).then(() => {
-      recalculateScoresLive();
-    });
-  };
-
-  function recalculateScoresLive() {
-    const players = gameState.players || {};
-    const cats = objToCats(gameState.cats);
-    const valData = gameState.validation || {};
-    const uids = Object.keys(players);
-
-    const roundWords = {};
-    cats.forEach(c => { roundWords[sanitizeId(c)] = {}; });
-
-    uids.forEach(uid => {
-      cats.forEach(c => {
-        const cid = sanitizeId(c);
-        const item = valData[cid]?.[uid] || {};
-        if(item.status === "approved" && item.word) {
-          const w = item.word.trim().toLowerCase();
-          if(!roundWords[cid][w]) roundWords[cid][w] = [];
-          roundWords[cid][w].push(uid);
-        }
-      });
-    });
-
-    const updates = {};
-    uids.forEach(uid => {
-      let roundSum = 0;
-      cats.forEach(c => {
-        const cid = sanitizeId(c);
-        const item = valData[cid]?.[uid] || {};
-        if(item.status === "approved" && item.word) {
-          const w = item.word.trim().toLowerCase();
-          const users = roundWords[cid][w] || [];
-          
-          let activePlayersInCatCount = 0;
-          Object.keys(roundWords[cid]).forEach(wordKey => {
-            activePlayersInCatCount += roundWords[cid][wordKey].length;
-          });
-
-          if(users.length > 1) {
-            roundSum += 5;
-          } else {
-            if(activePlayersInCatCount === users.length) {
-              roundSum += 20;
-            } else {
-              roundSum += 10;
-            }
-          }
-        }
-      });
-      updates[`players/${uid}/roundPoints`] = roundSum;
-    });
-
-    update(ref(db, `rooms/${myRoom}`), updates);
-  }
-
-  function renderResultsActions(isHost) {
-    const area = document.getElementById("results-actions");
-    if(!area) return;
-    area.innerHTML = "";
-    
-    const isLastRound = gameState.currentRound >= gameState.roundsLimit;
-    const isFinalized = gameState.isGameOverFinalized || false;
-
-    if(!isHost) {
-      if(isLastRound && isFinalized) {
-        area.innerHTML = `<button class="btn btn-outline" onclick="window.leaveRoom()">Zurück zum Hauptmenü</button>`;
-      } else {
-        area.innerHTML = `<p class="hint"><span class="pulse-dot"></span>Warte auf den Spielleiter...</p>`;
-      }
-      return;
+      card.innerHTML = inner;
+      resContainer.appendChild(card);
     }
 
-    if(isLastRound) {
-      if(!isFinalized) {
-        area.innerHTML = `<button class="btn" onclick="window.finalizeGame()">Punkte eintragen & Spiel beenden 🏁</button>`;
+    // Actions-Bereich am Ende des Blocks
+    const actionsArea = document.getElementById("results-actions");
+    if(isHost) {
+      if(isGameOver) {
+        actionsArea.innerHTML = `<button class="btn" onclick="window.resetToLobby()">Zurück zur Lobby 🔄</button>`;
       } else {
-        area.innerHTML = `
-          <button class="btn" onclick="window.restartGameEntirely()">Neues Spiel starten (gleicher Raum) 🔄</button>
-          <button class="btn btn-outline" onclick="window.leaveRoom()" style="margin-top:12px">Raum auflösen</button>
-        `;
+        actionsArea.innerHTML = `<button class="btn" onclick="window.startNextRound()">Nächste Runde →</button>`;
       }
     } else {
-      area.innerHTML = `<button class="btn" onclick="window.nextRound()">Nächste Runde starten ➡️</button>`;
+      if(isGameOver) {
+        actionsArea.innerHTML = `<p class="hint"><span class="pulse-dot"></span>Das Spiel ist beendet. Warte auf den Host...</p>`;
+      } else {
+        actionsArea.innerHTML = `<p class="hint"><span class="pulse-dot"></span>Der Spielleiter startet gleich die nächste Runde...</p>`;
+      }
     }
   }
 
-  window.finalizeGame = function() {
-    if(gameState.hostId !== myId) return;
+  window.toggleValidation = function(pid, cId) {
+    if(!isHost || gameState.phase !== "results") return;
+    playClick();
+    const r = gameState.currentRound;
+    const currentVal = gameState.validations?.[r]?.[pid]?.[cId] !== false;
     
-    const players = gameState.players || {};
-    const updates = {};
-    
-    Object.keys(players).forEach(uid => {
-      const p = players[uid];
-      const newScore = (p.score || 0) + (p.roundPoints || 0);
-      updates[`players/${uid}/score`] = newScore;
-    });
-    
-    updates[`isGameOverFinalized`] = true;
-    update(ref(db, `rooms/${myRoom}`), updates);
-    playTone(659.25, "sine", 0.5, 0.2);
+    let updatedVals = { ...gameState.validations?.[r] };
+    if(!updatedVals[pid]) updatedVals[pid] = {};
+    updatedVals[pid][cId] = !currentVal;
+
+    // Punkte mit dem neuen Validierungsstand sofort live neu kalkulieren
+    calculateScoresForRound(gameState, r, updatedVals);
+
+    // In DB sichern
+    update(ref(db, `rooms/${myRoom}/validations/${r}`), updatedVals);
   };
 
-  window.nextRound = function() {
-    if(gameState.hostId !== myId) return;
-
-    const players = gameState.players || {};
-    const updates = {};
+  window.startNextRound = function() {
+    playClick();
+    const nextR = gameState.currentRound + 1;
     
-    Object.keys(players).forEach(uid => {
-      const p = players[uid];
-      const newScore = (p.score || 0) + (p.roundPoints || 0);
-      updates[`players/${uid}/score`] = newScore;
-      updates[`players/${uid}/currentAnswers`] = null;
-      updates[`players/${uid}/roundPoints`] = null;
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWZ".split("");
+    const used = gameState.usedLetters || [];
+    const filtered = possible.filter(x => !used.includes(x));
+    
+    // Falls alle Buchstaben durch sind, Topf zurücksetzen
+    const pool = filtered.length > 0 ? filtered : possible;
+    const chosen = pool[Math.floor(Math.random() * pool.length)];
+    
+    let nextUsed = [...used];
+    if(!nextUsed.includes(chosen)) nextUsed.push(chosen);
+
+    update(ref(db, `rooms/${myRoom}`), {
+      phase: "playing",
+      currentRound: nextR,
+      letter: chosen,
+      usedLetters: nextUsed,
+      roundStartedAt: Date.now(),
+      buzzerFiredBy: null,
+      buzzerFiredAt: null
     });
+  };
 
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const used = gameState.usedLetters ? Object.keys(gameState.usedLetters) : [];
-    const available = [...alphabet].filter(l => !used.includes(l));
-    
-    if(available.length === 0) {
-      alert("Keine Buchstaben mehr übrig!");
-      updates[`phase`] = "results";
-      updates[`currentRound`] = gameState.roundsLimit;
-      updates[`isGameOverFinalized`] = true;
-      update(ref(db, `rooms/${myRoom}`), updates);
-      return;
+  window.resetToLobby = function() {
+    playClick();
+    // Punkte aller Spieler nullen für ein frisches Match
+    for(let pid in gameState.players) {
+      update(ref(db, `rooms/${myRoom}/players/${pid}`), { points: 0 }).catch(()=>{});
     }
 
-    const nextLetter = available[Math.floor(Math.random() * available.length)];
-    
-    updates[`currentRound`] = (gameState.currentRound || 1) + 1;
-    updates[`phase`] = "playing";
-    updates[`letter`] = nextLetter;
-    updates[`timerStartedAt`] = null;
-    updates[`timerEndsAt`] = null;
-    updates[`buzzerUser`] = null;
-    updates[`buzzerUsername`] = null;
-    updates[`validation`] = null;
-    updates[`typingStatus`] = null;
-    updates[`usedLetters/${nextLetter}`] = true;
-
-    localAnswers = {};
-    sessionStorage.removeItem("slf_local_answers");
-
-    update(ref(db, `rooms/${myRoom}`), updates);
-  };
-
-  window.restartGameEntirely = function() {
-    if(gameState.hostId !== myId) return;
-    
-    const players = gameState.players || {};
-    const updates = {
+    update(ref(db, `rooms/${myRoom}`), {
       phase: "lobby",
-      currentRound: 1,
-      letter: "",
-      timerStartedAt: null,
-      timerEndsAt: null,
-      buzzerUser: null,
-      buzzerUsername: null,
-      validation: null,
-      typingStatus: null,
+      currentRound: 0,
+      letter: null,
       usedLetters: null,
-      isGameOverFinalized: null
-    };
-
-    Object.keys(players).forEach(uid => {
-      updates[`players/${uid}/score`] = 0;
-      updates[`players/${uid}/currentAnswers`] = null;
-      updates[`players/${uid}/roundPoints`] = null;
-    });
-
-    localAnswers = {};
-    sessionStorage.removeItem("slf_local_answers");
-
-    set(ref(db, `rooms/${myRoom}`), {
-      ...gameState,
-      ...updates
+      answers: null,
+      validations: null
     });
   };
 
-  /* Input-Sperren & Event-Listener */
+  // ─── GENERAL HELPERS ──────────────────────────────────────────
+  function escapeHtml(text) {
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  // Real-Time Eingabeprüfung (Optisches Feedback)
   document.addEventListener("input", e => {
-    if(e.target.matches(".answer-row input") && gameState?.cats) {
+    if(e.target.matches(".answer-row input") && gameState?.cats){
       const cats = objToCats(gameState.cats);
       const cat = cats.find(c => `ans-${sanitizeId(c)}` === e.target.id);
-      if(cat) {
+      if(cat){
         localAnswers[cat] = e.target.value;
         sessionStorage.setItem("slf_local_answers", JSON.stringify(localAnswers));
 
         const val = e.target.value.trim();
-        if(val.length === 0) {
+        if(val.length === 0){
           e.target.classList.remove("typing-ok", "typing-bad");
-        } else if(val.toLowerCase().startsWith(gameState.letter.toLowerCase())) {
+        } else if(val.toLowerCase().startsWith(gameState.letter.toLowerCase())){
           e.target.classList.add("typing-ok");
           e.target.classList.remove("typing-bad");
         } else {
@@ -1931,10 +1740,10 @@
       }
 
       if(typingTimeout) clearTimeout(typingTimeout);
-      if(myRoom && myId && gameState?.phase === "playing") {
-        update(ref(db, `rooms/${myRoom}/typingStatus`), { [myId]: Date.now() }).catch(()=>{});
+      if(myRoom && myId && gameState?.phase === "playing"){
+        update(ref(db, `rooms/${myRoom}/typingStatus`), {[myId]: Date.now()}).catch(()=>{});
         typingTimeout = setTimeout(() => {
-          update(ref(db, `rooms/${myRoom}/typingStatus`), { [myId]: null }).catch(()=>{});
+          update(ref(db, `rooms/${myRoom}/typingStatus`), {[myId]: null}).catch(()=>{});
         }, 3000);
       }
     }
@@ -1942,6 +1751,13 @@
 
   document.getElementById("input-room").addEventListener("input", e => {
     e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  });
+
+  // Start-Kanal
+  window.addEventListener("DOMContentLoaded", () => {
+    initTheme();
+    updateSoundUI();
+    renderColorSwatches();
   });
 </script>
 </body>
