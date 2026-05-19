@@ -7,27 +7,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Special+Elite&family=Permanent+Marker&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      /* Standard Akzentfarbe (Lila) */
-      --primary-accent: #7950f2;
+      /* NEU: Saftiges, fröhliches Grün als Standard-Akzentfarbe */
+      --primary-accent: #22c55e;
       
-      /* Farbpalette freundlicher, wärmer und ROT-FREI gemacht */
-      --paper:        #fdfbf7; 
+      /* Farbpalette freundlicher und wärmer gemacht */
+      --paper:        #fdfbf7;
       --paper-white:  #ffffff;
-      --paper2:       #f0ede6; 
-      --grid:         rgba(100, 130, 190, 0.12); 
-      /* ANGEPASST: Linke Linie von rot zu sanftem grün geändert */
-      --margin:       rgba(81, 207, 102, 0.3); 
-      --ink:          #343a40; 
-      /* ANGEPASST: Altes Rot durch ein sattes, dunkleres Grün für "Stempel/Fehler" ersetzt */
-      --red:          #2b8a3e; 
-      /* ANGEPASST: Hellere grüne Warnfarbe für Fehlertexte/Buzzer */
-      --red-light:    #40c057;
+      --paper2:       #f0ede6;
+      --grid:         rgba(100, 130, 190, 0.12);
+      --margin:       rgba(235, 100, 100, 0.3);
+      --ink:          #343a40;
+      --red:          #22c55e;           /* Alles Rot → Grün */
       --blue:         #339af0;
       --pencil:       #868e96;
-      --stamp:        #2b8a3e;
-      --green:        #51cf66; 
+      --stamp:        #22c55e;           /* Alles Rot → Grün */
+      --green:        #22c55e;           /* Freundlicheres Grün (jetzt identisch mit Akzent) */
       --tape:         rgba(255, 243, 191, 0.9);
-      --highlight:    #ffec99; 
+      --highlight:    #ffec99;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -122,11 +118,11 @@
     .block {
       background: var(--paper-white);
       border: 1.5px solid var(--ink);
-      border-radius: 20px; 
+      border-radius: 20px;
       width: 100%; max-width: 480px;
       padding: 32px 28px;
       position: relative;
-      box-shadow: 0 12px 36px rgba(33, 37, 41, 0.05); 
+      box-shadow: 0 12px 36px rgba(33, 37, 41, 0.05);
     }
     
     .block-title {
@@ -160,9 +156,8 @@
       border-color: var(--primary-accent);
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-accent) 15%, transparent);
     }
-    input.typing-ok { border-color: var(--green) !important; box-shadow: 0 0 0 4px rgba(81, 207, 102, 0.15) !important;}
-    /* ANGEPASST: Bei falschem Buchstaben leuchtet das Feld nun in einem dunkleren, klaren Grün anstelle von Rot */
-    input.typing-bad { border-color: var(--red) !important; box-shadow: 0 0 0 4px color-mix(in srgb, var(--red) 15%, transparent) !important;}
+    input.typing-ok { border-color: var(--green) !important; box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.15) !important;}
+    input.typing-bad { border-color: var(--red) !important; box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.15) !important;}
 
     .field-label {
       font-family: 'Nunito', sans-serif;
@@ -198,12 +193,11 @@
     }
     .btn-outline:hover { background: var(--paper2); filter: none; }
     
-    /* ANGEPASST: Button-Klasse für ehemals rote Löschaktionen komplett auf Grün umgestellt */
     .btn-red {
       background: var(--red); color: white;
-      box-shadow: 0 4px 12px color-mix(in srgb, var(--red) 25%, transparent);
+      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
     }
-    .btn-red:hover { background: var(--red-light); }
+    .btn-red:hover { background: #16a34a; }
     
     .btn-sm {
       width: auto; padding: 10px 16px; font-size: 0.95rem;
@@ -270,7 +264,6 @@
       color: var(--pencil); font-size: 18px;
       transition: color 0.2s, transform 0.2s;
     }
-    /* ANGEPASST: Hover beim Löschen von Kategorien nutzt jetzt Grün statt Rot */
     .cat-remove:hover { color: var(--red); transform: scale(1.1) rotate(5deg); }
     
     .cats-readonly { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
@@ -341,13 +334,11 @@
     .timer-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .timer-label { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--pencil); }
     .timer-secs { font-family: 'Permanent Marker', cursive; font-size: 2rem; color: var(--ink); line-height: 1; }
-    /* ANGEPASST: Dringender Timer wechselt jetzt zu Grün anstelle von Rot */
     .timer-secs.urgent { color: var(--red); animation: pulseScale 0.5s infinite alternate; }
     @keyframes pulseScale { from { transform: scale(1); } to { transform: scale(1.05); } }
     
     .timer-track { width: 100%; height: 12px; background: var(--paper2); border-radius: 10px; overflow: hidden; }
     .timer-fill { height: 100%; background: var(--primary-accent); transition: width 1s linear; border-radius: 10px; }
-    /* ANGEPASST: Dringende Timer-Leiste wechselt nun ebenfalls auf Grün */
     .timer-fill.urgent { background: var(--red); }
     
     .buzzer-wrap { width: 100%; max-width: 480px; margin-bottom: 20px; margin-top: 20px; }
@@ -446,7 +437,6 @@
     .result-row { display: grid; grid-template-columns: 90px 1fr auto; align-items: center; gap: 16px; padding: 10px 0; border-bottom: 1px dashed var(--paper2); }
     .result-row.host-clickable { cursor: pointer; transition: background 0.2s; border-radius: 8px; margin: 0 -8px; padding: 10px 8px; }
     .result-row.host-clickable:hover { background: var(--paper2); }
-    /* ANGEPASST: Durchgestrichene Antworten nutzen das neue Dunkelgrün statt Rot */
     .result-row.rejected .result-word { text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: var(--red); opacity: 0.6; }
     .result-row:last-child { border-bottom: none; }
     .result-cat { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; color: var(--pencil); text-transform: uppercase; }
@@ -462,7 +452,6 @@
     }
     @keyframes stampIn { 0% { opacity: 0; transform: scale(2) rotate(-10deg); } 100% { opacity: 1; transform: scale(1) rotate(-2deg); } }
     .stamp-ok { border: 2px solid var(--green); color: var(--green); }
-    /* ANGEPASST: Negativer Stempel (Gestricken / Falsch) nutzt nun ebenfalls das neue Dunkelgrün */
     .stamp-no { border: 2px solid var(--red); color: var(--red); }
     
     .val-banner {
@@ -514,25 +503,6 @@
     .sound-toggle:hover { background: var(--paper2); }
     .sound-toggle.muted { opacity: 0.6; }
 
-    .color-picker-container {
-      position: fixed; top: 104px; right: 16px; z-index: 100;
-      background: var(--paper-white); border: 1px solid var(--paper2);
-      border-radius: 20px; padding: 4px 12px;
-      font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700;
-      display: flex; align-items: center; gap: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      transition: all 0.2s;
-    }
-    .color-picker-container:hover { background: var(--paper2); }
-    .color-picker-input {
-      border: none; width: 22px; height: 22px; padding: 0;
-      cursor: pointer; background: transparent;
-      border-radius: 50%; overflow: hidden;
-    }
-    .color-picker-input::-webkit-color-swatch-wrapper { padding: 0; }
-    .color-picker-input::-webkit-color-swatch { border: 1.5px solid var(--ink); border-radius: 50%; }
-
-    /* ANGEPASST: Der "Raus"-Button oben links erstrahlt jetzt in grünem Schriftzug */
     .leave-btn {
       position: fixed; top: 16px; left: 16px; z-index: 100;
       background: var(--paper-white); border: 1px solid var(--paper2);
@@ -543,7 +513,6 @@
     }
     .leave-btn:hover { background: var(--paper2); }
     
-    /* ANGEPASST: Fehlermeldungen und Ladehinweise ("Verbinde...") sind nun grün gehighlighted */
     .error-msg { color: var(--red); font-size: 14px; margin-top: 12px; font-weight: 700; text-align: center; }
     .hint { font-size: 13px; color: var(--pencil); text-align: center; margin-top: 16px; font-weight: 600; }
     .divider { border: none; border-top: 1.5px solid var(--paper2); margin: 24px 0; width: 100%; max-width: 480px; }
@@ -557,14 +526,14 @@
       border-radius: 13px; cursor: pointer; transition: background 0.3s, border-color 0.3s;
       flex-shrink: 0;
     }
-    .toggle-switch.on { background: var(--green); border-color: #51cf66; }
+    .toggle-switch.on { background: var(--green); border-color: #22c55e; }
     .toggle-switch::after {
       content: ''; position: absolute; top: 2px; left: 2px;
       width: 18px; height: 18px; border-radius: 50%;
       background: white; border: 1.5px solid var(--pencil);
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    .toggle-switch.on::after { transform: translateX(22px); border-color: #51cf66; }
+    .toggle-switch.on::after { transform: translateX(22px); border-color: #22c55e; }
   </style>
 </head>
 <body>
@@ -580,11 +549,6 @@
   <span id="sound-icon">🔊</span>
   <span id="sound-label">Sound</span>
 </button>
-
-<div class="color-picker-container">
-  <label for="theme-color-picker" style="cursor: pointer;">Farbe</label>
-  <input type="color" id="theme-color-picker" class="color-picker-input" value="#7950f2">
-</div>
 
 <div id="screen-join" class="screen">
   <div class="game-header">
@@ -678,19 +642,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// ─── FARBAUSWAHL LOGIK ──────────────────────────────────────
-const colorPicker = document.getElementById('theme-color-picker');
-const savedColor = localStorage.getItem('slf_accent_color');
-if (savedColor) {
-  colorPicker.value = savedColor;
-  document.documentElement.style.setProperty('--primary-accent', savedColor);
-}
-colorPicker.addEventListener('input', (e) => {
-  const newColor = e.target.value;
-  document.documentElement.style.setProperty('--primary-accent', newColor);
-  localStorage.setItem('slf_accent_color', newColor);
-});
-// ─────────────────────────────────────────────────────────────────
+// ─── FARBAUSWAHL entfernt ──────────────────────────────────────
 
 const DEFAULT_CATS = ["Stadt","Land","Fluss","Tier","Beruf"];
 const ALL_LETTERS = "ABCDEFGHIKLMNOPRSTW".split("");
@@ -735,11 +687,10 @@ function playTone(type, freq, duration, gain=0.3, delay=0){
     osc.stop(ctx.currentTime+delay+duration+0.05);
   }catch(e){}
 }
-// ANGEPASST: Sound etwas harmonischer/tiefer gestimmt, passend zur neuen grünen Farbe
 function playSoundBuzzer(){
-  playTone('sine',523.25,0.08,0.3,0); 
-  playTone('sine',659.25,0.08,0.3,0.1);
-  playTone('sine',783.99,0.15,0.35,0.2);
+  playTone('square',880,0.08,0.35,0);
+  playTone('square',660,0.08,0.35,0.1);
+  playTone('square',440,0.15,0.4,0.2);
 }
 function playSoundRoundStart(){
   playTone('sine',440,0.1,0.25,0);
@@ -750,9 +701,8 @@ function playSoundSubmit(){
   playTone('sine',880,0.08,0.2,0);
   playTone('sine',1100,0.1,0.15,0.09);
 }
-// ANGEPASST: Ticken sanfter gestaltet
 function playSoundTimerUrgent(){
-  playTone('sine',523.25,0.04,0.1,0);
+  playTone('sine',440,0.05,0.15,0);
 }
 function playSoundGameOver(){
   [0,0.15,0.3,0.5].forEach((d,i)=>{
@@ -852,7 +802,7 @@ window.joinRoom=async function(){
 window.leaveRoom=async function(){
   stopRoundTimer();
   if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
-  if(myRoom&&myId)try{await update(ref(db,`rooms/${myRoom}/typingStatus`),{[myId]:null});}catch(e){}
+  if(myRoom&&myId)try{await update(roomRef(),{[`typingStatus/${myId}`]:null});}catch(e){}
   if(myRoom&&myId)try{await update(roomRef(),{[`players/${myId}`]:null});}catch(e){}
   sessionStorage.clear();
   if(heartbeatInterval)clearInterval(heartbeatInterval);
@@ -884,8 +834,7 @@ async function processStateUpdate(newState){
     if(stale.length>0){
       const patch={};
       stale.forEach(id=>{patch[`players/${id}`]=null; patch[`typingStatus/${id}`]=null;});
-      await updateRoomData({players: gameState.players});
-      await update(ref(db,`rooms/${myRoom}/typingStatus`), patch);
+      await updateRoomData(patch);
       return;
     }
   }
@@ -1281,7 +1230,7 @@ window.submitAnswers=async function(){
     ans[cat]=e?e.value.trim():(localAnswers[cat]||"");
   });
   submitted=true;
-  try{await update(ref(db,`rooms/${myRoom}/typingStatus`),{[myId]:null});}catch(e){}
+  try{await update(roomRef(),{[`typingStatus/${myId}`]:null});}catch(e){}
   await updateRoomData({[`roundAnswers/${myId}`]:ans});
   playSoundSubmit();
 };
@@ -1365,8 +1314,7 @@ function renderResults(){
   const roundLimit=gameState.roundLimit||0;
   const isGameOver=roundLimit>0&&gameState.round>=roundLimit;
 
-  document.getElementById("results-sub").textContent=
-    `Runde ${gameState.round}${roundLimit>0?" / "+roundLimit:""} · Buchstabe ${gameState.letter}`;
+  document.getElementById("results-sub").textContent=`Runde ${gameState.round}${roundLimit>0?" / "+roundLimit:""} · Buchstabe ${gameState.letter}`;
 
   const goArea=document.getElementById("gameover-area");
   if(isGameOver&&goArea){
@@ -1384,7 +1332,7 @@ function renderResults(){
   if(banner){
     banner.innerHTML=isHost
       ?`<div class="val-banner"><div class="val-title">✍️ Du bist der Korrektor!</div><div class="val-sub">Klicke auf falsche Antworten in den Blöcken, um sie per Rotstift zu streichen.</div></div>`
-      :Refas=`<div class="val-banner"><div class="val-title">👀 Notenbekanntgabe</div><div class="val-sub">Der Spielleiter prüft die Antworten und zückt bei Bedarf den Rotstift.</div></div>`;
+      :`<div class="val-banner"><div class="val-title">👀 Notenbekanntgabe</div><div class="val-sub">Der Spielleiter prüft die Antworten und zückt bei Bedarf den Rotstift.</div></div>`;
   }
 
   const sorted=Object.entries(gameState.players||{}).sort((a,b)=>(b[1].score||0)-(a[1].score||0));
