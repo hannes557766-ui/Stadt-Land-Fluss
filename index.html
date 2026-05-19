@@ -1232,6 +1232,43 @@ window.submitAnswers=async function(){
   playSoundSubmit();
 };
 
+// ─── SMART EVALUATOR (WIKIPEDIA API) ─────────────────────────────
+async function validateAnswer(word, category, letter) {
+  word = word.trim();
+  if (!word) return false;
+  if (!word.toLowerCase().startsWith(letter.toLowerCase())) return false;
+
+  const catKeywords = {
+    "Stadt": ["stadt", "gemeinde", "ort", "hauptstadt", "metropole"],
+    "Land": ["staat", "land", "republik", "königreich", "inselstaat"],
+    "Fluss": ["fluss", "gewässer", "strom", "nebenfluss"],
+    "Tier": ["tier", "art", "familie", "gattung", "säugetier", "vogel", "fisch", "insekt"],
+    "Beruf": ["beruf", "berufsbezeichnung", "tätigkeit", "ausbildung", "berufsfeld"]
+  };
+
+  try {
+    const url = `https://de.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(word)}&utf8=&format=json&origin=*`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data.query || !data.query.search || data.query.search.length === 0) {
+      return false; 
+    }
+
+    const topResult = data.query.search[0];
+    const snippet = topResult.snippet.toLowerCase() + " " + topResult.title.toLowerCase();
+
+    const keywords = catKeywords[category];
+    if (!keywords) return true; 
+
+    return keywords.some(kw => snippet.includes(kw));
+
+  } catch (e) {
+    console.error("Fehler bei Wikipedia API:", e);
+    return true; 
+  }
+}
+
 // ─── HOST ROUND END ──────────────────────────────────────────────
 async function checkHostRoundEnd(){
   if(!isHost)return;
@@ -1245,37 +1282,57 @@ async function checkHostRoundEnd(){
 
 async function forceRoundEnd(cur){
   if(!cur||cur.phase==="results")return;
-  calculateBaseScores(cur);
+  await calculateBaseScores(cur); // <-- Jetzt asynchron mit await
   cur.phase="results";
   cur.typingStatus={};
   setConnStatus("sync");await set(roomRef(),cur);setConnStatus("ok");
 }
 
-function calculateBaseScores(state){
-  const cats=objToCats(state.cats);
-  const pids=Object.keys(state.players||{});
-  const rejections=state.rejections||{};
+async function calculateBaseScores(state) {
+  const cats = objToCats(state.cats);
+  const pids = Object.keys(state.players || {});
+  
+  if (!state.rejections) state.rejections = {};
+  
+  const roundScores = {};
+  pids.forEach(id => { roundScores[id] = 0; });
 
-  const roundScores={};
-  pids.forEach(id=>{roundScores[id]=0;});
+  const validationPromises = [];
+  
+  pids.forEach(id => {
+    cats.forEach(cat => {
+      let word = (state.roundAnswers?.[id]?.[cat] || "").trim();
+      
+      if (state.rejections[`${id}__${cat}`]) {
+          validationPromises.push(Promise.resolve({ id, cat, word, isValid: false }));
+          return;
+      }
 
-  cats.forEach(cat=>{
-    const valid=pids.map(id=>{
-      let v=(state.roundAnswers?.[id]?.[cat]||"").trim().toLowerCase();
-      if(rejections[`${id}__${cat}`])v="";
-      if(v&&!v.startsWith(state.letter.toLowerCase()))v="";
-      return{id,v};
-    });
-    valid.forEach(({id,v})=>{
-      if(!v)return;
-      const tot=valid.filter(a=>a.v!=="").length;
-      const dup=valid.filter(a=>a.v===v).length;
-      roundScores[id]+=(tot===1?20:dup===1?10:5);
+      const p = validateAnswer(word, cat, state.letter).then(isValid => {
+         if (!isValid && word !== "") {
+             state.rejections[`${id}__${cat}`] = true;
+         }
+         return { id, cat, word, isValid };
+      });
+      validationPromises.push(p);
     });
   });
 
-  pids.forEach(id=>{
-    state.players[id].score=(state.players[id].score||0)+roundScores[id];
+  const validationResults = await Promise.all(validationPromises);
+
+  cats.forEach(cat => {
+    const validAnswers = validationResults.filter(r => r.cat === cat && r.isValid);
+    
+    validAnswers.forEach(({ id, word }) => {
+      const tot = validAnswers.length; 
+      const dup = validAnswers.filter(a => a.word.toLowerCase() === word.toLowerCase()).length; 
+      
+      roundScores[id] += (tot === 1 ? 20 : dup === 1 ? 10 : 5);
+    });
+  });
+
+  pids.forEach(id => {
+    state.players[id].score = (state.players[id].score || 0) + roundScores[id];
   });
 }
 
@@ -1295,10 +1352,10 @@ window.toggleAnswerStrike=async function(pid,cat){
     Object.keys(cur.players||{}).forEach(id=>{
       cur.players[id].score=cur.preRoundScores[id]||0;
     });
-    calculateBaseScores(cur);
+    await calculateBaseScores(cur); // <-- Jetzt auch asynchron
   } else {
     Object.keys(cur.players||{}).forEach(id=>{cur.players[id].score=0;});
-    calculateBaseScores(cur);
+    await calculateBaseScores(cur); // <-- Jetzt auch asynchron
   }
   await set(roomRef(),cur);
 };
