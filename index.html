@@ -4,27 +4,48 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Stadt Land Fluss</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Special+Elite&family=Permanent+Marker&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Special+Elite&family=Permanent+Marker&family=Caveat:wght@600&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      /* NEU: Anpassbare Akzentfarbe (Standard: ein freundliches Lila) */
+      /* Standard-Akzentfarbe */
       --primary-accent: #7950f2;
       
-      /* Farbpalette freundlicher und wärmer gemacht */
-      --paper:        #fdfbf7; /* Wärmeres Papier */
+      /* Helles Heft-Theme */
+      --paper:        #fdfbf7; 
       --paper-white:  #ffffff;
-      --paper2:       #f0ede6; /* Sanfteres Grau-Beige für Felder */
-      --grid:         rgba(100, 130, 190, 0.12); /* Etwas weicheres Karomuster */
-      --margin:       rgba(235, 100, 100, 0.3); /* Sanftere rote Linie */
-      --ink:          #343a40; /* Weniger hartes Schwarz für Text */
-      --red:          #ff6b6b; /* Weicheres Rot für Fehler/Stempel */
+      --paper2:       #f0ede6; 
+      --grid:         rgba(100, 130, 190, 0.12); 
+      --margin:       rgba(235, 100, 100, 0.3); 
+      --ink:          #343a40; 
+      --red:          #ff6b6b; 
       --blue:         #339af0;
       --pencil:       #868e96;
       --stamp:        #fa5252;
-      --green:        #51cf66; /* Freundlicheres Grün */
+      --green:        #51cf66; 
       --tape:         rgba(255, 243, 191, 0.9);
-      --highlight:    #ffec99; /* Zarteres Gelb */
+      --highlight:    #ffec99; 
+      --input-font:   'Caveat', cursive;
+      --doodle-opacity: 0.04;
     }
+
+    /* Tafel-Modus (Dark Theme) */
+    body.chalkboard-mode {
+      --paper:        #2b303a; 
+      --paper-white:  #343a40;
+      --paper2:       #212529; 
+      --grid:         rgba(255, 255, 255, 0.07); 
+      --margin:       rgba(255, 107, 107, 0.4); 
+      --ink:          #f8f9fa; 
+      --red:          #ff8787; 
+      --blue:         #74c0fc;
+      --pencil:       #adb5bd;
+      --stamp:        #ff8787;
+      --green:        #69db7c; 
+      --tape:         rgba(103, 115, 130, 0.6);
+      --highlight:    #e5dbff; 
+      --doodle-opacity: 0.12;
+    }
+    
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
@@ -39,6 +60,16 @@
       min-height: 100vh;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
+      position: relative;
+    }
+
+    /* Subtiles Papier-Rauschen / Kreide-Textur */
+    #paper-noise {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0.025; pointer-events: none; z-index: 9999;
+    }
+    body.chalkboard-mode #paper-noise {
+      opacity: 0.06;
     }
     
     body::before {
@@ -51,6 +82,20 @@
       z-index: 0;
       pointer-events: none;
     }
+
+    /* Dekorative Doodles im Hintergrund (Punkt 1) */
+    .doodle-bg {
+      position: fixed;
+      font-family: 'Permanent Marker', cursive;
+      font-size: 8rem;
+      color: var(--ink);
+      opacity: var(--doodle-opacity);
+      pointer-events: none;
+      z-index: 0;
+      user-select: none;
+    }
+    .d1 { top: 10%; right: 5%; transform: rotate(15deg); }
+    .d2 { bottom: 15%; left: 2%; transform: rotate(-20deg); font-size: 6rem; }
     
     .screen {
       position: relative; z-index: 1;
@@ -81,7 +126,7 @@
       display: inline-block;
       mix-blend-mode: multiply;
     }
-    /* Slashes nutzen jetzt die Akzentfarbe */
+    body.chalkboard-mode .game-title { mix-blend-mode: normal; }
     .game-title .slash { color: var(--primary-accent); }
     
     .game-sub {
@@ -106,6 +151,7 @@
       z-index: 10;
       mix-blend-mode: multiply;
     }
+    body.chalkboard-mode .tape-strip { mix-blend-mode: normal; border: 1px dashed rgba(255,255,255,0.2); }
     
     .section-label {
       font-family: 'Special Elite', monospace;
@@ -119,12 +165,13 @@
     .block {
       background: var(--paper-white);
       border: 1.5px solid var(--ink);
-      border-radius: 20px; /* Etwas runder */
+      border-radius: 20px; 
       width: 100%; max-width: 480px;
       padding: 32px 28px;
       position: relative;
-      box-shadow: 0 12px 36px rgba(33, 37, 41, 0.05); /* Weicherer Schatten */
+      box-shadow: 0 12px 36px rgba(33, 37, 41, 0.05); 
     }
+    body.chalkboard-mode .block { box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4); }
     
     .block-title {
       font-family: 'Nunito', sans-serif;
@@ -148,17 +195,39 @@
       transition: all 0.2s ease;
       -webkit-appearance: none;
     }
+    
+    /* Handschriftliche Eingaben für die echten Antworten (Punkt 1) */
+    .answer-row input[type=text] {
+      font-family: var(--input-font);
+      font-size: 24px;
+      padding: 6px 16px;
+    }
+    
     input[type=text]::placeholder, input[type=number]::placeholder {
       color: var(--pencil);
       font-weight: 400;
     }
+    .answer-row input[type=text]::placeholder { font-family: 'Nunito', sans-serif; font-size: 16px; }
+
     input[type=text]:focus, input[type=number]:focus {
       background: var(--paper-white);
       border-color: var(--primary-accent);
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-accent) 15%, transparent);
     }
-    input.typing-ok { border-color: var(--green) !important; box-shadow: 0 0 0 4px rgba(81, 207, 102, 0.15) !important;}
+    
+    /* Sanftes Pulsieren bei korrektem Anfangsbuchstaben (Punkt 2) */
+    input.typing-ok { 
+      border-color: var(--green) !important; 
+      box-shadow: 0 0 0 4px rgba(81, 207, 102, 0.15) !important;
+      animation: pulseSuccess 0.3s ease-in-out 1;
+    }
     input.typing-bad { border-color: var(--red) !important; box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.15) !important;}
+
+    @keyframes pulseSuccess {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
 
     .field-label {
       font-family: 'Nunito', sans-serif;
@@ -168,7 +237,6 @@
     }
     .field-label:first-child { margin-top: 0; }
     
-    /* Haupt-Buttons nutzen die Akzentfarbe */
     .btn {
       width: 100%; padding: 14px 20px;
       border: none;
@@ -233,11 +301,11 @@
       position: absolute; top: -12px; right: -10px;
       font-family: 'Special Elite', monospace;
       font-size: 11px; letter-spacing: 2px; font-weight: bold;
-      background: var(--highlight); color: var(--ink);
-      border: 1.5px solid var(--ink);
+      background: var(--highlight); color: #343a40;
+      border: 1.5px solid #343a40;
       padding: 4px 10px; transform: rotate(8deg);
       border-radius: 8px;
-      box-shadow: 2px 2px 0 var(--ink);
+      box-shadow: 2px 2px 0 #343a40;
     }
     
     .players-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
@@ -307,6 +375,7 @@
       mix-blend-mode: multiply;
       position: relative;
     }
+    body.chalkboard-mode .big-letter { mix-blend-mode: normal; }
     .big-letter::after {
       content: '';
       position: absolute; left: 0; bottom: 5px; width: 100%; height: 16px;
@@ -361,7 +430,7 @@
     
     .buzzer-fired {
       width: 100%; max-width: 480px; padding: 20px;
-      border: 1.5px solid var(--ink); background: var(--highlight); color: var(--ink);
+      border: 1.5px solid var(--ink); background: var(--highlight); color: #343a40;
       border-radius: 16px;
       font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.2rem;
       text-align: center; margin-bottom: 20px; margin-top: 14px;
@@ -421,7 +490,8 @@
       border-radius: 14px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
-    .score-row.gold { background: var(--highlight); border-left: 6px solid var(--primary-accent); box-shadow: 0 6px 16px rgba(255, 236, 153, 0.4); }
+    .score-row.gold { background: var(--highlight); border-left: 6px solid var(--primary-accent); box-shadow: 0 6px 16px rgba(255, 236, 153, 0.4); color: #343a40; }
+    body.chalkboard-mode .score-row.gold { color: #343a40; }
     .score-name { font-size: 17px; font-weight: 800; }
     .score-pts { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: var(--primary-accent); }
     
@@ -442,23 +512,31 @@
     .result-row.rejected .result-word { text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: var(--red); opacity: 0.6; }
     .result-row:last-child { border-bottom: none; }
     .result-cat { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; color: var(--pencil); text-transform: uppercase; }
-    .result-word { font-size: 17px; color: var(--blue); font-weight: 700; }
+    .result-word { font-size: 22px; color: var(--blue); font-weight: 700; font-family: var(--input-font); }
     
+    /* Verzögerte, satte Stempel-Animation (Punkt 2) */
     .stamp {
       font-family: 'Special Elite', monospace; font-size: 10px;
       letter-spacing: 0.5px; padding: 4px 8px; white-space: nowrap;
       text-transform: uppercase; font-weight: bold;
       border-radius: 6px; transform: rotate(-2deg);
       mix-blend-mode: multiply;
-      animation: stampIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+      opacity: 0;
+      animation: stampIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.4) forwards;
+      animation-delay: 0.2s;
     }
-    @keyframes stampIn { 0% { opacity: 0; transform: scale(2) rotate(-10deg); } 100% { opacity: 1; transform: scale(1) rotate(-2deg); } }
+    body.chalkboard-mode .stamp { mix-blend-mode: normal; }
+    @keyframes stampIn { 
+      0% { opacity: 0; transform: scale(2.5) rotate(-15deg); filter: blur(2px); } 
+      80% { opacity: 0.9; transform: scale(0.95) rotate(-1deg); }
+      100% { opacity: 1; transform: scale(1) rotate(-2deg); } 
+    }
     .stamp-ok { border: 2px solid var(--green); color: var(--green); }
     .stamp-no { border: 2px solid var(--red); color: var(--red); }
     
     .val-banner {
       width: 100%; max-width: 480px;
-      border: 1.5px solid var(--ink); background: var(--highlight); color: var(--ink);
+      border: 1.5px solid var(--ink); background: var(--highlight); color: #343a40;
       border-radius: 16px; padding: 16px 20px; margin-bottom: 28px; text-align: center;
       box-shadow: 0 8px 24px rgba(255, 236, 153, 0.4);
     }
@@ -505,24 +583,34 @@
     .sound-toggle:hover { background: var(--paper2); }
     .sound-toggle.muted { opacity: 0.6; }
 
-    /* NEU: Farbwähler UI */
-    .color-picker-container {
+    /* Theme-Umschalter (Punkt 5) */
+    .theme-toggle-btn {
       position: fixed; top: 104px; right: 16px; z-index: 100;
       background: var(--paper-white); border: 1px solid var(--paper2);
-      border-radius: 20px; padding: 4px 12px;
+      border-radius: 20px; padding: 6px 14px;
       font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700;
-      display: flex; align-items: center; gap: 8px;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
       transition: all 0.2s;
     }
-    .color-picker-container:hover { background: var(--paper2); }
-    .color-picker-input {
-      border: none; width: 22px; height: 22px; padding: 0;
-      cursor: pointer; background: transparent;
-      border-radius: 50%; overflow: hidden;
+    .theme-toggle-btn:hover { background: var(--paper2); }
+
+    /* Aufgewerteter Farbwähler mit Farb-Swatches (Punkt 2) */
+    .color-picker-container {
+      position: fixed; top: 148px; right: 16px; z-index: 100;
+      background: var(--paper-white); border: 1px solid var(--paper2);
+      border-radius: 20px; padding: 8px 12px;
+      display: flex; flex-direction: column; gap: 6px; align-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
-    .color-picker-input::-webkit-color-swatch-wrapper { padding: 0; }
-    .color-picker-input::-webkit-color-swatch { border: 1.5px solid var(--ink); border-radius: 50%; }
+    .color-picker-label { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--pencil); }
+    .color-swatches { display: flex; gap: 6px; }
+    .swatch {
+      width: 18px; height: 18px; border-radius: 50%; cursor: pointer;
+      border: 1.5px solid transparent; transition: transform 0.15s;
+    }
+    .swatch:hover { transform: scale(1.2); }
+    .swatch.active { border-color: var(--ink); transform: scale(1.1); }
 
     .leave-btn {
       position: fixed; top: 16px; left: 16px; z-index: 100;
@@ -559,6 +647,16 @@
 </head>
 <body>
 
+<svg id="paper-noise" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+  <filter id="noiseFilter">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
+  </filter>
+  <rect width="100%" height="100%" filter="url(#noiseFilter)"/>
+</svg>
+
+<div class="doodle-bg d1">✎</div>
+<div class="doodle-bg d2">★</div>
+
 <button id="btn-leave" class="leave-btn" onclick="window.leaveRoom()">← Raus</button>
 
 <div class="conn-indicator" id="conn-indicator">
@@ -571,9 +669,14 @@
   <span id="sound-label">Sound</span>
 </button>
 
+<button class="theme-toggle-btn" id="theme-toggle-btn" onclick="window.toggleTheme()">
+  <span id="theme-icon">📝</span>
+  <span id="theme-label">Block</span>
+</button>
+
 <div class="color-picker-container">
-  <label for="theme-color-picker" style="cursor: pointer;">Farbe</label>
-  <input type="color" id="theme-color-picker" class="color-picker-input" value="#7950f2">
+  <span class="color-picker-label">Tinte</span>
+  <div class="color-swatches" id="color-swatches-container"></div>
 </div>
 
 <div id="screen-join" class="screen">
@@ -668,18 +771,54 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// ─── NEU: FARBAUSWAHL LOGIK ──────────────────────────────────────
-const colorPicker = document.getElementById('theme-color-picker');
-const savedColor = localStorage.getItem('slf_accent_color');
-if (savedColor) {
-  colorPicker.value = savedColor;
-  document.documentElement.style.setProperty('--primary-accent', savedColor);
+// ─── THEME & FARBWÄHLER (Punkte 2 & 5) ───────────────────────────
+const PRESET_COLORS = ["#7950f2", "#339af0", "#22b8cf", "#51cf66", "#f783ac", "#f59f00", "#ff6b6b"];
+let currentAccentColor = localStorage.getItem('slf_accent_color') || "#7950f2";
+let isChalkboard = localStorage.getItem('slf_chalkboard_mode') === "1";
+
+function initThemeAndColors() {
+  if (isChalkboard) {
+    document.body.classList.add('chalkboard-mode');
+    document.getElementById("theme-icon").textContent = "𓊍";
+    document.getElementById("theme-label").textContent = "Tafel";
+  }
+  document.documentElement.style.setProperty('--primary-accent', currentAccentColor);
+  renderSwatches();
 }
-colorPicker.addEventListener('input', (e) => {
-  const newColor = e.target.value;
-  document.documentElement.style.setProperty('--primary-accent', newColor);
-  localStorage.setItem('slf_accent_color', newColor);
-});
+
+window.toggleTheme = function() {
+  isChalkboard = !isChalkboard;
+  if (isChalkboard) {
+    document.body.classList.add('chalkboard-mode');
+    document.getElementById("theme-icon").textContent = "𓊍";
+    document.getElementById("theme-label").textContent = "Tafel";
+    localStorage.setItem('slf_chalkboard_mode', "1");
+  } else {
+    document.body.classList.remove('chalkboard-mode');
+    document.getElementById("theme-icon").textContent = "📝";
+    document.getElementById("theme-label").textContent = "Block";
+    localStorage.setItem('slf_chalkboard_mode', "0");
+  }
+};
+
+function renderSwatches() {
+  const container = document.getElementById("color-swatches-container");
+  if (!container) return;
+  container.innerHTML = PRESET_COLORS.map(color => `
+    <div class="swatch ${color === currentAccentColor ? 'active' : ''}" 
+         style="background: ${color}" 
+         onclick="window.selectAccentColor('${color}')">
+    </div>
+  `).join("");
+}
+
+window.selectAccentColor = function(color) {
+  currentAccentColor = color;
+  document.documentElement.style.setProperty('--primary-accent', color);
+  localStorage.setItem('slf_accent_color', color);
+  renderSwatches();
+};
+
 // ─────────────────────────────────────────────────────────────────
 
 const DEFAULT_CATS = ["Stadt","Land","Fluss","Tier","Beruf"];
@@ -787,6 +926,7 @@ async function updateRoomData(patch){
 
 // ─── INIT ────────────────────────────────────────────────────────
 window.addEventListener("DOMContentLoaded",()=>{
+  initThemeAndColors();
   const savedSound=localStorage.getItem("slf_sound");
   if(savedSound==="0"){soundEnabled=false;document.getElementById("sound-icon").textContent="🔇";document.getElementById("sound-label").textContent="Stumm";document.getElementById("sound-toggle-btn").classList.add("muted");}
 
