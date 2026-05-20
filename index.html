@@ -738,7 +738,7 @@
     <input type="text" id="input-room" placeholder="z.B. SPIELEN" maxlength="10" autocomplete="off"/>
     <div id="join-error" class="error-msg" style="display:none"></div>
     <button type="button" class="btn" id="btn-connect" onclick="joinRoom()">Rein da →</button>
-    <p class="hint">Erster im Raum = Spielleiter. Alle gleichen Code eingeben.</p>
+
   </div>
 </div>
 
@@ -1357,6 +1357,7 @@ function resetRoundData(){
   sessionStorage.removeItem("slf_local_answers");
   if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
   localBuzzerCountdown=null;
+  visibleSuggestions=[];
 }
 
 // ─── TIMER ───────────────────────────────────────────────────────
@@ -1438,13 +1439,16 @@ function renderLobby(){
           <input type="text" id="lobby-cat-input" placeholder="Neue Kategorie…" maxlength="20"
             onkeydown="if(event.key==='Enter'){event.preventDefault();window.addCat();}"/>
           <button type="button" class="btn btn-outline btn-sm" onclick="window.addCat()">+ Add</button>
-        </div>`;
+        </div>
+        <div class="suggestions-label">Vorschläge</div>
+        <div class="cat-suggestions" id="cat-suggestions-list"></div>`;
     }
     document.getElementById("lobby-cats-list").innerHTML=cats.map((c,i)=>
       `<div class="cat-item">
         <span>${c}</span>
         <button type="button" class="cat-remove" onclick="window.removeCat(${i})">✕</button>
       </div>`).join("");
+    renderSuggestionChips(cats);
   }else{
     catsArea.innerHTML=`<div class="cats-readonly">${cats.map(c=>`<div class="cat-tag">${c}</div>`).join("")}</div>`;
   }
@@ -1527,6 +1531,48 @@ window.toggleBuzzer=async function(){
 window.resetLetters=async function(){
   await updateRoomData({usedLetters:[]});
 };
+// Welche Vorschläge gerade sichtbar sind (persistent solange Lobby offen)
+let visibleSuggestions = [];
+
+function renderSuggestionChips(currentCats){
+  const usedLower = currentCats.map(c=>c.toLowerCase());
+  const available = CAT_SUGGESTIONS.filter(s=>!usedLower.includes(s.toLowerCase()));
+
+  // Beim ersten Mal oder wenn zu wenige sichtbar: befüllen
+  visibleSuggestions = visibleSuggestions.filter(s=>!usedLower.includes(s.toLowerCase()));
+  while(visibleSuggestions.length < 5 && available.length > visibleSuggestions.length){
+    const remaining = available.filter(s=>!visibleSuggestions.includes(s));
+    if(!remaining.length) break;
+    const pick = remaining[Math.floor(Math.random()*remaining.length)];
+    visibleSuggestions.push(pick);
+  }
+
+  const sugEl = document.getElementById("cat-suggestions-list");
+  if(!sugEl) return;
+  sugEl.innerHTML = visibleSuggestions.map(s=>
+    `<span class="cat-suggestion" onclick="window.addSuggestion('${s.replace(/'/g,"\\'")}')">+ ${s}</span>`
+  ).join("");
+}
+
+window.addSuggestion=async function(s){
+  const cats=objToCats(gameState.cats);
+  if(cats.map(c=>c.toLowerCase()).includes(s.toLowerCase()))return;
+
+  // Diesen Vorschlag aus den sichtbaren entfernen und einen neuen nachladen
+  visibleSuggestions = visibleSuggestions.filter(v=>v!==s);
+  const usedLower = [...cats.map(c=>c.toLowerCase()), s.toLowerCase()];
+  const remaining = CAT_SUGGESTIONS.filter(r=>
+    !usedLower.includes(r.toLowerCase()) && !visibleSuggestions.includes(r)
+  );
+  if(remaining.length){
+    const pick = remaining[Math.floor(Math.random()*remaining.length)];
+    visibleSuggestions.push(pick);
+  }
+
+  cats.push(s);
+  await updateRoomData({cats:catsToObj(cats)});
+};
+
 window.addCat=async function(){
   const i=document.getElementById("lobby-cat-input");if(!i)return;
   const v=i.value.trim();i.value="";if(!v)return;
@@ -1670,27 +1716,16 @@ window.triggerBuzzer=async function(){
 
 function triggerLocalBuzzerTicker(){
   if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
-  let countdown=5;
-  localBuzzerCountdown=setInterval(async()=>{
-    countdown--;
-    const ticker=document.getElementById("buzzer-ticker");
-    if(ticker)ticker.textContent=`🔔 ${gameState.buzzer} hat STOPP gerufen! (${countdown}s)`;
-    if(countdown<=0){
-      clearInterval(localBuzzerCountdown);
-      localBuzzerCountdown=null;
-      if(!submitted)window.submitAnswers();
-      if(isHost){
-        const c=(await get(roomRef())).val();
-        if(c&&c.phase==="playing"){
-          await updateRoomData({phase:"collecting"});
-          setTimeout(async()=>{
-            const f=(await get(roomRef())).val();
-            if(f&&f.phase==="collecting") await forceRoundEnd(f);
-          },2000);
-        }
+  // Sofort abgeben
+  if(!submitted) window.submitAnswers();
+  if(isHost){
+    (async()=>{
+      const c=(await get(roomRef())).val();
+      if(c&&c.phase==="playing"){
+        await forceRoundEnd(c);
       }
-    }
-  },1000);
+    })();
+  }
 }
 
 window.submitAnswers=async function(){
@@ -1698,8 +1733,10 @@ window.submitAnswers=async function(){
   const cats=objToCats(gameState?.cats);
   const ans={};
   cats.forEach(cat=>{
+    // DOM hat Vorrang, dann localAnswers als Fallback (falls Felder nicht mehr im DOM)
     const e=document.getElementById(`ans-${sanitizeId(cat)}`);
-    ans[cat]=e?e.value.trim():(localAnswers[cat]||"");
+    const domVal=e?e.value.trim():"";
+    ans[cat]=domVal||localAnswers[cat]||"";
   });
   submitted=true;
   try{await update(roomRef(),{[`typingStatus/${myId}`]:null});}catch(e){}
