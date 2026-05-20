@@ -7,14 +7,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Special+Elite&family=Permanent+Marker&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      /* Natürliches, gedecktes Waldgrün als Akzentfarbe */
       --primary-accent: #6bc94e;
-      
       --paper:        #fdfbf7;
       --paper-white:  #ffffff;
       --paper2:       #f0ede6;
       --grid:         rgba(100, 130, 190, 0.12);
-      --margin:       rgba(107, 201, 78, 0.35);   /* Grüner Randstrich links */
+      --margin:       rgba(107, 201, 78, 0.35);
       --ink:          #343a40;
       --red:          #6bc94e;
       --blue:         #339af0;
@@ -39,7 +37,6 @@
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
     }
-    
     body::before {
       content: '';
       position: fixed;
@@ -50,7 +47,6 @@
       z-index: 0;
       pointer-events: none;
     }
-    
     .screen {
       position: relative; z-index: 1;
       min-height: 100vh;
@@ -59,7 +55,6 @@
       animation: pageFlip 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
     .screen.hidden { display: none; }
-    
     @keyframes pageFlip {
       from { opacity: 0; transform: translateY(15px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -81,7 +76,6 @@
       mix-blend-mode: multiply;
     }
     .game-title .slash { color: var(--primary-accent); }
-    
     .game-sub {
       font-family: 'Special Elite', monospace;
       font-size: 12px;
@@ -92,7 +86,6 @@
       padding-left: 4px;
       font-weight: bold;
     }
-    
     .tape-strip {
       position: absolute;
       top: -15px; left: -10px;
@@ -104,7 +97,6 @@
       z-index: 10;
       mix-blend-mode: multiply;
     }
-    
     .section-label {
       font-family: 'Special Elite', monospace;
       font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
@@ -113,7 +105,6 @@
       border-bottom: 1.5px dashed rgba(134, 142, 150, 0.3);
       padding-bottom: 6px;
     }
-    
     .block {
       background: var(--paper-white);
       border: 1.5px solid var(--ink);
@@ -123,7 +114,6 @@
       position: relative;
       box-shadow: 0 12px 36px rgba(33, 37, 41, 0.05);
     }
-    
     .block-title {
       font-family: 'Nunito', sans-serif;
       font-weight: 800;
@@ -165,7 +155,7 @@
       font-weight: 800;
     }
     .field-label:first-child { margin-top: 0; }
-    
+
     .btn {
       width: 100%; padding: 14px 20px;
       border: none;
@@ -178,26 +168,23 @@
       transition: all 0.2s ease;
       box-shadow: 0 6px 16px color-mix(in srgb, var(--primary-accent) 30%, transparent);
     }
-    .btn:hover { 
-      filter: brightness(1.1); 
-      transform: translateY(-2px); 
-      box-shadow: 0 8px 20px color-mix(in srgb, var(--primary-accent) 40%, transparent); 
+    .btn:hover {
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px color-mix(in srgb, var(--primary-accent) 40%, transparent);
     }
     .btn:active { transform: translateY(0); box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-accent) 20%, transparent); }
-    
     .btn-outline {
       background: var(--paper-white); color: var(--ink);
       border: 1.5px solid var(--ink);
       box-shadow: 0 2px 8px rgba(33, 37, 41, 0.05);
     }
     .btn-outline:hover { background: var(--paper2); filter: none; }
-    
     .btn-red {
       background: var(--red); color: white;
       box-shadow: 0 4px 12px rgba(107, 201, 78, 0.25);
     }
     .btn-red:hover { background: #59b33e; }
-    
     .btn-sm {
       width: auto; padding: 10px 16px; font-size: 0.95rem;
       margin-top: 0;
@@ -225,7 +212,6 @@
       color: var(--ink);
       line-height: 1;
     }
-    
     .host-stamp {
       position: absolute; top: -12px; right: -10px;
       font-family: 'Special Elite', monospace;
@@ -236,7 +222,6 @@
       border-radius: 8px;
       box-shadow: 2px 2px 0 var(--ink);
     }
-    
     .players-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
     .player-chip {
       display: inline-flex; align-items: center; gap: 8px;
@@ -251,7 +236,6 @@
       font-family: 'Nunito', sans-serif; font-weight: 800;
       font-size: 12px; color: var(--primary-accent); margin-left: 4px;
     }
-    
     .cat-suggestions {
       display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px;
     }
@@ -273,6 +257,7 @@
       font-size: 11px; font-weight: 800; letter-spacing: 1px;
       text-transform: uppercase; color: var(--pencil); margin-top: 16px; margin-bottom: 2px;
     }
+    .cat-item {
       display: flex; align-items: center; justify-content: space-between;
       border-bottom: 1.5px solid var(--paper2);
       padding: 12px 4px; font-size: 16px; font-weight: 700;
@@ -284,7 +269,6 @@
       transition: color 0.2s, transform 0.2s;
     }
     .cat-remove:hover { color: var(--red); transform: scale(1.1) rotate(5deg); }
-    
     .cats-readonly { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
     .cat-tag {
       background: var(--paper2);
@@ -292,7 +276,6 @@
       padding: 6px 14px;
       font-size: 15px; font-weight: 700; color: var(--ink);
     }
-    
     .timer-presets, .round-presets { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
     .timer-preset, .round-preset {
       padding: 8px 16px; border: 1.5px solid var(--pencil);
@@ -302,10 +285,10 @@
       cursor: pointer; transition: all 0.2s;
     }
     .timer-preset:hover, .round-preset:hover { border-color: var(--ink); color: var(--ink); }
-    .timer-preset.active, .round-preset.active { 
-      background: var(--primary-accent); 
-      color: white; 
-      border-color: var(--primary-accent); 
+    .timer-preset.active, .round-preset.active {
+      background: var(--primary-accent);
+      color: white;
+      border-color: var(--primary-accent);
     }
 
     .letter-stage { text-align: center; margin: 0 0 30px; width: 100%; max-width: 480px; }
@@ -338,7 +321,6 @@
       0% { transform: rotate(-2deg) scale(1.3); opacity: 0.6; }
       100% { transform: rotate(-2deg) scale(1); opacity: 1; }
     }
-    
     .used-letters { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 16px; }
     .used-letter-chip {
       font-family: 'Nunito', sans-serif; font-weight: 800;
@@ -362,15 +344,14 @@
     .timer-secs { font-family: 'Permanent Marker', cursive; font-size: 2rem; color: var(--ink); line-height: 1; }
     .timer-secs.urgent { color: var(--red); animation: pulseScale 0.5s infinite alternate; }
     @keyframes pulseScale { from { transform: scale(1); } to { transform: scale(1.05); } }
-    
     .timer-track { width: 100%; height: 12px; background: var(--paper2); border-radius: 10px; overflow: hidden; }
     .timer-fill { height: 100%; background: var(--primary-accent); transition: width 1s linear; border-radius: 10px; }
     .timer-fill.urgent { background: var(--red); }
-    
+
     .buzzer-wrap { width: 100%; max-width: 480px; margin-bottom: 20px; margin-top: 20px; }
     .buzzer-btn {
       width: 100%; padding: 24px;
-      border: none; 
+      border: none;
       background: var(--primary-accent); color: white;
       border-radius: 20px;
       font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.6rem;
@@ -378,11 +359,10 @@
       box-shadow: 0 8px 0 rgba(0,0,0,0.15), 0 15px 20px color-mix(in srgb, var(--primary-accent) 40%, transparent);
       transition: transform 0.1s, box-shadow 0.1s;
     }
-    .buzzer-btn:active { 
-      transform: translateY(8px); 
-      box-shadow: 0 0 0 rgba(0,0,0,0.15), 0 5px 10px color-mix(in srgb, var(--primary-accent) 40%, transparent); 
+    .buzzer-btn:active {
+      transform: translateY(8px);
+      box-shadow: 0 0 0 rgba(0,0,0,0.15), 0 5px 10px color-mix(in srgb, var(--primary-accent) 40%, transparent);
     }
-    
     .buzzer-fired {
       width: 100%; max-width: 480px; padding: 20px;
       border: 1.5px solid var(--ink); background: var(--highlight); color: var(--ink);
@@ -436,7 +416,8 @@
     .wait-chip { padding: 6px 14px; font-size: 14px; font-weight: 700; border-radius: 20px; }
     .wait-chip.done { background: var(--green); color: white; }
     .wait-chip.pending { background: var(--paper2); color: var(--pencil); }
-    
+
+    /* ── Scoreboard – erster Platz mit Akzentrand statt Gelb-Hintergrund ── */
     .scoreboard { width: 100%; max-width: 480px; margin-bottom: 40px; }
     .score-row {
       display: flex; align-items: center; justify-content: space-between;
@@ -445,30 +426,15 @@
       border-radius: 14px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
-    .score-row.gold { background: var(--highlight); border-left: 6px solid var(--primary-accent); box-shadow: 0 6px 16px rgba(255, 236, 153, 0.4); }
+    .score-row.gold {
+      border-left: 5px solid var(--primary-accent);
+      background: var(--paper-white);
+      box-shadow: 0 4px 16px color-mix(in srgb, var(--primary-accent) 12%, transparent);
+    }
     .score-name { font-size: 17px; font-weight: 800; }
     .score-pts { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: var(--primary-accent); }
-    
-    .result-card {
-      width: 100%; max-width: 480px;
-      border: 1.5px solid var(--ink); background: var(--paper-white);
-      border-radius: 20px; padding: 24px; margin-bottom: 20px;
-      box-shadow: 0 8px 24px rgba(33, 37, 41, 0.04);
-    }
-    .result-player {
-      font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.4rem;
-      margin-bottom: 16px; border-bottom: 1.5px solid var(--paper2);
-      padding-bottom: 12px;
-    }
-    .result-row { display: grid; grid-template-columns: 90px 1fr auto; align-items: center; gap: 16px; padding: 10px 0; border-bottom: 1px dashed var(--paper2); }
-    .result-row.host-clickable { cursor: pointer; transition: background 0.2s; border-radius: 8px; margin: 0 -8px; padding: 10px 8px; }
-    .result-row.host-clickable:hover { background: var(--paper2); }
-    .result-row.rejected .result-word { text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: var(--red); opacity: 0.6; }
-    .result-row:last-child { border-bottom: none; }
-    .result-cat { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px; color: var(--pencil); text-transform: uppercase; }
-    .result-word { font-size: 17px; color: var(--blue); font-weight: 700; }
 
-    /* ── Neue Kategorie-Karten ── */
+    /* ── Kategorie-Karten Auswertung – helleres Header-Design ── */
     .cat-result-card {
       width: 100%; max-width: 480px;
       border: 1.5px solid var(--ink); background: var(--paper-white);
@@ -477,17 +443,22 @@
       overflow: hidden;
     }
     .cat-result-header {
-      background: var(--ink); color: white;
-      padding: 12px 20px;
-      font-family: 'Permanent Marker', cursive;
-      font-size: 1.3rem; letter-spacing: 1px;
-      display: flex; align-items: center; gap: 10px;
+      background: var(--paper2);
+      border-bottom: 1.5px solid rgba(52,58,64,0.12);
+      padding: 11px 20px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 0.85rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--pencil);
+      display: flex; align-items: center; gap: 8px;
     }
-    .cat-result-letter {
-      background: var(--primary-accent);
-      color: white; border-radius: 8px;
-      padding: 2px 10px; font-size: 1rem;
-      font-family: 'Nunito', sans-serif; font-weight: 800;
+    .cat-result-header-name {
+      color: var(--ink);
+      font-size: 1rem;
+      letter-spacing: 0.5px;
+      text-transform: none;
     }
     .cat-player-row {
       display: flex; align-items: center;
@@ -518,7 +489,7 @@
       min-width: 38px; text-align: right; flex-shrink: 0;
     }
     .cat-player-pts.zero { color: var(--pencil); opacity: 0.4; }
-    
+
     .stamp {
       font-family: 'Special Elite', monospace; font-size: 10px;
       letter-spacing: 0.5px; padding: 4px 8px; white-space: nowrap;
@@ -530,7 +501,7 @@
     @keyframes stampIn { 0% { opacity: 0; transform: scale(2) rotate(-10deg); } 100% { opacity: 1; transform: scale(1) rotate(-2deg); } }
     .stamp-ok { border: 2px solid var(--green); color: var(--green); }
     .stamp-no { border: 2px solid var(--red); color: var(--red); }
-    
+
     .val-banner {
       width: 100%; max-width: 480px;
       border: 1.5px solid var(--ink); background: var(--highlight); color: var(--ink);
@@ -560,15 +531,19 @@
     .conn-dot.sync { background: #f59e0b; animation: blink 1s infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-    /* ── Zahnrad-Button ── */
+    /* ── Einstellungs-Button – unten rechts, weg von Timer und Titel ── */
     .gear-btn {
-      position: fixed; top: 16px; right: 16px; z-index: 200;
-      width: 42px; height: 42px;
-      background: var(--paper-white); border: 1.5px solid var(--paper2);
+      position: fixed;
+      bottom: 24px;
+      right: 20px;
+      z-index: 200;
+      width: 46px; height: 46px;
+      background: var(--paper-white);
+      border: 1.5px solid rgba(52,58,64,0.15);
       border-radius: 50%; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       font-size: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
       transition: all 0.2s;
     }
     .gear-btn:hover { background: var(--paper2); transform: rotate(30deg); }
@@ -583,7 +558,6 @@
     }
     .settings-overlay.hidden { display: none; }
     @keyframes fadeOverlay { from { opacity:0; } to { opacity:1; } }
-
     .settings-panel {
       background: var(--paper-white);
       border-radius: 24px 24px 0 0;
@@ -595,7 +569,6 @@
       animation: slideUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
     .settings-title {
       font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.4rem;
       margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;
@@ -607,11 +580,9 @@
       transition: background 0.2s;
     }
     .settings-close:hover { background: var(--paper); }
-
     .settings-section { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 11px;
       letter-spacing: 1.5px; text-transform: uppercase; color: var(--pencil);
       margin: 20px 0 10px; }
-
     .color-swatches { display: flex; gap: 10px; flex-wrap: wrap; }
     .color-swatch {
       width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
@@ -620,14 +591,11 @@
     }
     .color-swatch:hover { transform: scale(1.15); }
     .color-swatch.active { border-color: var(--ink); transform: scale(1.1); }
-
     .conn-status-row {
       display: flex; align-items: center; gap: 8px;
       font-size: 13px; font-weight: 700; color: var(--pencil);
       padding: 10px 0;
     }
-
-    /* ── Volume Sliders ── */
     .vol-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1.5px solid var(--paper2); }
     .vol-row:last-child { border-bottom: none; }
     .vol-icon { font-size: 18px; flex-shrink: 0; width: 24px; text-align: center; }
@@ -658,7 +626,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
     .leave-btn:hover { background: var(--paper2); }
-    
+
     .error-msg { color: var(--red); font-size: 14px; margin-top: 12px; font-weight: 700; text-align: center; }
     .hint { font-size: 13px; color: var(--pencil); text-align: center; margin-top: 16px; font-weight: 600; }
     .divider { border: none; border-top: 1.5px solid var(--paper2); margin: 24px 0; width: 100%; max-width: 480px; }
@@ -685,7 +653,6 @@
 <body>
 
 <button id="btn-leave" class="leave-btn" onclick="window.leaveRoom()">← Raus</button>
-
 <button class="gear-btn" onclick="window.openSettings()" title="Einstellungen">⚙️</button>
 
 <!-- Settings Modal -->
@@ -695,13 +662,11 @@
       Einstellungen
       <button class="settings-close" onclick="window.closeSettings()">✕</button>
     </div>
-
     <div class="settings-section">Verbindung</div>
     <div class="conn-status-row">
       <div class="conn-dot sync" id="conn-dot"></div>
       <span id="conn-label">Bereit</span>
     </div>
-
     <div class="settings-section">Lautstärke</div>
     <div class="vol-row">
       <span class="vol-icon">🎵</span>
@@ -717,7 +682,6 @@
         oninput="window.onSfxVol(this.value)"/>
       <span class="vol-pct" id="sfx-vol-label">70%</span>
     </div>
-
     <div class="settings-section">Akzentfarbe</div>
     <div class="color-swatches" id="color-swatches"></div>
   </div>
@@ -729,7 +693,6 @@
     <div class="game-title">Stadt<span class="slash">/</span>Land<span class="slash">/</span>Fluss</div>
     <div class="game-sub">Multiplayer · Klassischer Spielblock</div>
   </div>
-
   <div class="block">
     <div class="block-title">Mitspielen</div>
     <label class="field-label">Dein Name</label>
@@ -738,7 +701,6 @@
     <input type="text" id="input-room" placeholder="z.B. SPIELEN" maxlength="10" autocomplete="off"/>
     <div id="join-error" class="error-msg" style="display:none"></div>
     <button type="button" class="btn" id="btn-connect" onclick="joinRoom()">Rein da →</button>
-
   </div>
 </div>
 
@@ -747,7 +709,6 @@
     <div class="tape-strip"></div>
     <div class="game-title" style="font-size:2.6rem;transform:rotate(-1deg)">Warteraum</div>
   </div>
-
   <div class="block">
     <div class="code-box">
       <div class="the-code" id="display-roomcode">—</div>
@@ -764,9 +725,6 @@
     <hr class="divider" style="margin:20px -28px;width:calc(100% + 56px)"/>
     <div class="field-label">Runden-Limit</div>
     <div id="lobby-rounds-area"></div>
-    <hr class="divider" style="margin:20px -28px;width:calc(100% + 56px)"/>
-    <div class="field-label">Spieloptionen</div>
-    <div id="lobby-options-area"></div>
     <div id="lobby-host-area" style="margin-top:28px"></div>
   </div>
 </div>
@@ -841,7 +799,6 @@ let roundTimerInterval=null, roundTimerSecondsLeft=0;
 let typingTimeout=null;
 let prevBuzzerValue=null;
 
-// volume state (0.0 – 1.0)
 let sfxVolume  = parseFloat(localStorage.getItem("slf_sfx_vol")  ?? "0.7");
 let musicVolume= parseFloat(localStorage.getItem("slf_music_vol") ?? "0.45");
 
@@ -855,8 +812,6 @@ function getAudioCtx(){
   if(audioCtx.state==='suspended') audioCtx.resume().catch(()=>{});
   return audioCtx;
 }
-
-// ── SFX ──
 function playTone(type, freq, duration, gain=0.3, delay=0){
   if(sfxVolume<=0) return;
   try{
@@ -890,7 +845,6 @@ function playSoundTimerUrgent(){
   playTone('square',330,0.06,0.2,0);
 }
 function playSoundGameOver(){
-  // Triumphales Fanfare-Motiv
   const notes=[523,659,784,1047];
   notes.forEach((f,i)=>playTone('sine',f,0.3,0.4,i*0.18));
   setTimeout(()=>{
@@ -902,14 +856,12 @@ function playSoundGameOver(){
 
 // ── MUSIC ENGINE ──
 let musicGain=null, musicNodes=[], musicPlaying=false, musicPhase=null;
-
 function getMusicGain(){
   const ctx=getAudioCtx();
   if(!musicGain){ musicGain=ctx.createGain(); musicGain.connect(ctx.destination); }
   musicGain.gain.setTargetAtTime(musicVolume, ctx.currentTime, 0.1);
   return musicGain;
 }
-
 function stopMusic(fadeSecs=1.2){
   if(!musicGain) return;
   const ctx=getAudioCtx();
@@ -921,8 +873,6 @@ function stopMusic(fadeSecs=1.2){
     musicPhase=null;
   }, fadeSecs*1000+200);
 }
-
-// Lobby-Musik: fröhliche, leichte Akkord-Begleitung (C-Dur, loopend)
 function playLobbyMusic(){
   if(musicPhase==="lobby") return;
   stopMusic(0.6);
@@ -930,15 +880,12 @@ function playLobbyMusic(){
   if(musicVolume<=0) return;
   setTimeout(()=>{ if(musicPhase!=="lobby") return; _startLobbyLoop(); }, 700);
 }
-
 function _startLobbyLoop(){
   const ctx=getAudioCtx();
   const mg=getMusicGain();
-  // Chord progression: C - Am - F - G, each 2 beats at ~108bpm → ~1.11s per chord
   const BPM=108, beat=60/BPM, chord=beat*2;
   const chords=[ [261,330,392], [220,261,330], [174,220,261], [196,247,330] ];
   const totalLen=chord*chords.length;
-
   function loop(){
     if(musicPhase!=="lobby"||musicVolume<=0) return;
     chords.forEach((freqs,ci)=>{
@@ -956,7 +903,6 @@ function _startLobbyLoop(){
         osc.start(start); osc.stop(start+chord+0.05);
         musicNodes.push(osc);
       });
-      // light kick on beat 1 of each chord
       const buf=ctx.createBuffer(1,ctx.sampleRate*0.08,ctx.sampleRate);
       const d=buf.getChannelData(0);
       for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);
@@ -971,8 +917,6 @@ function _startLobbyLoop(){
   loop();
   musicPlaying=true;
 }
-
-// Spiel-Musik: treibender, spannungsvoller Beat
 function playGameMusic(){
   if(musicPhase==="game") return;
   stopMusic(0.5);
@@ -980,35 +924,27 @@ function playGameMusic(){
   if(musicVolume<=0) return;
   setTimeout(()=>{ if(musicPhase!=="game") return; _startGameLoop(); }, 600);
 }
-
 function _startGameLoop(){
   const ctx=getAudioCtx();
   const mg=getMusicGain();
   const BPM=126, beat=60/BPM;
-  // Pentatonic bass line: A minor pentatonic
   const bassNotes=[110,110,130,110, 98,110,130,147];
-  const stepLen=beat*0.5; // 8th notes
+  const stepLen=beat*0.5;
   const totalLen=stepLen*bassNotes.length;
-
-  // hi-hat pattern helper
   function makeNoise(start, dur, gainVal){
     const buf=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*dur),ctx.sampleRate);
     const d=buf.getChannelData(0);
     for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
     const src=ctx.createBufferSource(); src.buffer=buf;
     const g=ctx.createGain(); g.gain.value=gainVal;
-    // high-pass to make it hi-hat-ish
     const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=6000;
     src.connect(hp); hp.connect(g); g.connect(mg);
     src.start(start); src.stop(start+dur+0.01);
     musicNodes.push(src);
   }
-
   function loop(){
     if(musicPhase!=="game"||musicVolume<=0) return;
     const now=ctx.currentTime;
-
-    // bass line
     bassNotes.forEach((freq,i)=>{
       const osc=ctx.createOscillator();
       const g=ctx.createGain();
@@ -1022,11 +958,7 @@ function _startGameLoop(){
       osc.start(s); osc.stop(s+stepLen);
       musicNodes.push(osc);
     });
-
-    // hi-hat every 8th note
     for(let i=0;i<bassNotes.length;i++) makeNoise(now+i*stepLen, 0.05, 0.04);
-
-    // kick on beat 1 & 3
     [0,2].forEach(b=>{
       const ks=ctx.createOscillator();
       const kg=ctx.createGain();
@@ -1038,17 +970,12 @@ function _startGameLoop(){
       ks.start(now+b*beat); ks.stop(now+b*beat+0.2);
       musicNodes.push(ks);
     });
-
-    // snare on beat 2 & 4
     [1,3].forEach(b=>makeNoise(now+b*beat, 0.1, 0.06));
-
     setTimeout(loop, totalLen*1000-30);
   }
   loop();
   musicPlaying=true;
 }
-
-// Results-Musik: ruhige, auflösende Akkorde
 function playResultsMusic(){
   if(musicPhase==="results") return;
   stopMusic(0.8);
@@ -1056,13 +983,11 @@ function playResultsMusic(){
   if(musicVolume<=0) return;
   setTimeout(()=>{ if(musicPhase!=="results") return; _startResultsLoop(); }, 900);
 }
-
 function _startResultsLoop(){
   const ctx=getAudioCtx();
   const mg=getMusicGain();
   const chord=1.8;
   const chords=[ [261,330,392,523], [220,277,330,440], [174,220,261,349], [196,247,294,392] ];
-
   function loop(){
     if(musicPhase!=="results"||musicVolume<=0) return;
     chords.forEach((freqs,ci)=>{
@@ -1086,13 +1011,11 @@ function _startResultsLoop(){
   loop();
   musicPlaying=true;
 }
-
 function updateMusicVolume(){
   if(musicGain){
     const ctx=getAudioCtx();
     musicGain.gain.setTargetAtTime(musicVolume, ctx.currentTime, 0.1);
   }
-  // restart if was stopped due to vol=0
   if(musicVolume>0 && !musicPlaying && musicPhase){
     const p=musicPhase; musicPhase=null;
     if(p==="lobby") playLobbyMusic();
@@ -1115,9 +1038,7 @@ const ACCENT_COLORS = [
   { name:"Rot",       hex:"#ef4444" },
   { name:"Grau",      hex:"#6b7280" },
 ];
-
 let currentAccent = localStorage.getItem("slf_accent") || "#6bc94e";
-
 function applyAccent(hex){
   currentAccent = hex;
   document.documentElement.style.setProperty("--primary-accent", hex);
@@ -1129,7 +1050,6 @@ function applyAccent(hex){
   localStorage.setItem("slf_accent", hex);
   renderSwatches();
 }
-
 function renderSwatches(){
   const el=document.getElementById("color-swatches");
   if(!el)return;
@@ -1140,13 +1060,10 @@ function renderSwatches(){
       onclick="window.pickColor('${c.hex}')"></div>`
   ).join("");
 }
-
 window.pickColor=function(hex){ applyAccent(hex); };
-
 window.openSettings=function(){
   document.getElementById("settings-overlay").classList.remove("hidden");
   renderSwatches();
-  // sync sliders
   const ms=document.getElementById("music-vol-slider");
   const ss=document.getElementById("sfx-vol-slider");
   if(ms) ms.value=Math.round(musicVolume*100);
@@ -1176,7 +1093,6 @@ function updateSliderLabels(){
   if(ml) ml.textContent=Math.round(musicVolume*100)+"%";
   if(sl) sl.textContent=Math.round(sfxVolume*100)+"%";
 }
-
 
 // ─── UTILS ──────────────────────────────────────────────────────
 function setConnStatus(s){
@@ -1210,9 +1126,7 @@ async function updateRoomData(patch){
 window.addEventListener("DOMContentLoaded",()=>{
   const savedAccent=localStorage.getItem("slf_accent");
   if(savedAccent) applyAccent(savedAccent);
-  // Musik startet beim ersten Klick (Browser-Autoplay-Policy)
   document.addEventListener("click", ()=>{ try{ getAudioCtx(); playLobbyMusic(); }catch(e){} }, {once:true});
-
   const n=sessionStorage.getItem("slf_name"),r=sessionStorage.getItem("slf_room"),i=sessionStorage.getItem("slf_id");
   if(n&&r&&i){document.getElementById("input-name").value=n;document.getElementById("input-room").value=r;myId=i;window.joinRoom();}
 });
@@ -1220,7 +1134,6 @@ window.addEventListener("DOMContentLoaded",()=>{
 // ─── JOIN ────────────────────────────────────────────────────────
 window.joinRoom=async function(){
   try { getAudioCtx(); } catch(e) {}
-
   myName=document.getElementById("input-name").value.trim();
   myRoom=document.getElementById("input-room").value.trim().toUpperCase().replace(/[^A-Z0-9]/g,"");
   if(!myName||!myRoom){showError("Bitte Name und Raum-Code eingeben.");return;}
@@ -1286,10 +1199,8 @@ function startHeartbeat(){
 async function processStateUpdate(newState){
   const prevPhase=gameState?.phase;
   const prevBuzzer=prevBuzzerValue;
-
   gameState=newState;
   isHost=gameState.host===myId;
-
   if(isHost){
     const now=Date.now();
     const stale=Object.entries(gameState.players||{})
@@ -1302,7 +1213,6 @@ async function processStateUpdate(newState){
       return;
     }
   }
-
   if(gameState.phase==="playing" && prevPhase!=="playing"){
     const backup=sessionStorage.getItem("slf_local_answers");
     localAnswers=backup?JSON.parse(backup):{};
@@ -1313,7 +1223,6 @@ async function processStateUpdate(newState){
   if(gameState.phase!=="playing" && gameState.phase!=="collecting"){
     stopRoundTimer();
   }
-
   if(gameState.buzzer && gameState.buzzer!==prevBuzzer){
     prevBuzzerValue=gameState.buzzer;
     playSoundBuzzer();
@@ -1321,7 +1230,6 @@ async function processStateUpdate(newState){
   } else if(!gameState.buzzer){
     prevBuzzerValue=null;
   }
-
   syncUIWithPhase();
 }
 
@@ -1412,20 +1320,18 @@ function renderLobby(){
   document.getElementById("display-roomcode").textContent=myRoom;
   const hb=document.getElementById("host-badge");
   if(hb)hb.style.display=isHost?"block":"none";
-
   const now=Date.now();
   const cats=objToCats(gameState.cats);
   const dur=gameState.roundDuration??90;
   const roundLimit=gameState.roundLimit??0;
   const usedLetters=gameState.usedLetters||[];
   const available=ALL_LETTERS.filter(l=>!usedLetters.includes(l));
-  const allowBuzzer=gameState.allowBuzzer!==false;
 
   document.getElementById("players-list").innerHTML=Object.entries(gameState.players||{}).map(([id,p])=>{
     const online=now-(p.hb||0)<25000;
     return`<div class="player-chip">
       <div class="online-dot" style="background:${online?"var(--green)":"transparent"}"></div>
-      ${escHtml(p.name)}${id===gameState.host?" ★":""} 
+      ${escHtml(p.name)}${id===gameState.host?" ★":""}
       <span class="pts">${p.score||0}P</span>
     </div>`;
   }).join("");
@@ -1492,21 +1398,6 @@ function renderLobby(){
     ra.innerHTML=`<div style="font-size:18px;color:var(--pencil);font-weight:600;">${lbl}</div>`;
   }
 
-  const oa=document.getElementById("lobby-options-area");
-  if(isHost){
-    oa.innerHTML=`
-      <div class="toggle-row">
-        <span>STOPP-Buzzer erlaubt</span>
-        <div class="toggle-switch ${allowBuzzer?"on":""}" onclick="window.toggleBuzzer()"></div>
-      </div>`;
-  }else{
-    oa.innerHTML=`
-      <div class="toggle-row">
-        <span>STOPP-Buzzer</span>
-        <span style="font-size:14px;color:var(--pencil)">${allowBuzzer?"✓ Ja":"✕ Nein"}</span>
-      </div>`;
-  }
-
   const leftCount=ALL_LETTERS.filter(l=>!(gameState.usedLetters||[]).includes(l)).length;
   document.getElementById("lobby-host-area").innerHTML=isHost
     ?`<button type="button" class="btn" onclick="window.startRound()" ${leftCount===0?"disabled":""}>
@@ -1525,54 +1416,55 @@ window.setCustomTimer=async function(){
   await updateRoomData({roundDuration:v});
 };
 window.setRoundLimit=async function(r){await updateRoomData({roundLimit:r});};
-window.toggleBuzzer=async function(){
-  await updateRoomData({allowBuzzer:gameState.allowBuzzer===false});
-};
 window.resetLetters=async function(){
   await updateRoomData({usedLetters:[]});
 };
-// Welche Vorschläge gerade sichtbar sind (persistent solange Lobby offen)
 let visibleSuggestions = [];
-
+function fillVisibleSuggestions(usedLower){
+  visibleSuggestions = visibleSuggestions.filter(s=>!usedLower.includes(s.toLowerCase()));
+  const pool = CAT_SUGGESTIONS.filter(s=>
+    !usedLower.includes(s.toLowerCase()) && !visibleSuggestions.includes(s)
+  );
+  for(let i=pool.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [pool[i],pool[j]]=[pool[j],pool[i]];
+  }
+  while(visibleSuggestions.length < 5 && pool.length > 0){
+    visibleSuggestions.push(pool.shift());
+  }
+}
 function renderSuggestionChips(currentCats){
   const usedLower = currentCats.map(c=>c.toLowerCase());
-  const available = CAT_SUGGESTIONS.filter(s=>!usedLower.includes(s.toLowerCase()));
-
-  // Beim ersten Mal oder wenn zu wenige sichtbar: befüllen
-  visibleSuggestions = visibleSuggestions.filter(s=>!usedLower.includes(s.toLowerCase()));
-  while(visibleSuggestions.length < 5 && available.length > visibleSuggestions.length){
-    const remaining = available.filter(s=>!visibleSuggestions.includes(s));
-    if(!remaining.length) break;
-    const pick = remaining[Math.floor(Math.random()*remaining.length)];
-    visibleSuggestions.push(pick);
-  }
-
+  fillVisibleSuggestions(usedLower);
   const sugEl = document.getElementById("cat-suggestions-list");
   if(!sugEl) return;
-  sugEl.innerHTML = visibleSuggestions.map(s=>
-    `<span class="cat-suggestion" onclick="window.addSuggestion('${s.replace(/'/g,"\\'")}')">+ ${s}</span>`
-  ).join("");
+  const currentSpans = Array.from(sugEl.children);
+  const newKeys      = visibleSuggestions;
+  currentSpans.forEach(el=>{ if(!newKeys.includes(el.dataset.key)) el.remove(); });
+  newKeys.forEach(s=>{
+    if(!sugEl.querySelector(`[data-key="${CSS.escape(s)}"]`)){
+      const span = document.createElement("span");
+      span.className = "cat-suggestion";
+      span.dataset.key = s;
+      span.textContent = "+ " + s;
+      span.onclick = ()=>window.addSuggestion(s);
+      sugEl.appendChild(span);
+    }
+  });
+  newKeys.forEach((s,i)=>{
+    const el = sugEl.querySelector(`[data-key="${CSS.escape(s)}"]`);
+    if(el && sugEl.children[i] !== el) sugEl.insertBefore(el, sugEl.children[i]||null);
+  });
 }
-
 window.addSuggestion=async function(s){
   const cats=objToCats(gameState.cats);
   if(cats.map(c=>c.toLowerCase()).includes(s.toLowerCase()))return;
-
-  // Diesen Vorschlag aus den sichtbaren entfernen und einen neuen nachladen
   visibleSuggestions = visibleSuggestions.filter(v=>v!==s);
   const usedLower = [...cats.map(c=>c.toLowerCase()), s.toLowerCase()];
-  const remaining = CAT_SUGGESTIONS.filter(r=>
-    !usedLower.includes(r.toLowerCase()) && !visibleSuggestions.includes(r)
-  );
-  if(remaining.length){
-    const pick = remaining[Math.floor(Math.random()*remaining.length)];
-    visibleSuggestions.push(pick);
-  }
-
+  fillVisibleSuggestions(usedLower);
   cats.push(s);
   await updateRoomData({cats:catsToObj(cats)});
 };
-
 window.addCat=async function(){
   const i=document.getElementById("lobby-cat-input");if(!i)return;
   const v=i.value.trim();i.value="";if(!v)return;
@@ -1588,10 +1480,8 @@ window.startRound=async function(){
   const usedLetters=gameState.usedLetters||[];
   const available=ALL_LETTERS.filter(l=>!usedLetters.includes(l));
   if(available.length===0)return;
-
   const letter=available[Math.floor(Math.random()*available.length)];
   const newUsed=[...usedLetters,letter];
-
   await updateRoomData({
     phase:"playing",
     round:(gameState.round||0)+1,
@@ -1636,7 +1526,6 @@ function renderPlaying(){
     .filter(([id,ts])=>id!==myId&&Date.now()-ts<4000)
     .map(([id])=>gameState.players?.[id]?.name)
     .filter(Boolean);
-
   const tiEl=document.getElementById("typing-indicators-area");
   if(tiEl){
     tiEl.innerHTML=typingOthers.length>0
@@ -1657,7 +1546,7 @@ function renderPlaying(){
   if(gameState.phase==="playing"){
     if(gameState.buzzer){
       bEl.innerHTML=`<div class="buzzer-fired" id="buzzer-ticker">🔔 ${escHtml(gameState.buzzer)} hat STOPP gerufen!</div>`;
-    }else if(!submitted && gameState.allowBuzzer!==false){
+    }else if(!submitted){
       bEl.innerHTML=`<div class="buzzer-wrap"><button type="button" class="buzzer-btn" onclick="window.triggerBuzzer()">STOPP!</button></div>`;
     }else{
       bEl.innerHTML="";
@@ -1673,7 +1562,7 @@ function renderPlaying(){
           <div class="answer-row">
             <span class="ans-cat">${escHtml(cat)}</span>
             <input type="text" id="ans-${sanitizeId(cat)}"
-              placeholder="${escHtml(cat)} mit ${gameState.letter}…"
+              placeholder="${gameState.letter}…"
               autocomplete="off"
               inputmode="text"
               autocapitalize="words"/>
@@ -1685,7 +1574,6 @@ function renderPlaying(){
         if(e)e.value=localAnswers[cat];
       }
     });
-    // Erstes Feld automatisch fokussieren
     const firstId=`ans-${sanitizeId(cats[0])}`;
     const firstEl=document.getElementById(firstId);
     if(firstEl)setTimeout(()=>firstEl.focus(),100);
@@ -1708,15 +1596,13 @@ function renderWaiting(){
 }
 
 window.triggerBuzzer=async function(){
-  if(!gameState||gameState.buzzer||gameState.allowBuzzer===false)return;
+  if(!gameState||gameState.buzzer)return;
   const s=await get(ref(db,`rooms/${myRoom}/buzzer`));
   if(s.val())return;
   await updateRoomData({buzzer:myName,buzzerTs:Date.now()});
 };
-
 function triggerLocalBuzzerTicker(){
   if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
-  // Sofort abgeben
   if(!submitted) window.submitAnswers();
   if(isHost){
     (async()=>{
@@ -1727,13 +1613,11 @@ function triggerLocalBuzzerTicker(){
     })();
   }
 }
-
 window.submitAnswers=async function(){
   if(submitted)return;
   const cats=objToCats(gameState?.cats);
   const ans={};
   cats.forEach(cat=>{
-    // DOM hat Vorrang, dann localAnswers als Fallback (falls Felder nicht mehr im DOM)
     const e=document.getElementById(`ans-${sanitizeId(cat)}`);
     const domVal=e?e.value.trim():"";
     ans[cat]=domVal||localAnswers[cat]||"";
@@ -1754,7 +1638,6 @@ async function checkHostRoundEnd(){
     .map(([id])=>id);
   if(active.length>0&&active.every(id=>cur.roundAnswers?.[id]))await forceRoundEnd(cur);
 }
-
 async function forceRoundEnd(cur){
   if(!cur||cur.phase==="results")return;
   calculateBaseScores(cur);
@@ -1762,15 +1645,12 @@ async function forceRoundEnd(cur){
   cur.typingStatus={};
   setConnStatus("sync");await set(roomRef(),cur);setConnStatus("ok");
 }
-
 function calculateBaseScores(state){
   const cats=objToCats(state.cats);
   const pids=Object.keys(state.players||{});
   const rejections=state.rejections||{};
-
   const roundScores={};
   pids.forEach(id=>{roundScores[id]=0;});
-
   cats.forEach(cat=>{
     const valid=pids.map(id=>{
       let v=(state.roundAnswers?.[id]?.[cat]||"").trim().toLowerCase();
@@ -1785,12 +1665,10 @@ function calculateBaseScores(state){
       roundScores[id]+=(tot===1?20:dup===1?10:5);
     });
   });
-
   pids.forEach(id=>{
     state.players[id].score=(state.players[id].score||0)+roundScores[id];
   });
 }
-
 window.toggleAnswerStrike=async function(pid,cat){
   if(!isHost||!gameState||gameState.phase!=="results")return;
   const key=`${pid}__${cat}`;
@@ -1802,7 +1680,6 @@ window.toggleAnswerStrike=async function(pid,cat){
   }else{
     cur.rejections[key]=true;
   }
-  
   if(cur.preRoundScores){
     Object.keys(cur.players||{}).forEach(id=>{
       cur.players[id].score=cur.preRoundScores[id]||0;
@@ -1817,13 +1694,11 @@ window.toggleAnswerStrike=async function(pid,cat){
 
 // ─── RESULTS ─────────────────────────────────────────────────────
 function calcRoundPoints(state){
-  // Returns { [pid]: { [cat]: points } }
   const cats=objToCats(state.cats);
   const pids=Object.keys(state.players||{});
   const rejections=state.rejections||{};
   const result={};
   pids.forEach(id=>{ result[id]={}; });
-
   cats.forEach(cat=>{
     const answers=pids.map(id=>{
       let v=(state.roundAnswers?.[id]?.[cat]||"").trim().toLowerCase();
@@ -1877,7 +1752,7 @@ function renderResults(){
       <div class="score-pts">${p.score||0} Punkte</div>
     </div>`).join("");
 
-  // Kategorie für Kategorie
+  // Kategorie-Karten: Buchstabe vor Kategorienamen entfernt
   document.getElementById("results-container").innerHTML=cats.map(cat=>{
     const rows=pids.map(pid=>{
       const ans=gameState.roundAnswers?.[pid]||{};
@@ -1911,8 +1786,7 @@ function renderResults(){
 
     return`<div class="cat-result-card">
       <div class="cat-result-header">
-        <span class="cat-result-letter">${gameState.letter}</span>
-        ${escHtml(cat)}
+        <span class="cat-result-header-name">${escHtml(cat)}</span>
       </div>
       ${rows}
     </div>`;
@@ -1934,7 +1808,6 @@ window.backToLobby=function(){
   showScreen("lobby");
   renderLobby();
 };
-
 window.nextRound=async function(){
   const preRoundScores={};
   Object.entries(gameState.players||{}).forEach(([id,p])=>{preRoundScores[id]=p.score||0;});
@@ -1948,7 +1821,6 @@ window.nextRound=async function(){
     typingStatus:{}
   });
 };
-
 window.newGame=async function(){
   const playerReset={};
   Object.keys(gameState.players||{}).forEach(id=>{
@@ -2000,7 +1872,6 @@ async function checkAndMigrateHost(){
       .sort((a,b)=>a[0].localeCompare(b[0]));
     if(activePlayers.length>0){
       const newHostId=activePlayers[0][0];
-      const newHostName=activePlayers[0][1].name;
       if(newHostId===myId){
         await updateRoomData({host:myId,hostName:myName});
         isHost=true;
@@ -2022,7 +1893,6 @@ document.addEventListener("keydown",e=>{
     }
   }
 });
-
 document.addEventListener("input",e=>{
   if(e.target.matches(".answer-row input")&&gameState?.cats){
     const cats=objToCats(gameState.cats);
@@ -2030,7 +1900,6 @@ document.addEventListener("input",e=>{
     if(cat){
       localAnswers[cat]=e.target.value;
       sessionStorage.setItem("slf_local_answers",JSON.stringify(localAnswers));
-
       const val=e.target.value.trim();
       if(val.length===0){
         e.target.classList.remove("typing-ok","typing-bad");
@@ -2042,7 +1911,6 @@ document.addEventListener("input",e=>{
         e.target.classList.remove("typing-ok");
       }
     }
-
     if(typingTimeout)clearTimeout(typingTimeout);
     if(myRoom&&myId&&gameState?.phase==="playing"){
       update(ref(db,`rooms/${myRoom}/typingStatus`),{[myId]:Date.now()}).catch(()=>{});
@@ -2052,7 +1920,6 @@ document.addEventListener("input",e=>{
     }
   }
 });
-
 document.getElementById("input-room").addEventListener("input",e=>{
   e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,"");
 });
