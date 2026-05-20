@@ -798,6 +798,7 @@ let heartbeatInterval=null, roomListener=null;
 let roundTimerInterval=null, roundTimerSecondsLeft=0;
 let typingTimeout=null;
 let prevBuzzerValue=null;
+let syncedPhase=null; // tracks last rendered phase to detect real transitions
 
 let sfxVolume  = parseFloat(localStorage.getItem("slf_sfx_vol")  ?? "0.7");
 let musicVolume= parseFloat(localStorage.getItem("slf_music_vol") ?? "0.45");
@@ -1236,8 +1237,10 @@ async function processStateUpdate(newState){
 function syncUIWithPhase(){
   if(!gameState)return;
   const p=gameState.phase;
+  const isNewPhase = p !== syncedPhase;
+  syncedPhase = p;
   if(p==="lobby"){
-    resetRoundData();
+    if(isNewPhase) resetRoundData(); // nur bei echtem Phasenwechsel zurücksetzen
     showScreen("lobby");
     renderLobby();
     playLobbyMusic();
@@ -1455,6 +1458,13 @@ function renderSuggestionChips(currentCats){
     const el = sugEl.querySelector(`[data-key="${CSS.escape(s)}"]`);
     if(el && sugEl.children[i] !== el) sugEl.insertBefore(el, sugEl.children[i]||null);
   });
+
+  // Hover-Bleed verhindern: nach DOM-Änderungen kurz Pointer-Events deaktivieren,
+  // damit kein Hover-State auf neu positionierte Chips "übertragen" wird
+  sugEl.style.pointerEvents = 'none';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    sugEl.style.pointerEvents = '';
+  }));
 }
 window.addSuggestion=async function(s){
   const cats=objToCats(gameState.cats);
