@@ -7,18 +7,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --primary-accent: #6bc94e;
+      --primary-accent: #9ce866;
       --paper:        #fdfbf7;
       --paper-white:  #ffffff;
       --paper2:       #f0ede6;
       --grid:         rgba(100, 130, 190, 0.12);
-      --margin:       rgba(107, 201, 78, 0.35);
+      --margin:       rgba(156, 232, 102, 0.35);
       --ink:          #343a40;
       --red:          #ef4444;
       --blue:         #339af0;
       --pencil:       #868e96;
-      --stamp:        #6bc94e;
-      --green:        #6bc94e;
+      --stamp:        #9ce866;
+      --green:        #9ce866;
       --tape:         rgba(255, 243, 191, 0.9);
       --highlight:    #ffec99;
       --line:         rgba(52,58,64,0.12);
@@ -674,29 +674,33 @@
     .cat-player-pts.zero { color: var(--pencil); opacity: 0.4; }
 
     .vote-btn {
-      border: 1px solid var(--line);
+      width: 42px; height: 42px;
+      border: 1.5px solid var(--red);
       background: var(--paper-white);
-      color: var(--pencil);
-      border-radius: 999px;
-      padding: 6px 10px;
+      color: var(--red);
+      border-radius: 50%;
+      padding: 0;
       font-family: 'Nunito', sans-serif;
-      font-size: 12px;
-      font-weight: 800;
+      font-size: 18px;
+      font-weight: 900;
       cursor: pointer;
       flex-shrink: 0;
       transition: all 0.15s ease;
-      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
     }
-    .vote-btn:hover { border-color: var(--red); color: var(--red); transform: translateY(-1px); }
-    .vote-btn.active { background: color-mix(in srgb, var(--red) 12%, var(--paper-white)); border-color: var(--red); color: var(--red); }
+    .vote-btn:hover { background: color-mix(in srgb, var(--red) 8%, var(--paper-white)); transform: translateY(-1px); }
+    .vote-btn.active,
     .vote-btn.passed { background: var(--red); border-color: var(--red); color: white; }
-    .vote-count { opacity: 0.8; margin-left: 4px; }
+    .vote-count { display: none; }
     .vote-note { font-size: 11px; font-weight: 800; color: var(--pencil); opacity: 0.55; white-space: nowrap; padding-top: 4px; }
     @media (max-width: 430px) {
       .cat-player-row { padding: 12px 14px; gap: 8px; }
       .cat-player-name { width: 68px; font-size: 11px; }
       .cat-player-word { font-size: 16px; }
-      .vote-btn { padding: 5px 8px; font-size: 11px; }
+      .vote-btn { width: 38px; height: 38px; font-size: 17px; }
     }
 
 
@@ -848,14 +852,14 @@
       border-radius: 13px; cursor: pointer; transition: background 0.3s, border-color 0.3s;
       flex-shrink: 0;
     }
-    .toggle-switch.on { background: var(--green); border-color: #6bc94e; }
+    .toggle-switch.on { background: var(--green); border-color: var(--green); }
     .toggle-switch::after {
       content: ''; position: absolute; top: 2px; left: 2px;
       width: 18px; height: 18px; border-radius: 50%;
       background: white; border: 1px solid var(--line);
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    .toggle-switch.on::after { transform: translateX(22px); border-color: #6bc94e; }
+    .toggle-switch.on::after { transform: translateX(22px); border-color: var(--green); }
   </style>
 </head>
 <body>
@@ -1256,7 +1260,7 @@ function updateMusicVolume(){
 
 // ─── SETTINGS ────────────────────────────────────────────────────
 const ACCENT_COLORS = [
-  { name:"Grasgrün",  hex:"#6bc94e" },
+  { name:"Hellgrün",   hex:"#9ce866" },
   { name:"Waldgrün",  hex:"#4a7c59" },
   { name:"Himmelblau",hex:"#3b9edd" },
   { name:"Ozean",     hex:"#0ea5a0" },
@@ -1267,7 +1271,7 @@ const ACCENT_COLORS = [
   { name:"Rot",       hex:"#ef4444" },
   { name:"Grau",      hex:"#6b7280" },
 ];
-let currentAccent = localStorage.getItem("slf_accent") || "#6bc94e";
+let currentAccent = localStorage.getItem("slf_accent") || "#9ce866";
 function applyAccent(hex){
   currentAccent = hex;
   document.documentElement.style.setProperty("--primary-accent", hex);
@@ -1353,7 +1357,8 @@ async function updateRoomData(patch){
 // ─── INIT ────────────────────────────────────────────────────────
 window.addEventListener("DOMContentLoaded",()=>{
   const savedAccent=localStorage.getItem("slf_accent");
-  if(savedAccent) applyAccent(savedAccent);
+  if(savedAccent && savedAccent!=="#6bc94e") applyAccent(savedAccent);
+  else applyAccent("#9ce866");
   document.addEventListener("click", ()=>{ try{ getAudioCtx(); playLobbyMusic(); }catch(e){} }, {once:true});
 
   const roomFromUrl=normalizeRoomCode(new URLSearchParams(location.search).get("room")||"");
@@ -2392,15 +2397,7 @@ function renderResults(){
   }else if(goArea){ goArea.innerHTML=""; }
 
   const banner=document.getElementById("validation-banner-area");
-  if(banner){
-    if(validationMode==="vote"){
-      banner.innerHTML=`<div class="val-banner"><div class="val-title">🗳️ Abstimmung</div></div>`;
-    }else{
-      banner.innerHTML=isHost
-        ?`<div class="val-banner"><div class="val-title">✍️ Korrektur</div></div>`
-        :`<div class="val-banner"><div class="val-title">👀 Auswertung</div></div>`;
-    }
-  }
+  if(banner) banner.innerHTML="";
 
   const sorted=Object.entries(players).sort((a,b)=>safeNum(b[1].score)-safeNum(a[1].score));
   document.getElementById("scoreboard").innerHTML=sorted.map(([id,p],i)=>`
@@ -2450,9 +2447,10 @@ function renderResults(){
         }else if(Number.isFinite(threshold)){
           const actionKey=`a_${Object.keys(resultActionMap).length}`;
           resultActionMap[actionKey]={pid,cat};
-          voteHtml=`<button type="button" class="vote-btn ${myVote?"active":""} ${isRejected?"passed":""}" onclick="window.toggleVoteByKey('${actionKey}')">
-            ${myVote?"Zurück":"Anzweifeln"}<span class="vote-count">${rejectCount}/${threshold}</span>
-          </button>`;
+          voteHtml=`<button type="button" class="vote-btn ${myVote?"active":""} ${isRejected?"passed":""}"
+            title="Antwort anzweifeln (${rejectCount}/${threshold})"
+            aria-label="Antwort anzweifeln (${rejectCount}/${threshold})"
+            onclick="window.toggleVoteByKey('${actionKey}')">👎</button>`;
         }
       }
 
@@ -2622,5 +2620,5 @@ function escHtml(s){
     .replace(/'/g,"&#039;");
 }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a11fa9b6fce2931b',t:'MTc4MjUxMzA5NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
