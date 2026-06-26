@@ -14,7 +14,7 @@
       --grid:         rgba(100, 130, 190, 0.12);
       --margin:       rgba(107, 201, 78, 0.35);
       --ink:          #343a40;
-      --red:          #6bc94e;
+      --red:          #ef4444;
       --blue:         #339af0;
       --pencil:       #868e96;
       --stamp:        #6bc94e;
@@ -121,6 +121,31 @@
       color: var(--ink);
       margin-bottom: 24px;
     }
+    .join-mode-card {
+      border: 1.5px dashed rgba(134,142,150,0.35);
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 18px;
+      background: color-mix(in srgb, var(--paper-white) 82%, var(--paper2));
+    }
+    .join-mode-title {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      margin-bottom: 5px;
+      color: var(--ink);
+    }
+    .join-mode-sub {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--pencil);
+      line-height: 1.35;
+      margin-bottom: 12px;
+    }
+    .join-mode-card > .btn { margin-top: 0; }
+    .join-row { display: flex; gap: 8px; align-items: flex-end; }
+    .join-row input { flex: 1; }
+    .join-row .btn { margin-top: 0; white-space: nowrap; }
 
     input[type=text], input[type=number] {
       width: 100%;
@@ -146,7 +171,7 @@
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-accent) 15%, transparent);
     }
     input.typing-ok { border-color: var(--green) !important; box-shadow: 0 0 0 4px rgba(107, 201, 78, 0.15) !important;}
-    input.typing-bad { border-color: var(--red) !important; box-shadow: 0 0 0 4px rgba(107, 201, 78, 0.15) !important;}
+    input.typing-bad { border-color: var(--red) !important; box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15) !important;}
 
     .field-label {
       font-family: 'Nunito', sans-serif;
@@ -276,16 +301,16 @@
       padding: 6px 14px;
       font-size: 15px; font-weight: 700; color: var(--ink);
     }
-    .timer-presets, .round-presets { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-    .timer-preset, .round-preset {
+    .timer-presets, .round-presets, .validation-presets { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .timer-preset, .round-preset, .validation-preset {
       padding: 8px 16px; border: 1.5px solid var(--pencil);
       border-radius: 10px;
       font-size: 14px; font-weight: 700;
       background: var(--paper-white); color: var(--pencil);
       cursor: pointer; transition: all 0.2s;
     }
-    .timer-preset:hover, .round-preset:hover { border-color: var(--ink); color: var(--ink); }
-    .timer-preset.active, .round-preset.active {
+    .timer-preset:hover, .round-preset:hover, .validation-preset:hover { border-color: var(--ink); color: var(--ink); }
+    .timer-preset.active, .round-preset.active, .validation-preset.active {
       background: var(--primary-accent);
       color: white;
       border-color: var(--primary-accent);
@@ -379,11 +404,120 @@
       40%, 60% { transform: translate3d(4px, 0, 0); }
     }
 
-    .answer-form { width: 100%; max-width: 480px; }
-    .answer-row { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; position: relative; }
+    .answer-form {
+      width: 100%; max-width: 480px;
+      position: relative;
+      overflow: hidden;
+      background: var(--paper-white);
+      border: 2px solid var(--ink);
+      border-radius: 18px;
+      box-shadow: 7px 9px 0 rgba(52,58,64,0.08), 0 14px 34px rgba(33,37,41,0.06);
+      transform: rotate(-0.35deg);
+      margin-bottom: 12px;
+    }
+    .answer-form::before {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 116px;
+      width: 2px;
+      background: color-mix(in srgb, var(--primary-accent) 45%, transparent);
+      z-index: 1;
+      pointer-events: none;
+    }
+    .answer-form::after {
+      content: '';
+      position: absolute;
+      left: 14px;
+      top: 54px;
+      width: 10px;
+      height: calc(100% - 72px);
+      background:
+        radial-gradient(circle at center, rgba(52,58,64,0.22) 0 4px, transparent 4.5px) 0 0 / 10px 50px repeat-y;
+      opacity: 0.55;
+      pointer-events: none;
+    }
+    .answer-sheet-head {
+      display: grid;
+      grid-template-columns: 116px 1fr;
+      background: var(--paper2);
+      border-bottom: 2px solid rgba(52,58,64,0.16);
+      font-family: 'Special Elite', monospace;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--pencil);
+      position: relative;
+      z-index: 2;
+    }
+    .answer-sheet-head span { padding: 12px 16px; }
+    .answer-sheet-head span:first-child { text-align: right; padding-right: 18px; }
+    .answer-sheet-head span:last-child { border-left: 1.5px solid rgba(52,58,64,0.14); color: var(--ink); }
+    .answer-row {
+      display: grid;
+      grid-template-columns: 116px 1fr;
+      align-items: stretch;
+      gap: 0;
+      margin: 0;
+      min-height: 58px;
+      border-bottom: 1.5px solid rgba(52,58,64,0.13);
+      position: relative;
+      z-index: 2;
+    }
+    .answer-row:last-child { border-bottom: none; }
     .ans-cat {
-      font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px;
-      text-transform: uppercase; color: var(--ink); width: 90px; text-align: right; flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 12px 18px 12px 28px;
+      font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 12px;
+      text-transform: uppercase; letter-spacing: 0.7px;
+      color: var(--ink);
+      text-align: right;
+      background: rgba(240,237,230,0.35);
+      overflow-wrap: anywhere;
+    }
+    .answer-row input[type=text] {
+      height: 100%;
+      min-height: 58px;
+      background: transparent;
+      border: none;
+      border-left: 1.5px solid rgba(52,58,64,0.14);
+      border-radius: 0;
+      padding: 12px 16px;
+      font-family: 'Permanent Marker', cursive;
+      font-weight: 400;
+      font-size: 1.35rem;
+      letter-spacing: 0.2px;
+      box-shadow: none !important;
+    }
+    .answer-row input[type=text]::placeholder {
+      font-family: 'Special Elite', monospace;
+      color: rgba(134,142,150,0.55);
+      font-size: 1.05rem;
+    }
+    .answer-row input[type=text]:focus {
+      background: color-mix(in srgb, var(--primary-accent) 6%, transparent);
+      border-left-color: var(--primary-accent);
+      box-shadow: inset 5px 0 0 color-mix(in srgb, var(--primary-accent) 24%, transparent) !important;
+    }
+    .answer-row input.typing-ok {
+      border-left-color: var(--green) !important;
+      background: rgba(107,201,78,0.06) !important;
+      box-shadow: inset 5px 0 0 rgba(107,201,78,0.22) !important;
+    }
+    .answer-row input.typing-bad {
+      border-left-color: var(--red) !important;
+      background: rgba(239,68,68,0.06) !important;
+      box-shadow: inset 5px 0 0 rgba(239,68,68,0.22) !important;
+    }
+    @media (max-width: 420px) {
+      .answer-form::before { left: 96px; }
+      .answer-sheet-head, .answer-row { grid-template-columns: 96px 1fr; }
+      .answer-sheet-head span, .answer-row input[type=text] { padding-left: 12px; padding-right: 12px; }
+      .ans-cat { font-size: 11px; padding: 10px 12px 10px 24px; }
+      .answer-row input[type=text] { font-size: 1.18rem; }
     }
 
     .typing-indicators { width: 100%; max-width: 480px; display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; min-height: 28px; }
@@ -489,6 +623,27 @@
       min-width: 38px; text-align: right; flex-shrink: 0;
     }
     .cat-player-pts.zero { color: var(--pencil); opacity: 0.4; }
+
+    .vote-btn {
+      border: 1.5px solid var(--pencil);
+      background: var(--paper-white);
+      color: var(--pencil);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .vote-btn:hover { border-color: var(--red); color: var(--red); transform: translateY(-1px); }
+    .vote-btn.active { background: color-mix(in srgb, var(--red) 12%, var(--paper-white)); border-color: var(--red); color: var(--red); }
+    .vote-btn.passed { background: var(--red); border-color: var(--red); color: white; }
+    .vote-count { opacity: 0.8; margin-left: 4px; }
+    .vote-note { font-size: 11px; font-weight: 800; color: var(--pencil); opacity: 0.55; white-space: nowrap; }
+
 
     .stamp {
       font-family: 'Special Elite', monospace; font-size: 10px;
@@ -697,10 +852,25 @@
     <div class="block-title">Mitspielen</div>
     <label class="field-label">Dein Name</label>
     <input type="text" id="input-name" placeholder="Wie heißt du?" maxlength="15" autocomplete="off"/>
-    <label class="field-label">Raum-Code</label>
-    <input type="text" id="input-room" placeholder="z.B. SPIELEN" maxlength="10" autocomplete="off"/>
+
+    <div class="join-mode-card">
+      <div class="join-mode-title">Neuen Raum erstellen</div>
+      <div class="join-mode-sub">Erzeugt automatisch einen kurzen Code für deine Mitspieler.</div>
+      <button type="button" class="btn" id="btn-create-room" onclick="window.createRoom()">Raum erstellen →</button>
+    </div>
+
+    <div class="join-mode-card">
+      <div class="join-mode-title">Bestehendem Raum beitreten</div>
+      <div class="join-mode-sub">Gib den Code ein, den dir der Spielleiter geschickt hat.</div>
+      <label class="field-label" style="margin-top:0">Raum-Code</label>
+      <div class="join-row">
+        <input type="text" id="input-room" placeholder="z.B. WOLKE7" maxlength="10" autocomplete="off"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();window.joinExistingRoom();}"/>
+        <button type="button" class="btn btn-outline btn-sm" id="btn-join-room" onclick="window.joinExistingRoom()">Beitreten</button>
+      </div>
+    </div>
+
     <div id="join-error" class="error-msg" style="display:none"></div>
-    <button type="button" class="btn" id="btn-connect" onclick="joinRoom()">Rein da →</button>
   </div>
 </div>
 
@@ -725,6 +895,9 @@
     <hr class="divider" style="margin:20px -28px;width:calc(100% + 56px)"/>
     <div class="field-label">Runden-Limit</div>
     <div id="lobby-rounds-area"></div>
+    <hr class="divider" style="margin:20px -28px;width:calc(100% + 56px)"/>
+    <div class="field-label">Auswertung</div>
+    <div id="lobby-validation-area"></div>
     <div id="lobby-host-area" style="margin-top:28px"></div>
   </div>
 </div>
@@ -759,7 +932,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, set, get, update, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBnmd0GcbVIFYT2aivcRpppt1h1_XX0XFY",
@@ -789,13 +962,16 @@ const ALL_LETTERS = "ABCDEFGHIKLMNOPRSTW".split("");
 const ROOM_EXPIRY_MS = 24*60*60*1000;
 const TIMER_PRESETS = [0,60,90,120,180];
 const ROUND_PRESETS = [0,3,5,8,10];
+const COLLECTING_MS = 3500; // Zeitfenster, damit nach STOPP/Timer alle Antworten gespeichert werden
 
 let myName="", myRoom="";
 let myId = "p_"+Math.random().toString(36).slice(2,10);
-let isHost=false, gameState=null, submitted=false;
+let isHost=false, gameState=null, submitted=false, submitting=false;
 let localAnswers={}, localBuzzerCountdown=null;
+let resultActionMap={};
 let heartbeatInterval=null, roomListener=null;
 let roundTimerInterval=null, roundTimerSecondsLeft=0;
+let collectingTimerInterval=null;
 let typingTimeout=null;
 let prevBuzzerValue=null;
 let syncedPhase=null; // tracks last rendered phase to detect real transitions
@@ -1045,7 +1221,6 @@ function applyAccent(hex){
   document.documentElement.style.setProperty("--primary-accent", hex);
   const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
   document.documentElement.style.setProperty("--margin", `rgba(${r},${g},${b},0.35)`);
-  document.documentElement.style.setProperty("--red", hex);
   document.documentElement.style.setProperty("--stamp", hex);
   document.documentElement.style.setProperty("--green", hex);
   localStorage.setItem("slf_accent", hex);
@@ -1128,62 +1303,156 @@ window.addEventListener("DOMContentLoaded",()=>{
   const savedAccent=localStorage.getItem("slf_accent");
   if(savedAccent) applyAccent(savedAccent);
   document.addEventListener("click", ()=>{ try{ getAudioCtx(); playLobbyMusic(); }catch(e){} }, {once:true});
+
+  const roomFromUrl=normalizeRoomCode(new URLSearchParams(location.search).get("room")||"");
   const n=sessionStorage.getItem("slf_name"),r=sessionStorage.getItem("slf_room"),i=sessionStorage.getItem("slf_id");
-  if(n&&r&&i){document.getElementById("input-name").value=n;document.getElementById("input-room").value=r;myId=i;window.joinRoom();}
+  const savedRoom=normalizeRoomCode(r||"");
+  const targetRoom=roomFromUrl||savedRoom;
+  if(targetRoom) document.getElementById("input-room").value=targetRoom;
+  if(n&&targetRoom&&i){
+    document.getElementById("input-name").value=n;
+    myId=i;
+    window.joinExistingRoom({auto:true});
+  }
 });
 
-// ─── JOIN ────────────────────────────────────────────────────────
-window.joinRoom=async function(){
+// ─── JOIN / CREATE ROOM ──────────────────────────────────────────
+const ROOM_WORDS=["WOLKE","TIGER","PAPYR","KAKTUS","WIESE","FUCHS","INSEL","PILOT","LAMPE","HONIG","KOMET","ANKER","FARBE","MOND","STIFT","KARTE","RADIO","ZEBRA","BIRKE","RIESE"];
+function normalizeRoomCode(s){return String(s||"").trim().toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,10);}
+function setJoinBusy(busy){
+  ["btn-create-room","btn-join-room"].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=busy;});
+}
+function clearJoinSession(){
+  ["slf_name","slf_room","slf_id","slf_local_answers"].forEach(k=>sessionStorage.removeItem(k));
+}
+function generateRoomCode(){
+  const word=ROOM_WORDS[Math.floor(Math.random()*ROOM_WORDS.length)];
+  const n=Math.floor(Math.random()*90)+10;
+  return normalizeRoomCode(word+n);
+}
+function initialRoomData(){
+  return {
+    host:myId, hostName:myName,
+    players:{[myId]:{name:myName,score:0,hb:Date.now()}},
+    cats:catsToObj(DEFAULT_CATS),
+    roundDuration:90,
+    roundLimit:0,
+    validationMode:"vote",
+    validationVotes:{},
+    usedLetters:[],
+    typingStatus:{},
+    allowBuzzer:true,
+    phase:"lobby", round:0, letter:"",
+    buzzer:null, buzzerTs:null, collectUntil:null,
+    roundAnswers:{}, rejections:{}, roundStartTs:null,
+    createdAt:Date.now()
+  };
+}
+function updateInviteUrl(room){
+  try{
+    const url=new URL(location.href);
+    url.searchParams.set("room",room);
+    history.replaceState(null,"",url);
+  }catch(e){}
+}
+function clearInviteUrl(){
+  try{
+    const url=new URL(location.href);
+    url.searchParams.delete("room");
+    history.replaceState(null,"",url);
+  }catch(e){}
+}
+async function finishRoomConnection(){
+  sessionStorage.setItem("slf_name",myName);
+  sessionStorage.setItem("slf_room",myRoom);
+  sessionStorage.setItem("slf_id",myId);
+  updateInviteUrl(myRoom);
+  startHeartbeat();
+  if(roomListener)roomListener();
+  prevBuzzerValue=null;
+  roomListener=onValue(roomRef(),snap=>{if(snap.exists())processStateUpdate(snap.val());});
+  setJoinBusy(false);
+  showError("");
+}
+
+window.createRoom=async function(){
   try { getAudioCtx(); } catch(e) {}
   myName=document.getElementById("input-name").value.trim();
-  myRoom=document.getElementById("input-room").value.trim().toUpperCase().replace(/[^A-Z0-9]/g,"");
+  if(!myName){showError("Bitte zuerst deinen Namen eingeben.");return;}
+  let connected=false;
+  setJoinBusy(true);
+  showError("Erstelle Raum…");
+  try{
+    for(let attempt=0;attempt<12;attempt++){
+      const code=generateRoomCode();
+      const snap=await get(ref(db,`rooms/${code}`));
+      let existing=snap.exists()?snap.val():null;
+      if(existing?.createdAt&&Date.now()-existing.createdAt>ROOM_EXPIRY_MS)existing=null;
+      if(existing)continue;
+      myRoom=code;
+      isHost=true;
+      document.getElementById("input-room").value=code;
+      await set(roomRef(),initialRoomData());
+      await finishRoomConnection();
+      connected=true;
+      return;
+    }
+    showError("Konnte keinen freien Raum-Code finden. Bitte nochmal versuchen.");
+  }catch(e){
+    showError("Fehler: "+e.message);
+  }finally{
+    if(!connected){
+      myRoom="";
+      isHost=false;
+      setJoinBusy(false);
+    }
+  }
+};
+
+window.joinExistingRoom=async function(opts={}){
+  try { getAudioCtx(); } catch(e) {}
+  myName=document.getElementById("input-name").value.trim();
+  myRoom=normalizeRoomCode(document.getElementById("input-room").value);
+  document.getElementById("input-room").value=myRoom;
   if(!myName||!myRoom){showError("Bitte Name und Raum-Code eingeben.");return;}
-  document.getElementById("btn-connect").disabled=true;
-  showError("Verbinde…");
+  setJoinBusy(true);
+  showError(opts.auto?"Verbinde erneut…":"Trete Raum bei…");
   try{
     const snap=await get(roomRef());
     let existing=snap.exists()?snap.val():null;
     if(existing?.createdAt&&Date.now()-existing.createdAt>ROOM_EXPIRY_MS)existing=null;
     if(!existing){
-      isHost=true;
-      await set(roomRef(),{
-        host:myId, hostName:myName,
-        players:{[myId]:{name:myName,score:0,hb:Date.now()}},
-        cats:catsToObj(DEFAULT_CATS),
-        roundDuration:90,
-        roundLimit:0,
-        usedLetters:[],
-        typingStatus:{},
-        allowBuzzer:true,
-        phase:"lobby", round:0, letter:"",
-        buzzer:null, buzzerTs:null,
-        roundAnswers:{}, rejections:{}, roundStartTs:null,
-        createdAt:Date.now()
-      });
-    }else{
-      isHost=existing.host===myId;
-      await updateRoomData({[`players/${myId}`]:{name:myName,score:existing.players?.[myId]?.score||0,hb:Date.now()}});
+      if(opts.auto){
+        clearJoinSession();
+        showError("Gespeicherter Raum existiert nicht mehr. Erstelle einen neuen Raum oder tritt einem bestehenden Raum bei.");
+      }else{
+        showError("Diesen Raum gibt es nicht. Prüfe den Code oder erstelle einen neuen Raum.");
+      }
+      setJoinBusy(false);
+      return;
     }
-    sessionStorage.setItem("slf_name",myName);
-    sessionStorage.setItem("slf_room",myRoom);
-    sessionStorage.setItem("slf_id",myId);
-    startHeartbeat();
-    if(roomListener)roomListener();
-    prevBuzzerValue=null;
-    roomListener=onValue(roomRef(),snap=>{if(snap.exists())processStateUpdate(snap.val());});
-  }catch(e){showError("Fehler: "+e.message);document.getElementById("btn-connect").disabled=false;}
+    isHost=existing.host===myId;
+    await updateRoomData({[`players/${myId}`]:{name:myName,score:Number(existing.players?.[myId]?.score)||0,hb:Date.now()}});
+    await finishRoomConnection();
+  }catch(e){
+    showError("Fehler: "+e.message);
+    setJoinBusy(false);
+  }
 };
+window.joinRoom=window.joinExistingRoom;
 
 window.leaveRoom=async function(){
   stopRoundTimer();
+  stopCollectingTimer();
   if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
   if(myRoom&&myId)try{await update(roomRef(),{[`typingStatus/${myId}`]:null});}catch(e){}
   if(myRoom&&myId)try{await update(roomRef(),{[`players/${myId}`]:null});}catch(e){}
-  sessionStorage.clear();
+  ["slf_name","slf_room","slf_id","slf_local_answers"].forEach(k=>sessionStorage.removeItem(k));
   if(heartbeatInterval)clearInterval(heartbeatInterval);
   if(roomListener)roomListener();
   myName="";myRoom="";gameState=null;prevBuzzerValue=null;
-  document.getElementById("btn-connect").disabled=false;
+  setJoinBusy(false);
+  clearInviteUrl();
   document.getElementById("join-error").style.display="none";
   showScreen("join");
 };
@@ -1217,17 +1486,23 @@ async function processStateUpdate(newState){
   if(gameState.phase==="playing" && prevPhase!=="playing"){
     const backup=sessionStorage.getItem("slf_local_answers");
     localAnswers=backup?JSON.parse(backup):{};
+    stopCollectingTimer();
     startRoundTimerClient();
     playSoundRoundStart();
     animateLetterShuffle(gameState.letter);
   }
+  if(gameState.phase==="collecting" && prevPhase!=="collecting"){
+    stopRoundTimer();
+    startCollectingTimerClient();
+  }
   if(gameState.phase!=="playing" && gameState.phase!=="collecting"){
     stopRoundTimer();
+    stopCollectingTimer();
   }
   if(gameState.buzzer && gameState.buzzer!==prevBuzzer){
     prevBuzzerValue=gameState.buzzer;
     playSoundBuzzer();
-    if(gameState.phase==="playing") triggerLocalBuzzerTicker();
+    if(gameState.phase==="playing"||gameState.phase==="collecting") triggerLocalBuzzerTicker();
   } else if(!gameState.buzzer){
     prevBuzzerValue=null;
   }
@@ -1248,10 +1523,15 @@ function syncUIWithPhase(){
     showScreen("playing");
     renderPlaying();
     if(p==="playing") playGameMusic();
-    if(p==="collecting"&&!submitted)submitAnswers();
+    if(p==="collecting"){
+      stopRoundTimer();
+      if(!submitted) submitAnswers();
+      if(isNewPhase || (isHost && !collectingTimerInterval)) startCollectingTimerClient();
+    }
     if(isHost)checkHostRoundEnd();
   } else if(p==="results"){
     stopRoundTimer();
+    stopCollectingTimer();
     if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
     showScreen("results");
     renderResults();
@@ -1263,8 +1543,10 @@ function syncUIWithPhase(){
 
 function resetRoundData(){
   submitted=false;
+  submitting=false;
   localAnswers={};
   stopRoundTimer();
+  stopCollectingTimer();
   sessionStorage.removeItem("slf_local_answers");
   if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
   localBuzzerCountdown=null;
@@ -1287,7 +1569,8 @@ function startRoundTimerClient(){
       stopRoundTimer();
       if(isHost){
         const c=(await get(roomRef())).val();
-        if(c?.phase==="playing"||c?.phase==="collecting") await forceRoundEnd(c);
+        if(c?.phase==="playing") await enterCollectingPhase();
+        else if(c?.phase==="collecting") await checkHostRoundEnd();
       } else if(!submitted) {
         window.submitAnswers();
       }
@@ -1298,7 +1581,45 @@ function stopRoundTimer(){
   if(roundTimerInterval){clearInterval(roundTimerInterval);roundTimerInterval=null;}
   const a=document.getElementById("timer-bar-area");if(a)a.innerHTML="";
 }
-function renderTimerBar(){
+async function enterCollectingPhase(extraPatch={}){
+  const now=Date.now();
+  await updateRoomData({
+    phase:"collecting",
+    collectUntil:now+COLLECTING_MS,
+    typingStatus:{},
+    ...extraPatch
+  });
+}
+function stopCollectingTimer(){
+  if(collectingTimerInterval){clearInterval(collectingTimerInterval);collectingTimerInterval=null;}
+}
+function activePlayerIds(state){
+  return Object.entries(state?.players||{})
+    .filter(([id,p])=>Date.now()-(p.hb||0)<25000)
+    .map(([id])=>id);
+}
+function startCollectingTimerClient(){
+  stopCollectingTimer();
+  if(!gameState||gameState.phase!=="collecting")return;
+  if(!submitted) window.submitAnswers();
+  if(!isHost)return;
+  const check=async()=>{
+    try{
+      const cur=(await get(roomRef())).val();
+      if(!cur||cur.phase!=="collecting"){stopCollectingTimer();return;}
+      const active=activePlayerIds(cur);
+      const allSubmitted=active.length>0&&active.every(id=>cur.roundAnswers?.[id]);
+      const timedOut=Date.now()>=(cur.collectUntil||0);
+      if(allSubmitted||timedOut){
+        stopCollectingTimer();
+        await forceRoundEnd(cur);
+      }
+    }catch(e){setConnStatus("err");}
+  };
+  check();
+  collectingTimerInterval=setInterval(check,400);
+}
+function renderTimerBar(){ 
   const a=document.getElementById("timer-bar-area");if(!a)return;
   const dur=gameState?.roundDuration||0;if(!dur){a.innerHTML="";return;}
   const pct=Math.min(100,Math.max(0,(roundTimerSecondsLeft/dur)*100));
@@ -1327,6 +1648,7 @@ function renderLobby(){
   const cats=objToCats(gameState.cats);
   const dur=gameState.roundDuration??90;
   const roundLimit=gameState.roundLimit??0;
+  const validationMode=gameState.validationMode||"host";
   const usedLetters=gameState.usedLetters||[];
   const available=ALL_LETTERS.filter(l=>!usedLetters.includes(l));
 
@@ -1335,7 +1657,7 @@ function renderLobby(){
     return`<div class="player-chip">
       <div class="online-dot" style="background:${online?"var(--green)":"transparent"}"></div>
       ${escHtml(p.name)}${id===gameState.host?" ★":""}
-      <span class="pts">${p.score||0}P</span>
+      <span class="pts">${safeNum(p.score)}P</span>
     </div>`;
   }).join("");
 
@@ -1354,12 +1676,12 @@ function renderLobby(){
     }
     document.getElementById("lobby-cats-list").innerHTML=cats.map((c,i)=>
       `<div class="cat-item">
-        <span>${c}</span>
+        <span>${escHtml(c)}</span>
         <button type="button" class="cat-remove" onclick="window.removeCat(${i})">✕</button>
       </div>`).join("");
     renderSuggestionChips(cats);
   }else{
-    catsArea.innerHTML=`<div class="cats-readonly">${cats.map(c=>`<div class="cat-tag">${c}</div>`).join("")}</div>`;
+    catsArea.innerHTML=`<div class="cats-readonly">${cats.map(c=>`<div class="cat-tag">${escHtml(c)}</div>`).join("")}</div>`;
   }
 
   const ta=document.getElementById("lobby-timer-area");
@@ -1401,6 +1723,23 @@ function renderLobby(){
     ra.innerHTML=`<div style="font-size:18px;color:var(--pencil);font-weight:600;">${lbl}</div>`;
   }
 
+
+  const va=document.getElementById("lobby-validation-area");
+  if(va){
+    if(isHost){
+      va.innerHTML=`
+        <div class="validation-presets">
+          <button type="button" class="validation-preset ${validationMode==="host"?"active":""}" onclick="window.setValidationMode('host')">Host entscheidet</button>
+          <button type="button" class="validation-preset ${validationMode==="vote"?"active":""}" onclick="window.setValidationMode('vote')">Alle stimmen ab</button>
+        </div>
+        <div style="font-size:12px;color:var(--pencil);margin-top:8px;font-family:'Nunito',sans-serif;font-weight:700;">
+          ${validationMode==="vote"?"Spieler können Antworten anzweifeln. Mehrheit streicht automatisch.":"Der Spielleiter streicht falsche Antworten."}
+        </div>`;
+    }else{
+      va.innerHTML=`<div style="font-size:18px;color:var(--pencil);font-weight:600;">${validationMode==="vote"?"Alle stimmen ab":"Host entscheidet"}</div>`;
+    }
+  }
+
   const leftCount=ALL_LETTERS.filter(l=>!(gameState.usedLetters||[]).includes(l)).length;
   document.getElementById("lobby-host-area").innerHTML=isHost
     ?`<button type="button" class="btn" onclick="window.startRound()" ${leftCount===0?"disabled":""}>
@@ -1412,14 +1751,20 @@ function renderLobby(){
     :`<div style="font-size:16px;color:var(--pencil);font-weight:600;"><span class="pulse-dot"></span>Warte auf den Spielleiter…</div>`;
 }
 
-window.setTimer=async function(s){await updateRoomData({roundDuration:s});};
+window.setTimer=async function(s){if(!isHost)return;await updateRoomData({roundDuration:s});};
 window.setCustomTimer=async function(){
+  if(!isHost)return;
   const v=parseInt(document.getElementById("timer-custom-input")?.value||"0",10);
   if(!v||v<10||v>600)return;
   await updateRoomData({roundDuration:v});
 };
-window.setRoundLimit=async function(r){await updateRoomData({roundLimit:r});};
+window.setRoundLimit=async function(r){if(!isHost)return;await updateRoomData({roundLimit:r});};
+window.setValidationMode=async function(mode){
+  if(!isHost||!["host","vote"].includes(mode))return;
+  await updateRoomData({validationMode:mode,validationVotes:{},rejections:{}});
+};
 window.resetLetters=async function(){
+  if(!isHost)return;
   await updateRoomData({usedLetters:[]});
 };
 let visibleSuggestions = [];
@@ -1467,6 +1812,7 @@ function renderSuggestionChips(currentCats){
   }));
 }
 window.addSuggestion=async function(s){
+  if(!isHost)return;
   const cats=objToCats(gameState.cats);
   if(cats.map(c=>c.toLowerCase()).includes(s.toLowerCase()))return;
   visibleSuggestions = visibleSuggestions.filter(v=>v!==s);
@@ -1476,6 +1822,7 @@ window.addSuggestion=async function(s){
   await updateRoomData({cats:catsToObj(cats)});
 };
 window.addCat=async function(){
+  if(!isHost)return;
   const i=document.getElementById("lobby-cat-input");if(!i)return;
   const v=i.value.trim();i.value="";if(!v)return;
   const cats=objToCats(gameState.cats);
@@ -1483,10 +1830,12 @@ window.addCat=async function(){
   cats.push(v);await updateRoomData({cats:catsToObj(cats)});
 };
 window.removeCat=async function(idx){
+  if(!isHost)return;
   const cats=objToCats(gameState.cats);if(cats.length<=1)return;
   cats.splice(idx,1);await updateRoomData({cats:catsToObj(cats)});
 };
 window.startRound=async function(){
+  if(!isHost)return;
   const usedLetters=gameState.usedLetters||[];
   const available=ALL_LETTERS.filter(l=>!usedLetters.includes(l));
   if(available.length===0)return;
@@ -1499,8 +1848,10 @@ window.startRound=async function(){
     usedLetters:newUsed,
     buzzer:null,
     buzzerTs:null,
+    collectUntil:null,
     roundAnswers:{},
     rejections:{},
+    validationVotes:{},
     roundStartTs:Date.now(),
     typingStatus:{}
   });
@@ -1549,7 +1900,10 @@ function renderPlaying(){
   const cEl=document.getElementById("playing-content");
 
   if(gameState.phase==="collecting"){
-    bEl.innerHTML=`<div class="buzzer-fired">⌛ Zeit läuft ab — Einsammeln!</div>`;
+    const msg=gameState.buzzer
+      ?`🔔 ${escHtml(gameState.buzzer)} hat STOPP gerufen — Einsammeln!`
+      :`⌛ Zeit läuft ab — Einsammeln!`;
+    bEl.innerHTML=`<div class="buzzer-fired">${msg}</div>`;
     if(submitted){cEl.innerHTML=renderWaiting(); bEl.innerHTML=""; return;}
   }
 
@@ -1568,24 +1922,27 @@ function renderPlaying(){
   if(!cEl.querySelector(".answer-form")){
     cEl.innerHTML=`
       <div class="answer-form">
-        ${cats.map(cat=>`
+        <div class="answer-sheet-head">
+          <span>Kategorie</span>
+          <span>Antwort · ${escHtml(gameState.letter)}</span>
+        </div>
+        ${cats.map((cat,i)=>`
           <div class="answer-row">
             <span class="ans-cat">${escHtml(cat)}</span>
-            <input type="text" id="ans-${sanitizeId(cat)}"
+            <input type="text" id="ans-${i}"
               placeholder="${gameState.letter}…"
               autocomplete="off"
               inputmode="text"
               autocapitalize="words"/>
           </div>`).join("")}
       </div>`;
-    cats.forEach(cat=>{
+    cats.forEach((cat,i)=>{
       if(localAnswers[cat]){
-        const e=document.getElementById(`ans-${sanitizeId(cat)}`);
+        const e=document.getElementById(`ans-${i}`);
         if(e)e.value=localAnswers[cat];
       }
     });
-    const firstId=`ans-${sanitizeId(cats[0])}`;
-    const firstEl=document.getElementById(firstId);
+    const firstEl=document.getElementById("ans-0");
     if(firstEl)setTimeout(()=>firstEl.focus(),100);
   }
 }
@@ -1606,36 +1963,57 @@ function renderWaiting(){
 }
 
 window.triggerBuzzer=async function(){
-  if(!gameState||gameState.buzzer)return;
-  const s=await get(ref(db,`rooms/${myRoom}/buzzer`));
-  if(s.val())return;
-  await updateRoomData({buzzer:myName,buzzerTs:Date.now()});
+  if(!gameState||gameState.buzzer||gameState.phase!=="playing")return;
+  const now=Date.now();
+  setConnStatus("sync");
+  try{
+    await runTransaction(roomRef(),cur=>{
+      if(!cur||cur.phase!=="playing"||cur.buzzer)return;
+      cur.buzzer=myName;
+      cur.buzzerTs=now;
+      cur.phase="collecting";
+      cur.collectUntil=now+COLLECTING_MS;
+      cur.typingStatus={};
+      return cur;
+    });
+    setConnStatus("ok");
+  }catch(e){
+    setConnStatus("err");
+  }
 };
 function triggerLocalBuzzerTicker(){
   if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
-  if(!submitted) window.submitAnswers();
-  if(isHost){
-    (async()=>{
-      const c=(await get(roomRef())).val();
-      if(c&&c.phase==="playing"){
-        await forceRoundEnd(c);
-      }
-    })();
+  if(!submitted&&!submitting) window.submitAnswers();
+  if(isHost&&gameState?.phase==="playing"){
+    enterCollectingPhase({
+      buzzer:gameState.buzzer||myName,
+      buzzerTs:gameState.buzzerTs||Date.now()
+    }).catch(()=>setConnStatus("err"));
   }
 }
 window.submitAnswers=async function(){
-  if(submitted)return;
+  if(submitted||submitting)return;
   const cats=objToCats(gameState?.cats);
   const ans={};
-  cats.forEach(cat=>{
-    const e=document.getElementById(`ans-${sanitizeId(cat)}`);
+  cats.forEach((cat,i)=>{
+    const e=document.getElementById(`ans-${i}`);
     const domVal=e?e.value.trim():"";
     ans[cat]=domVal||localAnswers[cat]||"";
   });
-  submitted=true;
-  try{await update(roomRef(),{[`typingStatus/${myId}`]:null});}catch(e){}
-  await updateRoomData({[`roundAnswers/${myId}`]:ans});
-  playSoundSubmit();
+  submitting=true;
+  try{
+    try{await update(roomRef(),{[`typingStatus/${myId}`]:null});}catch(e){}
+    await updateRoomData({[`roundAnswers/${myId}`]:ans});
+    submitted=true;
+    sessionStorage.removeItem("slf_local_answers");
+    playSoundSubmit();
+    renderPlaying();
+  }catch(e){
+    submitted=false;
+    setConnStatus("err");
+  }finally{
+    submitting=false;
+  }
 };
 
 // ─── HOST ROUND END ──────────────────────────────────────────────
@@ -1643,15 +2021,19 @@ async function checkHostRoundEnd(){
   if(!isHost)return;
   const cur=(await get(roomRef())).val();
   if(!cur||(cur.phase!=="playing"&&cur.phase!=="collecting"))return;
-  const active=Object.entries(cur.players||{})
-    .filter(([id,p])=>Date.now()-(p.hb||0)<25000)
-    .map(([id])=>id);
-  if(active.length>0&&active.every(id=>cur.roundAnswers?.[id]))await forceRoundEnd(cur);
+  const active=activePlayerIds(cur);
+  const allSubmitted=active.length>0&&active.every(id=>cur.roundAnswers?.[id]);
+  if(cur.phase==="collecting"){
+    if(allSubmitted||Date.now()>=(cur.collectUntil||0)) await forceRoundEnd(cur);
+  }else if(allSubmitted){
+    await forceRoundEnd(cur);
+  }
 }
 async function forceRoundEnd(cur){
   if(!cur||cur.phase==="results")return;
   calculateBaseScores(cur);
   cur.phase="results";
+  cur.collectUntil=null;
   cur.typingStatus={};
   setConnStatus("sync");await set(roomRef(),cur);setConnStatus("ok");
 }
@@ -1676,30 +2058,85 @@ function calculateBaseScores(state){
     });
   });
   pids.forEach(id=>{
-    state.players[id].score=(state.players[id].score||0)+roundScores[id];
+    state.players[id].score=safeNum(state.players[id].score)+roundScores[id];
   });
 }
+function resetScoresAndRecalculate(state){
+  Object.keys(state.players||{}).forEach(id=>{
+    state.players[id].score=state.preRoundScores?safeNum(state.preRoundScores[id]):0;
+  });
+  calculateBaseScores(state);
+}
+function eligibleVoterIds(state,answerPid){
+  return Object.keys(state.players||{}).filter(id=>id!==answerPid);
+}
+function voteThreshold(state,answerPid){
+  const n=eligibleVoterIds(state,answerPid).length;
+  return n>0?Math.floor(n/2)+1:Infinity;
+}
+function voteRejectCount(state,key,answerPid){
+  const votes=state.validationVotes?.[key]||{};
+  return eligibleVoterIds(state,answerPid).filter(id=>votes[id]).length;
+}
+function recomputeVoteRejections(state){
+  if((state.validationMode||"host")!=="vote")return;
+  const next={};
+  Object.keys(state.validationVotes||{}).forEach(key=>{
+    const sep=key.indexOf("__");
+    if(sep<0)return;
+    const answerPid=key.slice(0,sep);
+    const threshold=voteThreshold(state,answerPid);
+    if(Number.isFinite(threshold)&&voteRejectCount(state,key,answerPid)>=threshold){
+      next[key]=true;
+    }
+  });
+  state.rejections=next;
+}
+window.toggleAnswerStrikeByKey=function(actionKey){
+  const data=resultActionMap[actionKey];
+  if(data) window.toggleAnswerStrike(data.pid,data.cat);
+};
+window.toggleVoteByKey=function(actionKey){
+  const data=resultActionMap[actionKey];
+  if(data) window.toggleVote(data.pid,data.cat);
+};
 window.toggleAnswerStrike=async function(pid,cat){
-  if(!isHost||!gameState||gameState.phase!=="results")return;
+  if(!isHost||!gameState||gameState.phase!=="results"||(gameState.validationMode||"host")!=="host")return;
   const key=`${pid}__${cat}`;
   const cur=(await get(roomRef())).val();
-  if(!cur)return;
+  if(!cur||(cur.validationMode||"host")!=="host")return;
   if(!cur.rejections)cur.rejections={};
   if(cur.rejections[key]){
     delete cur.rejections[key];
   }else{
     cur.rejections[key]=true;
   }
-  if(cur.preRoundScores){
-    Object.keys(cur.players||{}).forEach(id=>{
-      cur.players[id].score=cur.preRoundScores[id]||0;
-    });
-    calculateBaseScores(cur);
-  } else {
-    Object.keys(cur.players||{}).forEach(id=>{cur.players[id].score=0;});
-    calculateBaseScores(cur);
-  }
+  resetScoresAndRecalculate(cur);
   await set(roomRef(),cur);
+};
+window.toggleVote=async function(pid,cat){
+  if(!gameState||gameState.phase!=="results"||(gameState.validationMode||"host")!=="vote"||pid===myId)return;
+  const key=`${pid}__${cat}`;
+  setConnStatus("sync");
+  try{
+    await runTransaction(roomRef(),cur=>{
+      if(!cur||cur.phase!=="results"||(cur.validationMode||"host")!=="vote")return;
+      if(!cur.players?.[myId]||!cur.players?.[pid]||pid===myId)return;
+      const word=(cur.roundAnswers?.[pid]?.[cat]||"").trim();
+      if(!word||!word.toLowerCase().startsWith(String(cur.letter||"").toLowerCase()))return;
+      if(!cur.validationVotes)cur.validationVotes={};
+      if(!cur.validationVotes[key])cur.validationVotes[key]={};
+      if(cur.validationVotes[key][myId]) delete cur.validationVotes[key][myId];
+      else cur.validationVotes[key][myId]=true;
+      if(Object.keys(cur.validationVotes[key]).length===0) delete cur.validationVotes[key];
+      recomputeVoteRejections(cur);
+      resetScoresAndRecalculate(cur);
+      return cur;
+    });
+    setConnStatus("ok");
+  }catch(e){
+    setConnStatus("err");
+  }
 };
 
 // ─── RESULTS ─────────────────────────────────────────────────────
@@ -1734,32 +2171,38 @@ function renderResults(){
   const isGameOver=roundLimit>0&&gameState.round>=roundLimit;
   const players=gameState.players||{};
   const pids=Object.keys(players);
+  const validationMode=gameState.validationMode||"host";
   const roundPts=calcRoundPoints(gameState);
+  resultActionMap={};
 
   document.getElementById("results-sub").textContent=`Runde ${gameState.round}${roundLimit>0?" / "+roundLimit:""} · Buchstabe ${gameState.letter}`;
 
   const goArea=document.getElementById("gameover-area");
   if(isGameOver&&goArea){
-    const sorted=Object.entries(players).sort((a,b)=>(b[1].score||0)-(a[1].score||0));
+    const sorted=Object.entries(players).sort((a,b)=>safeNum(b[1].score)-safeNum(a[1].score));
     const winner=sorted[0]?.[1]?.name||"?";
     goArea.innerHTML=`<div class="gameover-banner">
       <div class="gameover-title">🏆 Spiel vorbei!</div>
-      <div class="gameover-winner">Gewinner: ${escHtml(winner)} · ${sorted[0]?.[1]?.score||0} Punkte</div>
+      <div class="gameover-winner">Gewinner: ${escHtml(winner)} · ${safeNum(sorted[0]?.[1]?.score)} Punkte</div>
     </div>`;
   }else if(goArea){ goArea.innerHTML=""; }
 
   const banner=document.getElementById("validation-banner-area");
   if(banner){
-    banner.innerHTML=isHost
-      ?`<div class="val-banner"><div class="val-title">✍️ Du bist der Korrektor!</div><div class="val-sub">Klicke auf eine Antwort um sie zu streichen.</div></div>`
-      :`<div class="val-banner"><div class="val-title">👀 Notenbekanntgabe</div><div class="val-sub">Der Spielleiter prüft die Antworten.</div></div>`;
+    if(validationMode==="vote"){
+      banner.innerHTML=`<div class="val-banner"><div class="val-title">🗳️ Abstimmung</div><div class="val-sub">Zweifle fremde Antworten an. Sobald die Mehrheit der anderen Spieler zustimmt, wird gestrichen.</div></div>`;
+    }else{
+      banner.innerHTML=isHost
+        ?`<div class="val-banner"><div class="val-title">✍️ Du bist der Korrektor!</div><div class="val-sub">Klicke auf eine Antwort um sie zu streichen.</div></div>`
+        :`<div class="val-banner"><div class="val-title">👀 Notenbekanntgabe</div><div class="val-sub">Der Spielleiter prüft die Antworten.</div></div>`;
+    }
   }
 
-  const sorted=Object.entries(players).sort((a,b)=>(b[1].score||0)-(a[1].score||0));
+  const sorted=Object.entries(players).sort((a,b)=>safeNum(b[1].score)-safeNum(a[1].score));
   document.getElementById("scoreboard").innerHTML=sorted.map(([id,p],i)=>`
     <div class="score-row ${i===0?"gold":""}">
       <div class="score-name">${["①","②","③"][i]||"  "} ${escHtml(p.name)}</div>
-      <div class="score-pts">${p.score||0} Punkte</div>
+      <div class="score-pts">${safeNum(p.score)} Punkte</div>
     </div>`).join("");
 
   // Kategorie-Karten: Buchstabe vor Kategorienamen entfernt
@@ -1783,13 +2226,36 @@ function renderResults(){
       }
 
       const ptsHtml=`<span class="cat-player-pts ${pts===0?"zero":""}">${pts>0?"+"+pts+"P":pts===0&&word?"0P":""}</span>`;
-      const clickable=isHost&&word&&!wrongLetter?"host-clickable":"";
       const rejClass=isRejected?"rejected":"";
+      let clickable="", clickAttr="", voteHtml="";
+      const key=`${pid}__${cat}`;
 
-      return`<div class="cat-player-row ${clickable} ${rejClass}"
-        onclick="window.toggleAnswerStrike('${pid}','${escHtml(cat)}')">
+      if(validationMode==="host"){
+        clickable=isHost&&word&&!wrongLetter?"host-clickable":"";
+        if(clickable){
+          const actionKey=`a_${Object.keys(resultActionMap).length}`;
+          resultActionMap[actionKey]={pid,cat};
+          clickAttr=` onclick="window.toggleAnswerStrikeByKey('${actionKey}')"`;
+        }
+      }else if(validationMode==="vote"&&word&&!wrongLetter){
+        const threshold=voteThreshold(gameState,pid);
+        const rejectCount=voteRejectCount(gameState,key,pid);
+        const myVote=!!gameState.validationVotes?.[key]?.[myId];
+        if(pid===myId){
+          voteHtml=`<span class="vote-note">deine Antwort</span>`;
+        }else if(Number.isFinite(threshold)){
+          const actionKey=`a_${Object.keys(resultActionMap).length}`;
+          resultActionMap[actionKey]={pid,cat};
+          voteHtml=`<button type="button" class="vote-btn ${myVote?"active":""} ${isRejected?"passed":""}" onclick="window.toggleVoteByKey('${actionKey}')">
+            ${myVote?"Zurück":"Anzweifeln"}<span class="vote-count">${rejectCount}/${threshold}</span>
+          </button>`;
+        }
+      }
+
+      return`<div class="cat-player-row ${clickable} ${rejClass}"${clickAttr}>
         <span class="cat-player-name">${escHtml(players[pid]?.name||"?")}</span>
         ${wordHtml}
+        ${voteHtml}
         ${ptsHtml}
       </div>`;
     }).join("");
@@ -1805,11 +2271,11 @@ function renderResults(){
   if(isGameOver){
     document.getElementById("results-actions").innerHTML=isHost
       ?`<button type="button" class="btn" onclick="window.newGame()">Neues Spiel →</button>`
-      :`<button type="button" class="btn btn-outline" onclick="window.backToLobby()">← Zurück zur Lobby</button>`;
+      :`<button type="button" class="btn btn-outline" disabled>Warte auf Spielleiter…</button>`;
   }else{
     document.getElementById("results-actions").innerHTML=isHost
       ?`<button type="button" class="btn" onclick="window.nextRound()">Nächste Runde →</button>`
-      :`<button type="button" class="btn btn-outline" onclick="window.backToLobby()">← Zurück zur Lobby</button>`;
+      :`<button type="button" class="btn btn-outline" disabled>Warte auf Spielleiter…</button>`;
   }
 }
 
@@ -1819,19 +2285,21 @@ window.backToLobby=function(){
   renderLobby();
 };
 window.nextRound=async function(){
+  if(!isHost)return;
   const preRoundScores={};
-  Object.entries(gameState.players||{}).forEach(([id,p])=>{preRoundScores[id]=p.score||0;});
+  Object.entries(gameState.players||{}).forEach(([id,p])=>{preRoundScores[id]=safeNum(p.score);});
   resetRoundData();
   await updateRoomData({
     phase:"lobby",
-    buzzer:null,buzzerTs:null,
-    roundAnswers:{},rejections:{},
+    buzzer:null,buzzerTs:null,collectUntil:null,
+    roundAnswers:{},rejections:{},validationVotes:{},
     roundStartTs:null,
     preRoundScores,
     typingStatus:{}
   });
 };
 window.newGame=async function(){
+  if(!isHost)return;
   const playerReset={};
   Object.keys(gameState.players||{}).forEach(id=>{
     playerReset[`players/${id}/score`]=0;
@@ -1841,8 +2309,8 @@ window.newGame=async function(){
     ...playerReset,
     phase:"lobby",
     round:0,
-    buzzer:null,buzzerTs:null,
-    roundAnswers:{},rejections:{},
+    buzzer:null,buzzerTs:null,collectUntil:null,
+    roundAnswers:{},rejections:{},validationVotes:{},
     roundStartTs:null,
     usedLetters:[],
     preRoundScores:null,
@@ -1895,7 +2363,7 @@ document.addEventListener("keydown",e=>{
   if(e.key==="Enter"&&e.target.matches(".answer-row input")){
     e.preventDefault();
     const cats=objToCats(gameState?.cats||{});
-    const ids=cats.map(c=>`ans-${sanitizeId(c)}`);
+    const ids=cats.map((_,i)=>`ans-${i}`);
     const idx=ids.indexOf(e.target.id);
     if(idx>=0&&idx<ids.length-1){
       const next=document.getElementById(ids[idx+1]);
@@ -1906,7 +2374,8 @@ document.addEventListener("keydown",e=>{
 document.addEventListener("input",e=>{
   if(e.target.matches(".answer-row input")&&gameState?.cats){
     const cats=objToCats(gameState.cats);
-    const cat=cats.find(c=>`ans-${sanitizeId(c)}`===e.target.id);
+    const idx=Number(e.target.id.replace("ans-",""));
+    const cat=Number.isInteger(idx)?cats[idx]:null;
     if(cat){
       localAnswers[cat]=e.target.value;
       sessionStorage.setItem("slf_local_answers",JSON.stringify(localAnswers));
@@ -1935,9 +2404,18 @@ document.getElementById("input-room").addEventListener("input",e=>{
 });
 
 // ─── HELPERS ──────────────────────────────────────────────────────
+function safeNum(n){
+  const v=Number(n);
+  return Number.isFinite(v)?v:0;
+}
 function escHtml(s){
-  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  return String(s)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 }
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a11f0dfd685b606b',t:'MTc4MjUwNjcxNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
