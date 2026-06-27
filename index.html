@@ -297,6 +297,51 @@
       font-family: 'Nunito', sans-serif; font-weight: 800;
       font-size: 12px; color: var(--primary-accent); margin-left: 4px;
     }
+    .lobby-section { margin-top: 24px; }
+    .lobby-section-title {
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--pencil);
+      margin-bottom: 10px;
+    }
+    .lobby-summary-card {
+      margin-top: 24px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.55);
+    }
+    .lobby-summary-card + .lobby-summary-card { margin-top: 14px; }
+    .lobby-cats-line { display: flex; flex-wrap: wrap; gap: 8px; }
+    .lobby-meta-line { display: flex; flex-wrap: wrap; gap: 8px; }
+    .lobby-meta-pill {
+      background: var(--paper2);
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+    .lobby-editor {
+      margin-top: 18px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.7);
+    }
+    .lobby-editor-group + .lobby-editor-group { margin-top: 24px; }
+    .lobby-editor-title {
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--pencil);
+      margin-bottom: 10px;
+    }
+    .lobby-actions { margin-top: 24px; }
+    .lobby-actions .btn + .btn { margin-top: 10px; }
     .cat-suggestions {
       display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px;
     }
@@ -937,21 +982,13 @@
       <div class="the-code" id="display-roomcode">—</div>
       <span class="host-stamp" id="host-badge" style="display:none">HOST</span>
     </div>
-    <div class="field-label">Spieler</div>
-    <div class="players-list" id="players-list"></div>
-    <hr class="divider" style="margin:20px -28px;width:calc(100% + 56px)"/>
-    <div class="field-label">Kategorien</div>
-    <div id="lobby-cats-area"></div>
-    <hr class="divider" style="margin:20px -28px;width:calc(100% + 56px)"/>
-    <div class="field-label">Rundentimer</div>
-    <div id="lobby-timer-area"></div>
-    <hr class="divider" style="margin:20px -28px;width:calc(100% + 56px)"/>
-    <div class="field-label">Runden-Limit</div>
-    <div id="lobby-rounds-area"></div>
-    <hr class="divider" style="margin:20px -28px;width:calc(100% + 56px)"/>
-    <div class="field-label">Auswertung</div>
-    <div id="lobby-validation-area"></div>
-    <div id="lobby-host-area" style="margin-top:28px"></div>
+    <div class="lobby-section">
+      <div class="lobby-section-title">Spieler</div>
+      <div class="players-list" id="players-list"></div>
+    </div>
+    <div id="lobby-summary-area"></div>
+    <div id="lobby-editor-area"></div>
+    <div id="lobby-host-area" class="lobby-actions"></div>
   </div>
 </div>
 
@@ -1025,6 +1062,7 @@ let isHost=false, gameState=null, submitted=false, submitting=false;
 let localAnswers={}, localBuzzerCountdown=null;
 let liveSaveRunning=false, liveSaveQueued=false, finalFlushed=false, finalFlushPromise=null;
 let resultActionMap={};
+let lobbyEditorOpen=false;
 let heartbeatInterval=null, roomListener=null;
 let roundTimerInterval=null, roundTimerSecondsLeft=0;
 let collectingTimerInterval=null, stoppingTimerInterval=null;
@@ -1628,6 +1666,7 @@ function resetRoundData(){
   liveSaveQueued=false;
   liveSaveRunning=false;
   localAnswers={};
+  lobbyEditorOpen=false;
   stopRoundTimer();
   stopCollectingTimer();
   stopStoppingTimer();
@@ -1764,6 +1803,7 @@ function renderLobby(){
   document.getElementById("display-roomcode").textContent=myRoom;
   const hb=document.getElementById("host-badge");
   if(hb)hb.style.display=isHost?"block":"none";
+
   const now=Date.now();
   const cats=objToCats(gameState.cats);
   const dur=gameState.roundDuration??90;
@@ -1771,6 +1811,9 @@ function renderLobby(){
   const validationMode=gameState.validationMode||"host";
   const usedLetters=gameState.usedLetters||[];
   const available=ALL_LETTERS.filter(l=>!usedLetters.includes(l));
+  const timerLabel=dur===0?"Kein Timer":dur<60?`${dur}s`:`${Math.floor(dur/60)}:${String(dur%60).padStart(2,"0")} min`;
+  const roundsLabel=roundLimit===0?"∞ Runden":`${roundLimit} Runden`;
+  const validationLabel=validationMode==="vote"?"Abstimmung":"Host entscheidet";
 
   document.getElementById("players-list").innerHTML=Object.entries(gameState.players||{}).map(([id,p])=>{
     const online=now-(p.hb||0)<PLAYER_STALE_MS;
@@ -1781,92 +1824,101 @@ function renderLobby(){
     </div>`;
   }).join("");
 
-  const catsArea=document.getElementById("lobby-cats-area");
-  if(isHost){
-    if(!document.getElementById("lobby-cats-list")){
-      catsArea.innerHTML=`
-        <div id="lobby-cats-list"></div>
-        <div style="display:flex;gap:8px;margin-top:12px;align-items:flex-end">
-          <input type="text" id="lobby-cat-input" placeholder="Neue Kategorie…" maxlength="20"
-            onkeydown="if(event.key==='Enter'){event.preventDefault();window.addCat();}"/>
-          <button type="button" class="btn btn-outline btn-sm" onclick="window.addCat()">+ Add</button>
+  const summary=document.getElementById("lobby-summary-area");
+  if(summary){
+    summary.innerHTML=`
+      <div class="lobby-summary-card">
+        <div class="lobby-section-title">Kategorien</div>
+        <div class="lobby-cats-line">${cats.map(c=>`<div class="cat-tag">${escHtml(c)}</div>`).join("")}</div>
+      </div>
+      <div class="lobby-summary-card">
+        <div class="lobby-section-title">Spiel</div>
+        <div class="lobby-meta-line">
+          <span class="lobby-meta-pill">${timerLabel}</span>
+          <span class="lobby-meta-pill">${roundsLabel}</span>
+          <span class="lobby-meta-pill">${validationLabel}</span>
         </div>
-        <div class="suggestions-label">Vorschläge</div>
-        <div class="cat-suggestions" id="cat-suggestions-list"></div>`;
-    }
-    document.getElementById("lobby-cats-list").innerHTML=cats.map((c,i)=>
-      `<div class="cat-item">
-        <span>${escHtml(c)}</span>
-        <button type="button" class="cat-remove" onclick="window.removeCat(${i})">✕</button>
-      </div>`).join("");
-    renderSuggestionChips(cats);
-  }else{
-    catsArea.innerHTML=`<div class="cats-readonly">${cats.map(c=>`<div class="cat-tag">${escHtml(c)}</div>`).join("")}</div>`;
-  }
-
-  const ta=document.getElementById("lobby-timer-area");
-  if(isHost){
-    ta.innerHTML=`
-      <div class="timer-presets">
-        ${TIMER_PRESETS.map(t=>{
-          const lbl=t===0?"Kein":t<60?`${t}s`:`${t/60}min`;
-          return`<button type="button" class="timer-preset ${dur===t?"active":""}" onclick="window.setTimer(${t})">${lbl}</button>`;
-        }).join("")}
-      </div>
-      <div style="display:flex;gap:8px;align-items:flex-end;margin-top:10px">
-        <input type="number" id="timer-custom-input" min="10" max="600" placeholder="Eigene Sekunden…"
-          style="max-width:180px"
-          onkeydown="if(event.key==='Enter'){event.preventDefault();window.setCustomTimer();}"
-          value="${!TIMER_PRESETS.includes(dur)&&dur>0?dur:''}"/>
-        <button type="button" class="btn btn-outline btn-sm" onclick="window.setCustomTimer()">OK</button>
       </div>`;
-  }else{
-    const lbl=dur===0?"Kein Timer":dur<60?`${dur}s`:`${Math.floor(dur/60)}:${String(dur%60).padStart(2,"0")} min`;
-    ta.innerHTML=`<div style="font-size:18px;color:var(--pencil);font-weight:600;">${lbl}</div>`;
   }
 
-  const ra=document.getElementById("lobby-rounds-area");
-  if(isHost){
-    ra.innerHTML=`
-      <div class="round-presets">
-        ${ROUND_PRESETS.map(r=>{
-          const lbl=r===0?"∞":String(r);
-          return`<button type="button" class="round-preset ${roundLimit===r?"active":""}" onclick="window.setRoundLimit(${r})" title="${r===0?"Unbegrenzt":r+' Runden'}">${lbl}</button>`;
-        }).join("")}
-      </div>
-      <div style="font-size:12px;color:var(--pencil);margin-top:8px;font-family:'Nunito',sans-serif;font-weight:700;">
-        ${roundLimit===0?"Unbegrenzt viele Runden":roundLimit+" Runden insgesamt"}
-        · Noch ${available.length} Buchstaben verfügbar
-      </div>`;
-  }else{
-    const lbl=roundLimit===0?"Unbegrenzt":roundLimit+" Runden";
-    ra.innerHTML=`<div style="font-size:18px;color:var(--pencil);font-weight:600;">${lbl}</div>`;
-  }
-
-
-  const va=document.getElementById("lobby-validation-area");
-  if(va){
-    if(isHost){
-      va.innerHTML=`
-        <div class="validation-presets">
-          <button type="button" class="validation-preset ${validationMode==="host"?"active":""}" onclick="window.setValidationMode('host')">Host entscheidet</button>
-          <button type="button" class="validation-preset ${validationMode==="vote"?"active":""}" onclick="window.setValidationMode('vote')">Alle stimmen ab</button>
+  const editor=document.getElementById("lobby-editor-area");
+  if(editor){
+    if(isHost&&lobbyEditorOpen){
+      editor.innerHTML=`
+        <div class="lobby-editor">
+          <div class="lobby-editor-group">
+            <div class="lobby-editor-title">Kategorien</div>
+            <div id="lobby-cats-list"></div>
+            <div style="display:flex;gap:10px;margin-top:12px;align-items:stretch">
+              <input type="text" id="lobby-cat-input" placeholder="Neue Kategorie…" maxlength="20"
+                onkeydown="if(event.key==='Enter'){event.preventDefault();window.addCat();}"/>
+              <button type="button" class="btn btn-outline btn-sm" onclick="window.addCat()">+</button>
+            </div>
+            <div class="suggestions-label">Vorschläge</div>
+            <div class="cat-suggestions" id="cat-suggestions-list"></div>
+          </div>
+          <div class="lobby-editor-group">
+            <div class="lobby-editor-title">Timer</div>
+            <div class="timer-presets">
+              ${TIMER_PRESETS.map(t=>{
+                const lbl=t===0?"Kein":t<60?`${t}s`:`${t/60}min`;
+                return`<button type="button" class="timer-preset ${dur===t?"active":""}" onclick="window.setTimer(${t})">${lbl}</button>`;
+              }).join("")}
+            </div>
+            <div style="display:flex;gap:10px;align-items:stretch;margin-top:10px">
+              <input type="number" id="timer-custom-input" min="10" max="600" placeholder="Sekunden…"
+                style="max-width:160px"
+                onkeydown="if(event.key==='Enter'){event.preventDefault();window.setCustomTimer();}"
+                value="${!TIMER_PRESETS.includes(dur)&&dur>0?dur:''}"/>
+              <button type="button" class="btn btn-outline btn-sm" onclick="window.setCustomTimer()">OK</button>
+            </div>
+          </div>
+          <div class="lobby-editor-group">
+            <div class="lobby-editor-title">Runden</div>
+            <div class="round-presets">
+              ${ROUND_PRESETS.map(r=>{
+                const lbl=r===0?"∞":String(r);
+                return`<button type="button" class="round-preset ${roundLimit===r?"active":""}" onclick="window.setRoundLimit(${r})" title="${r===0?"Unbegrenzt":r+' Runden'}">${lbl}</button>`;
+              }).join("")}
+            </div>
+          </div>
+          <div class="lobby-editor-group">
+            <div class="lobby-editor-title">Auswertung</div>
+            <div class="validation-presets">
+              <button type="button" class="validation-preset ${validationMode==="host"?"active":""}" onclick="window.setValidationMode('host')">Host</button>
+              <button type="button" class="validation-preset ${validationMode==="vote"?"active":""}" onclick="window.setValidationMode('vote')">Abstimmung</button>
+            </div>
+          </div>
         </div>`;
+      document.getElementById("lobby-cats-list").innerHTML=cats.map((c,i)=>
+        `<div class="cat-item">
+          <span>${escHtml(c)}</span>
+          <button type="button" class="cat-remove" onclick="window.removeCat(${i})">✕</button>
+        </div>`).join("");
+      renderSuggestionChips(cats);
     }else{
-      va.innerHTML=`<div style="font-size:18px;color:var(--pencil);font-weight:600;">${validationMode==="vote"?"Alle stimmen ab":"Host entscheidet"}</div>`;
+      editor.innerHTML="";
     }
   }
 
-  const leftCount=ALL_LETTERS.filter(l=>!(gameState.usedLetters||[]).includes(l)).length;
+  const leftCount=available.length;
   document.getElementById("lobby-host-area").innerHTML=isHost
     ?`<button type="button" class="btn" onclick="window.startRound()" ${leftCount===0?"disabled":""}>
-        Runde starten → ${gameState.round>0?`(${gameState.round} gespielt)`:""}
+        Runde starten${gameState.round>0?` · ${gameState.round} gespielt`:""}
+      </button>
+      <button type="button" class="btn btn-outline" onclick="window.toggleLobbyEditor()">
+        ${lobbyEditorOpen?"Einstellungen schließen":"Einstellungen bearbeiten"}
       </button>
       ${leftCount===0?`<p class="hint" style="margin-top:8px">Alle Buchstaben gespielt.</p>`:``}
-      ${gameState.round>0?`<button type="button" class="btn btn-outline" style="margin-top:10px" onclick="window.resetLetters()">Buchstaben zurücksetzen</button>`:""}
-      `
-    :`<div style="font-size:16px;color:var(--pencil);font-weight:600;"><span class="pulse-dot"></span>Warte auf den Spielleiter…</div>`;
+      ${gameState.round>0?`<button type="button" class="btn btn-outline" onclick="window.resetLetters()">Buchstaben zurücksetzen</button>`:""}`
+    :`<div style="font-size:16px;color:var(--pencil);font-weight:700;"><span class="pulse-dot"></span>Warte auf den Host</div>`;
 }
+
+window.toggleLobbyEditor=function(){
+  if(!isHost)return;
+  lobbyEditorOpen=!lobbyEditorOpen;
+  renderLobby();
+};
 
 window.setTimer=async function(s){if(!isHost)return;await updateRoomData({roundDuration:s});};
 window.setCustomTimer=async function(){
@@ -2622,3 +2674,4 @@ function escHtml(s){
 </script>
 </body>
 </html>
+
