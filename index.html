@@ -497,6 +497,83 @@
     }
     .lobby-actions { margin-top: 24px; }
     .lobby-actions .btn + .btn { margin-top: 10px; }
+    .connect4-seats { display: grid; gap: 10px; margin-top: 24px; }
+    .connect4-seat {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.55);
+      padding: 12px 14px;
+      font-weight: 800;
+    }
+    .connect4-seat-left { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
+    .connect4-disc { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; }
+    .connect4-disc.red { background: #ef4444; }
+    .connect4-disc.yellow { background: #facc15; }
+    .connect4-seat-name { overflow-wrap: anywhere; }
+    .connect4-seat-role { color: var(--pencil); font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; }
+    .connect4-spectators { margin-top: 16px; }
+
+    .connect4-game {
+      width: 100%; max-width: 480px;
+      display: grid;
+      gap: 18px;
+    }
+    .connect4-status {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--paper-white);
+      padding: 16px;
+      text-align: center;
+      font-size: 1.05rem;
+      font-weight: 900;
+    }
+    .connect4-status-sub {
+      margin-top: 4px;
+      font-size: 13px;
+      color: var(--pencil);
+      font-weight: 800;
+    }
+    .connect4-board {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 7px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: color-mix(in srgb, var(--primary-accent) 15%, var(--paper-white));
+    }
+    .connect4-cell {
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: var(--paper-white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: default;
+    }
+    .connect4-cell.playable { cursor: pointer; }
+    .connect4-cell.playable:hover { background: color-mix(in srgb, var(--primary-accent) 18%, var(--paper-white)); }
+    .connect4-cell:disabled { opacity: 1; }
+    .connect4-cell.red { background: #ef4444; border-color: rgba(0,0,0,0.12); }
+    .connect4-cell.yellow { background: #facc15; border-color: rgba(0,0,0,0.12); }
+    .connect4-cell.win { outline: 3px solid var(--primary-accent); outline-offset: 2px; }
+    .connect4-legend {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .connect4-legend .connect4-seat { margin: 0; }
+    @media (max-width: 430px) {
+      .connect4-board { gap: 5px; padding: 10px; border-radius: 18px; }
+      .connect4-status { padding: 14px; }
+    }
+
     .cat-suggestions {
       display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px;
     }
@@ -986,6 +1063,69 @@
       background: color-mix(in srgb, var(--paper-white) 88%, transparent);
     }
 
+
+    .home-menu {
+      width: 100%; max-width: 480px;
+      display: grid;
+      gap: 14px;
+    }
+    .game-card-btn {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: color-mix(in srgb, var(--paper-white) 82%, transparent);
+      color: var(--ink);
+      padding: 18px;
+      cursor: pointer;
+      text-align: left;
+      font-family: 'Nunito', sans-serif;
+      display: grid;
+      grid-template-columns: 44px 1fr auto;
+      align-items: center;
+      gap: 14px;
+      transition: background 0.18s, border-color 0.18s, transform 0.18s;
+    }
+    .game-card-btn:hover {
+      background: var(--paper-white);
+      border-color: color-mix(in srgb, var(--primary-accent) 55%, var(--line));
+      transform: translateY(-1px);
+    }
+    .game-card-btn.disabled {
+      cursor: default;
+      opacity: 0.58;
+    }
+    .game-card-btn.disabled:hover {
+      transform: none;
+      background: color-mix(in srgb, var(--paper-white) 82%, transparent);
+      border-color: var(--line);
+    }
+    .game-card-icon {
+      width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 14px;
+      background: var(--paper2);
+      font-size: 22px;
+    }
+    .game-card-title { font-weight: 900; font-size: 1.08rem; margin-bottom: 2px; }
+    .game-card-sub { color: var(--pencil); font-size: 13px; font-weight: 700; line-height: 1.25; }
+    .game-card-status {
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--pencil);
+      white-space: nowrap;
+    }
+    .join-back-btn {
+      width: auto;
+      margin-top: 22px;
+      padding: 10px 0;
+      border: none;
+      background: transparent;
+      color: var(--pencil);
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
     /* ── Settings Modal ── */
     .settings-overlay {
       position: fixed; inset: 0; z-index: 300;
@@ -1148,13 +1288,38 @@
   </div>
 </div>
 
-<div id="screen-join" class="screen">
+<div id="screen-home" class="screen">
   <div class="game-header">
     <div class="tape-strip"></div>
     <div class="game-title">Stadt<span class="slash">/</span>Land<span class="slash">/</span>Fluss</div>
   </div>
+  <div class="home-menu">
+    <button type="button" class="game-card-btn" onclick="window.selectGame('slf')">
+      <span class="game-card-icon">✏️</span>
+      <span>
+        <span class="game-card-title">Stadt Land Fluss</span>
+        <span class="game-card-sub">Kategorien, Buchstaben und STOPP</span>
+      </span>
+      <span class="game-card-status">Spielen</span>
+    </button>
+    <button type="button" class="game-card-btn" onclick="window.selectGame('connect4')">
+      <span class="game-card-icon">🔴</span>
+      <span>
+        <span class="game-card-title">Vier gewinnt</span>
+        <span class="game-card-sub">2 Spieler · erste Lobby-Version</span>
+      </span>
+      <span class="game-card-status">Neu</span>
+    </button>
+  </div>
+</div>
+
+<div id="screen-join" class="screen hidden">
+  <div class="game-header">
+    <div class="tape-strip"></div>
+    <div class="game-title" id="join-game-title">Stadt<span class="slash">/</span>Land<span class="slash">/</span>Fluss</div>
+  </div>
   <div class="block">
-    <div class="block-title">Mitspielen</div>
+    <div class="block-title" id="join-block-title">Mitspielen</div>
     <label class="field-label">Dein Name</label>
     <input type="text" id="input-name" placeholder="Wie heißt du?" maxlength="15" autocomplete="off"/>
 
@@ -1171,6 +1336,7 @@
       </div>
     </div>
 
+    <button type="button" class="join-back-btn" onclick="window.backToHome()">← Spiele</button>
     <div id="join-error" class="error-msg" style="display:none"></div>
   </div>
 </div>
@@ -1238,6 +1404,22 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+
+const GAMES = {
+  slf: {
+    id:"slf",
+    name:"Stadt Land Fluss",
+    titleHtml:'Stadt<span class="slash">/</span>Land<span class="slash">/</span>Fluss',
+    enabled:true
+  },
+  connect4: {
+    id:"connect4",
+    name:"Vier gewinnt",
+    titleHtml:"Vier gewinnt",
+    enabled:true
+  }
+};
+let selectedGame="slf";
 
 const DEFAULT_CATS = ["Stadt","Land","Fluss","Tier","Beruf"];
 const CAT_SUGGESTIONS = [
@@ -1664,16 +1846,41 @@ function setConnStatus(s){
   l.textContent=s==="ok"?"Verbunden":s==="sync"?"Sync…":"Fehler";
 }
 function showScreen(id){
-  ["join","lobby","playing","results"].forEach(s=>
-    document.getElementById(`screen-${s}`).classList.toggle("hidden",s!==id));
-  document.getElementById("btn-leave").style.display=id==="join"?"none":"block";
+  ["home","join","lobby","playing","results"].forEach(s=>
+    document.getElementById(`screen-${s}`)?.classList.toggle("hidden",s!==id));
+  document.getElementById("btn-leave").style.display=(id==="home"||id==="join")?"none":"block";
   const hb=document.getElementById("host-badge");
   if(hb) hb.style.display=(id==="lobby"&&isHost)?"block":"none";
 }
 function showError(msg){
   const el=document.getElementById("join-error");
+  if(!el)return;
   el.textContent=msg; el.style.display=msg?"block":"none";
 }
+function updateJoinScreen(){
+  const game=GAMES[selectedGame]||GAMES.slf;
+  const title=document.getElementById("join-game-title");
+  const blockTitle=document.getElementById("join-block-title");
+  if(title) title.innerHTML=game.titleHtml;
+  if(blockTitle) blockTitle.textContent=game.enabled?"Mitspielen":game.name;
+  const disabled=!game.enabled;
+  ["btn-create-room","btn-join-room","input-room"].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.disabled=disabled;
+  });
+  showError(disabled?"Dieses Spiel ist noch nicht verfügbar.":"");
+}
+window.selectGame=function(gameId){
+  selectedGame=GAMES[gameId]?gameId:"slf";
+  updateJoinScreen();
+  showScreen("join");
+};
+window.backToHome=function(){
+  selectedGame="slf";
+  showError("");
+  updateJoinScreen();
+  showScreen("home");
+};
 function sanitizeId(s){return s.replace(/[^a-zA-Z0-9]/g,"_");}
 function catsToObj(a){return a.reduce((acc,c,i)=>({...acc,[String(i)]:c}),{});}
 function objToCats(o){
@@ -1695,15 +1902,25 @@ window.addEventListener("DOMContentLoaded",()=>{
   else applyAccent(theme.accent,{save:false});
   document.addEventListener("click", ()=>{ try{ getAudioCtx(); playLobbyMusic(); }catch(e){} }, {once:true});
 
+  updateJoinScreen();
   const roomFromUrl=normalizeRoomCode(new URLSearchParams(location.search).get("room")||"");
   const n=sessionStorage.getItem("slf_name"),r=sessionStorage.getItem("slf_room"),i=sessionStorage.getItem("slf_id");
   const savedRoom=normalizeRoomCode(r||"");
   const targetRoom=roomFromUrl||savedRoom;
   if(targetRoom) document.getElementById("input-room").value=targetRoom;
   if(n&&targetRoom&&i){
+    selectedGame="slf";
+    updateJoinScreen();
+    showScreen("join");
     document.getElementById("input-name").value=n;
     myId=i;
     window.joinExistingRoom({auto:true});
+  }else if(roomFromUrl){
+    selectedGame="slf";
+    updateJoinScreen();
+    showScreen("join");
+  }else{
+    showScreen("home");
   }
 });
 
@@ -1721,8 +1938,20 @@ function generateRoomCode(){
   const n=Math.floor(Math.random()*90)+10;
   return normalizeRoomCode(word+n);
 }
+function initialConnect4State(){
+  return {
+    board:Array(42).fill(null),
+    seats:{red:myId,yellow:null},
+    turn:"red",
+    winner:null,
+    winCells:[],
+    moveCount:0,
+    round:0
+  };
+}
 function initialRoomData(){
   return {
+    gameType:selectedGame,
     host:myId, hostName:myName,
     players:{[myId]:{name:myName,score:0,hb:Date.now()}},
     cats:catsToObj(DEFAULT_CATS),
@@ -1736,6 +1965,7 @@ function initialRoomData(){
     phase:"lobby", round:0, letter:"",
     buzzer:null, buzzerTs:null, collectUntil:null,
     roundAnswers:{}, liveAnswers:{}, finalAnswers:{}, rejections:{}, submittedStatus:{}, roundStartTs:null,
+    connect4:selectedGame==="connect4"?initialConnect4State():null,
     createdAt:Date.now()
   };
 }
@@ -1769,7 +1999,11 @@ async function finishRoomConnection(){
 window.createRoom=async function(){
   try { getAudioCtx(); } catch(e) {}
   myName=document.getElementById("input-name").value.trim();
-  if(!myName){showError("Bitte zuerst deinen Namen eingeben.");return;}
+  if(!myName){
+    const el=document.getElementById("join-error");
+    if(el){el.textContent="Bitte zuerst deinen Namen eingeben.";el.style.display="block";}
+    return;
+  }
   let connected=false;
   setJoinBusy(true);
   showError("Erstelle Raum…");
@@ -1822,8 +2056,22 @@ window.joinExistingRoom=async function(opts={}){
       setJoinBusy(false);
       return;
     }
+    const roomGame=existing.gameType||"slf";
+    if(!GAMES[roomGame]){
+      showError("Dieses Spiel wird von dieser Version nicht unterstützt.");
+      setJoinBusy(false);
+      return;
+    }
+    selectedGame=roomGame;
+    updateJoinScreen();
     isHost=existing.host===myId;
-    await updateRoomData({[`players/${myId}`]:{name:myName,score:Number(existing.players?.[myId]?.score)||0,hb:Date.now()}});
+    const patch={[`players/${myId}`]:{name:myName,score:Number(existing.players?.[myId]?.score)||0,hb:Date.now()}};
+    if(roomGame==="connect4"){
+      const seats=existing.connect4?.seats||{};
+      if(!seats.red) patch[`connect4/seats/red`]=existing.host||myId;
+      if(myId!==seats.red && !seats.yellow) patch[`connect4/seats/yellow`]=myId;
+    }
+    await updateRoomData(patch);
     await finishRoomConnection();
   }catch(e){
     showError("Fehler: "+e.message);
@@ -1845,7 +2093,9 @@ window.leaveRoom=async function(){
   setJoinBusy(false);
   clearInviteUrl();
   document.getElementById("join-error").style.display="none";
-  showScreen("join");
+  selectedGame="slf";
+  updateJoinScreen();
+  showScreen("home");
 };
 
 function startHeartbeat(){
@@ -1880,7 +2130,7 @@ async function processStateUpdate(newState){
       }
     }
   }
-  if(gameState.phase==="playing" && prevPhase!=="playing"){
+  if(gameState.phase==="playing" && prevPhase!=="playing" && gameState.gameType!=="connect4"){
     const backup=sessionStorage.getItem("slf_local_answers");
     const rk=String(gameState.round||0);
     const remoteAnswers=gameState.liveAnswers?.[rk]?.[myId]||gameState.roundAnswers?.[myId]||{};
@@ -1940,7 +2190,7 @@ function syncUIWithPhase(){
       flushFinalAnswersNow();
       if(isNewPhase || (isHost && !stoppingTimerInterval)) startStoppingTimerClient();
     }
-    if(isHost)checkHostRoundEnd();
+    if(isHost&&gameState.gameType!=="connect4")checkHostRoundEnd();
   } else if(p==="results"){
     stopRoundTimer();
     stopCollectingTimer();
@@ -2095,6 +2345,11 @@ function renderTimerBar(){
 
 // ─── LOBBY ───────────────────────────────────────────────────────
 function renderLobby(){
+  if(gameState?.gameType==="connect4") return renderConnect4Lobby();
+  return renderSlfLobby();
+}
+
+function renderSlfLobby(){
   if(!gameState)return;
   document.getElementById("display-roomcode").textContent=myRoom;
   const hb=document.getElementById("host-badge");
@@ -2216,6 +2471,83 @@ window.toggleLobbyEditor=function(){
   renderLobby();
 };
 
+function connect4PlayerName(id){
+  return id?(gameState.players?.[id]?.name||"?"):"Wartet";
+}
+function renderConnect4Lobby(){
+  if(!gameState)return;
+  document.getElementById("display-roomcode").textContent=myRoom;
+  const hb=document.getElementById("host-badge");
+  if(hb)hb.style.display=isHost?"block":"none";
+  const now=Date.now();
+  const players=gameState.players||{};
+  const c4=gameState.connect4||initialConnect4State();
+  const seats=c4.seats||{};
+  const redId=seats.red||gameState.host;
+  const yellowId=seats.yellow||null;
+  const spectatorIds=Object.keys(players).filter(id=>id!==redId&&id!==yellowId);
+
+  document.getElementById("players-list").innerHTML=Object.entries(players).map(([id,p])=>{
+    const online=now-(p.hb||0)<PLAYER_STALE_MS;
+    const role=id===redId?"Rot":id===yellowId?"Gelb":"Zuschauer";
+    return`<div class="player-chip">
+      <div class="online-dot" style="background:${online?"var(--green)":"transparent"}"></div>
+      ${escHtml(p.name)}${id===gameState.host?" ★":""}
+      <span class="pts">${role}</span>
+    </div>`;
+  }).join("");
+
+  const summary=document.getElementById("lobby-summary-area");
+  if(summary){
+    summary.innerHTML=`
+      <div class="connect4-seats">
+        <div class="connect4-seat">
+          <span class="connect4-seat-left"><span class="connect4-disc red"></span><span class="connect4-seat-name">${escHtml(connect4PlayerName(redId))}</span></span>
+          <span class="connect4-seat-role">Rot</span>
+        </div>
+        <div class="connect4-seat">
+          <span class="connect4-seat-left"><span class="connect4-disc yellow"></span><span class="connect4-seat-name">${escHtml(connect4PlayerName(yellowId))}</span></span>
+          <span class="connect4-seat-role">Gelb</span>
+        </div>
+      </div>
+      ${spectatorIds.length?`<div class="connect4-spectators"><div class="lobby-section-title">Zuschauer</div><div class="lobby-cats-line">${spectatorIds.map(id=>`<div class="cat-tag">${escHtml(players[id]?.name||"?")}</div>`).join("")}</div></div>`:""}`;
+  }
+  const editor=document.getElementById("lobby-editor-area");
+  if(editor) editor.innerHTML="";
+  const canStart=!!redId&&!!yellowId;
+  document.getElementById("lobby-host-area").innerHTML=isHost
+    ?`<button type="button" class="btn" ${canStart?"":"disabled"} onclick="window.startConnect4Game()">
+        ${canStart?"Spiel starten":"Warte auf zweiten Spieler"}
+      </button>`
+    :`<div style="font-size:16px;color:var(--pencil);font-weight:700;"><span class="pulse-dot"></span>Warte auf den Host</div>`;
+}
+window.startConnect4Game=async function(){
+  if(!isHost||!gameState||gameState.gameType!=="connect4")return;
+  setConnStatus("sync");
+  try{
+    await runTransaction(roomRef(),cur=>{
+      if(!cur||cur.gameType!=="connect4"||cur.phase!=="lobby")return;
+      const seats=cur.connect4?.seats||{};
+      if(!seats.red||!seats.yellow)return;
+      cur.connect4={
+        ...(cur.connect4||{}),
+        board:Array(42).fill(null),
+        seats,
+        turn:"red",
+        winner:null,
+        winCells:[],
+        moveCount:0,
+        round:(cur.connect4?.round||0)+1
+      };
+      cur.phase="playing";
+      return cur;
+    });
+    setConnStatus("ok");
+  }catch(e){
+    setConnStatus("err");
+  }
+};
+
 window.setTimer=async function(s){if(!isHost)return;await updateRoomData({roundDuration:s});};
 window.setCustomTimer=async function(){
   if(!isHost)return;
@@ -2327,7 +2659,130 @@ window.startRound=async function(){
 
 // ─── PLAYING ─────────────────────────────────────────────────────
 function renderPlaying(){
+  if(gameState?.gameType==="connect4") return renderConnect4Playing();
+  return renderSlfPlaying();
+}
+function connect4RoleFor(state,playerId){
+  const seats=state?.connect4?.seats||{};
+  if(playerId===seats.red)return"red";
+  if(playerId===seats.yellow)return"yellow";
+  return null;
+}
+function connect4ColumnFull(board,col){
+  return !!board[col];
+}
+function connect4DropRow(board,col){
+  for(let r=5;r>=0;r--){
+    const idx=r*7+col;
+    if(!board[idx])return r;
+  }
+  return -1;
+}
+function connect4CheckWin(board,row,col,token){
+  const dirs=[[0,1],[1,0],[1,1],[1,-1]];
+  for(const [dr,dc] of dirs){
+    const cells=[[row,col]];
+    for(const sign of [-1,1]){
+      let r=row+dr*sign,c=col+dc*sign;
+      while(r>=0&&r<6&&c>=0&&c<7&&board[r*7+c]===token){
+        cells.push([r,c]);
+        r+=dr*sign; c+=dc*sign;
+      }
+    }
+    if(cells.length>=4){
+      return cells.slice(0,4).map(([r,c])=>r*7+c);
+    }
+  }
+  return [];
+}
+function connect4BoardFull(board){
+  return board.every(Boolean);
+}
+function renderConnect4Playing(){
   if(!gameState)return;
+  stopRoundTimer();
+  const letterStage=document.querySelector(".letter-stage");
+  if(letterStage) letterStage.style.display="none";
+  const tiEl=document.getElementById("typing-indicators-area");
+  if(tiEl) tiEl.innerHTML="";
+  const bEl=document.getElementById("buzzer-container");
+  if(bEl) bEl.innerHTML="";
+  const cEl=document.getElementById("playing-content");
+  if(!cEl)return;
+  const c4=gameState.connect4||initialConnect4State();
+  const seats=c4.seats||{};
+  const redName=connect4PlayerName(seats.red);
+  const yellowName=connect4PlayerName(seats.yellow);
+  const turnId=seats[c4.turn]||null;
+  const turnName=connect4PlayerName(turnId);
+  const myRoleKey=connect4RoleFor(gameState,myId);
+  const myRole=myRoleKey==="red"?"Rot":myRoleKey==="yellow"?"Gelb":"Zuschauer";
+  const board=c4.board||Array(42).fill(null);
+  const isMyTurn=myRoleKey&&c4.turn===myRoleKey&&!c4.winner;
+  const statusText=isMyTurn?"Du bist dran":`${turnName} ist dran`;
+  cEl.innerHTML=`
+    <div class="connect4-game">
+      <div class="connect4-status">
+        ${escHtml(statusText)}
+        <div class="connect4-status-sub">Du bist ${myRole}</div>
+      </div>
+      <div class="connect4-legend">
+        <div class="connect4-seat"><span class="connect4-seat-left"><span class="connect4-disc red"></span><span class="connect4-seat-name">${escHtml(redName)}</span></span><span class="connect4-seat-role">Rot</span></div>
+        <div class="connect4-seat"><span class="connect4-seat-left"><span class="connect4-disc yellow"></span><span class="connect4-seat-name">${escHtml(yellowName)}</span></span><span class="connect4-seat-role">Gelb</span></div>
+      </div>
+      <div class="connect4-board" aria-label="Vier gewinnt Spielbrett">
+        ${board.map((cell,i)=>{
+          const col=i%7;
+          const playable=isMyTurn&&!connect4ColumnFull(board,col);
+          const win=(c4.winCells||[]).includes(i)?"win":"";
+          return`<button type="button" class="connect4-cell ${cell||""} ${playable?"playable":""} ${win}" data-cell="${i}" aria-label="Spalte ${col+1}" ${playable?`onclick="window.makeConnect4Move(${col})"`:"disabled"}></button>`;
+        }).join("")}
+      </div>
+    </div>`;
+}
+window.makeConnect4Move=async function(col){
+  col=Number(col);
+  if(!Number.isInteger(col)||col<0||col>6)return;
+  if(!gameState||gameState.gameType!=="connect4"||gameState.phase!=="playing")return;
+  setConnStatus("sync");
+  try{
+    await runTransaction(roomRef(),cur=>{
+      if(!cur||cur.gameType!=="connect4"||cur.phase!=="playing")return;
+      const role=connect4RoleFor(cur,myId);
+      const c4=cur.connect4||{};
+      if(!role||c4.turn!==role||c4.winner)return;
+      const board=Array.isArray(c4.board)?[...c4.board]:Array(42).fill(null);
+      const row=connect4DropRow(board,col);
+      if(row<0)return;
+      board[row*7+col]=role;
+      const winCells=connect4CheckWin(board,row,col,role);
+      const isDraw=!winCells.length&&connect4BoardFull(board);
+      cur.connect4={
+        ...c4,
+        board,
+        turn:winCells.length||isDraw?role:(role==="red"?"yellow":"red"),
+        winner:winCells.length?role:(isDraw?"draw":null),
+        winCells,
+        moveCount:(c4.moveCount||0)+1
+      };
+      if(winCells.length){
+        const winnerId=c4.seats?.[role];
+        if(winnerId&&cur.players?.[winnerId]) cur.players[winnerId].score=safeNum(cur.players[winnerId].score)+1;
+        cur.phase="results";
+      }else if(isDraw){
+        cur.phase="results";
+      }
+      return cur;
+    });
+    setConnStatus("ok");
+  }catch(e){
+    setConnStatus("err");
+  }
+};
+function renderSlfPlaying(){
+  if(!gameState)return;
+  const letterStage=document.querySelector(".letter-stage");
+  if(letterStage) letterStage.style.display="";
   const cats=objToCats(gameState.cats);
   const usedLetters=gameState.usedLetters||[];
   const roundLimit=gameState.roundLimit||0;
@@ -2721,6 +3176,45 @@ function calcRoundPoints(state){
 }
 
 function renderResults(){
+  if(gameState?.gameType==="connect4") return renderConnect4Results();
+  return renderSlfResults();
+}
+function renderConnect4Results(){
+  if(!gameState)return;
+  const c4=gameState.connect4||initialConnect4State();
+  const seats=c4.seats||{};
+  const players=gameState.players||{};
+  const redName=connect4PlayerName(seats.red);
+  const yellowName=connect4PlayerName(seats.yellow);
+  const winnerName=c4.winner==="draw"?"Unentschieden":connect4PlayerName(seats[c4.winner]);
+  document.getElementById("results-sub").textContent=`Vier gewinnt · Runde ${c4.round||1}`;
+  const goArea=document.getElementById("gameover-area");
+  if(goArea){
+    goArea.innerHTML=c4.winner==="draw"
+      ?`<div class="gameover-banner"><div class="gameover-title">Unentschieden</div></div>`
+      :`<div class="gameover-banner"><div class="gameover-title">🏆 ${escHtml(winnerName)} gewinnt!</div><div class="gameover-winner">+1 Punkt</div></div>`;
+  }
+  const banner=document.getElementById("validation-banner-area"); if(banner) banner.innerHTML="";
+  const board=c4.board||Array(42).fill(null);
+  document.getElementById("scoreboard").innerHTML=[
+    [seats.red,redName,"Rot"],[seats.yellow,yellowName,"Gelb"]
+  ].filter(([id])=>id).map(([id,name,role],i)=>`
+    <div class="score-row ${c4.winner!=="draw"&&id===seats[c4.winner]?"gold":""}">
+      <div class="score-name">${role==="Rot"?"🔴":"🟡"} ${escHtml(name)}</div>
+      <div class="score-pts">${safeNum(players[id]?.score)} Siege</div>
+    </div>`).join("");
+  document.getElementById("results-container").innerHTML=`
+    <div class="connect4-game">
+      <div class="connect4-board" aria-label="Vier gewinnt Endstand">
+        ${board.map((cell,i)=>`<div class="connect4-cell ${cell||""} ${(c4.winCells||[]).includes(i)?"win":""}"></div>`).join("")}
+      </div>
+    </div>`;
+  document.getElementById("results-actions").innerHTML=isHost
+    ?`<button type="button" class="btn" onclick="window.resetConnect4Game()">Nochmal spielen →</button>
+      <button type="button" class="btn btn-outline" onclick="window.connect4BackToLobby()">Zur Lobby</button>`
+    :`<button type="button" class="btn btn-outline" disabled>Warte auf den Host…</button>`;
+}
+function renderSlfResults(){
   if(!gameState)return;
   const cats=objToCats(gameState.cats);
   const rejections=gameState.rejections||{};
@@ -2834,6 +3328,37 @@ function renderResults(){
   }
 }
 
+window.resetConnect4Game=async function(){
+  if(!isHost||!gameState||gameState.gameType!=="connect4")return;
+  const c4=gameState.connect4||initialConnect4State();
+  await updateRoomData({
+    phase:"playing",
+    connect4:{
+      ...c4,
+      board:Array(42).fill(null),
+      turn:"red",
+      winner:null,
+      winCells:[],
+      moveCount:0,
+      round:(c4.round||0)+1
+    }
+  });
+};
+window.connect4BackToLobby=async function(){
+  if(!isHost||!gameState||gameState.gameType!=="connect4")return;
+  const c4=gameState.connect4||initialConnect4State();
+  await updateRoomData({
+    phase:"lobby",
+    connect4:{
+      ...c4,
+      board:Array(42).fill(null),
+      turn:"red",
+      winner:null,
+      winCells:[],
+      moveCount:0
+    }
+  });
+};
 window.backToLobby=function(){
   resetRoundData();
   showScreen("lobby");
@@ -2973,5 +3498,5 @@ function escHtml(s){
     .replace(/'/g,"&#039;");
 }
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1767d009d22d933',t:'MTc4MzQyMzUyMw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
