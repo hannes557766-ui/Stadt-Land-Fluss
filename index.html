@@ -510,9 +510,131 @@
     .connect4-disc { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; }
     .connect4-disc.red { background: #ef4444; }
     .connect4-disc.yellow { background: #facc15; }
+    .connect4-disc.sea { background: #3bb6d8; }
+    .connect4-disc.navy { background: #1f3a8a; }
     .connect4-seat-name { overflow-wrap: anywhere; }
     .connect4-seat-role { color: var(--pencil); font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; }
+    .seat-action {
+      border: none;
+      border-radius: 999px;
+      background: var(--paper2);
+      color: var(--ink);
+      padding: 6px 10px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .seat-action:hover { background: color-mix(in srgb, var(--primary-accent) 20%, var(--paper2)); }
     .connect4-spectators { margin-top: 16px; }
+
+
+    .battleship-game {
+      width: 100%; max-width: 480px;
+      display: grid;
+      gap: 16px;
+    }
+    .battleship-panel {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--paper-white);
+      padding: 16px;
+    }
+    .battleship-title {
+      font-size: 1.15rem;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+    .battleship-sub {
+      color: var(--pencil);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .battleship-toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .battleship-toolbar .btn { margin-top: 0; width: auto; flex: 1; min-width: 130px; }
+    .battleship-board {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 20px repeat(10, 1fr);
+      gap: 3px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--blue) 10%, var(--paper-white));
+    }
+    .battleship-coord {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--pencil);
+      font-size: 10px;
+      font-weight: 900;
+      line-height: 1;
+      user-select: none;
+    }
+    .battleship-cell {
+      aspect-ratio: 1 / 1;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--paper-white);
+      padding: 0;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+    .battleship-board.placing { touch-action: none; }
+    .battleship-cell.ship { background: color-mix(in srgb, var(--primary-accent) 24%, var(--paper-white)); border-color: color-mix(in srgb, var(--primary-accent) 70%, var(--line)); }
+    .battleship-cell.ship::after { content: '🚢'; font-size: clamp(9px, 2.6vw, 16px); line-height: 1; }
+    .battleship-cell.preview-valid { background: color-mix(in srgb, var(--primary-accent) 36%, var(--paper-white)); border-color: var(--primary-accent); }
+    .battleship-cell.preview-invalid { background: color-mix(in srgb, var(--red) 18%, var(--paper-white)); border-color: var(--red); }
+    .battleship-cell.hit { background: var(--red); border-color: rgba(0,0,0,0.14); animation: battleHit 0.28s ease-out; }
+    .battleship-cell.sunk { background: #7f1d1d; border-color: #450a0a; outline: 2px solid var(--red); outline-offset: 1px; animation: battleHit 0.28s ease-out; }
+    .battleship-cell.miss { background: color-mix(in srgb, var(--blue) 18%, var(--paper-white)); position: relative; animation: battleMiss 0.22s ease-out; }
+    .battleship-cell.miss::after {
+      content: '';
+      width: 34%; height: 34%;
+      border-radius: 50%;
+      background: var(--blue);
+      opacity: 0.55;
+    }
+    .battleship-cell.target { cursor: pointer; }
+    .battleship-cell.target:hover { background: color-mix(in srgb, var(--blue) 14%, var(--paper-white)); }
+    .battleship-cell:disabled { cursor: default; opacity: 1; }
+    @keyframes battleHit { from { transform: scale(0.72); } to { transform: scale(1); } }
+    @keyframes battleMiss { from { transform: scale(0.82); opacity: 0.65; } to { transform: scale(1); opacity: 1; } }
+    .battleship-board-wrap { display: grid; gap: 8px; }
+    .battleship-board-title {
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--pencil);
+    }
+    .battleship-board.own { background: color-mix(in srgb, var(--primary-accent) 8%, var(--paper-white)); }
+    .battleship-board.enemy { background: color-mix(in srgb, var(--blue) 10%, var(--paper-white)); }
+    .battleship-ships { display: flex; flex-wrap: wrap; gap: 8px; }
+    .battleship-ship-pill {
+      background: var(--paper2);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 7px 11px;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .battleship-ship-pill.done { background: var(--primary-accent); color: var(--accent-text); }
+    .battleship-warning { color: var(--red); font-size: 13px; font-weight: 800; min-height: 18px; }
+    @media (max-width: 430px) {
+      .battleship-board { grid-template-columns: 16px repeat(10, 1fr); gap: 2px; padding: 6px; }
+      .battleship-coord { font-size: 9px; }
+      .battleship-cell { border-radius: 5px; }
+    }
 
     .connect4-game {
       width: 100%; max-width: 480px;
@@ -562,13 +684,20 @@
     .connect4-cell:disabled { opacity: 1; }
     .connect4-cell.red { background: #ef4444; border-color: rgba(0,0,0,0.12); }
     .connect4-cell.yellow { background: #facc15; border-color: rgba(0,0,0,0.12); }
+    .connect4-cell.last.red, .connect4-cell.last.yellow { animation: connectDrop 0.28s ease-out; }
     .connect4-cell.win { outline: 3px solid var(--primary-accent); outline-offset: 2px; }
+    @keyframes connectDrop { from { transform: translateY(-26px) scale(0.88); } to { transform: translateY(0) scale(1); } }
     .connect4-legend {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
     .connect4-legend .connect4-seat { margin: 0; }
+    .connect4-actions {
+      display: grid;
+      gap: 10px;
+    }
+    .connect4-actions .btn { margin-top: 0; }
     @media (max-width: 430px) {
       .connect4-board { gap: 5px; padding: 10px; border-radius: 18px; }
       .connect4-status { padding: 14px; }
@@ -1306,7 +1435,15 @@
       <span class="game-card-icon">🔴</span>
       <span>
         <span class="game-card-title">Vier gewinnt</span>
-        <span class="game-card-sub">2 Spieler · erste Lobby-Version</span>
+        <span class="game-card-sub">2 Spieler · Taktik im Raster</span>
+      </span>
+      <span class="game-card-status">Spielen</span>
+    </button>
+    <button type="button" class="game-card-btn" onclick="window.selectGame('battleship')">
+      <span class="game-card-icon">🚢</span>
+      <span>
+        <span class="game-card-title">Schiffe versenken</span>
+        <span class="game-card-sub">2 Spieler · Flotten platzieren</span>
       </span>
       <span class="game-card-status">Neu</span>
     </button>
@@ -1417,6 +1554,12 @@ const GAMES = {
     name:"Vier gewinnt",
     titleHtml:"Vier gewinnt",
     enabled:true
+  },
+  battleship: {
+    id:"battleship",
+    name:"Schiffe versenken",
+    titleHtml:"Schiffe versenken",
+    enabled:true
   }
 };
 let selectedGame="slf";
@@ -1434,6 +1577,7 @@ const CAT_SUGGESTIONS = [
 ];
 
 const ALL_LETTERS = "ABCDEFGHIKLMNOPRSTW".split("");
+const BATTLESHIP_SHIPS = [5,4,3,3,2];
 const ROOM_EXPIRY_MS = 24*60*60*1000;
 const PLAYER_STALE_MS = 90*1000; // Spieler bleiben sichtbar; nur Online-Status/aktive Runden nutzen diesen Timeout
 const TIMER_PRESETS = [0,60,90,120,180];
@@ -1448,6 +1592,8 @@ let localAnswers={}, localBuzzerCountdown=null;
 let liveSaveRunning=false, liveSaveQueued=false, finalFlushed=false, finalFlushPromise=null;
 let resultActionMap={};
 let lobbyEditorOpen=false;
+let battleshipLocalRound=null, battleshipPlacedShips=[], battleshipOrientation="h";
+let battleshipDragging=false, battleshipDragCell=null, battleshipSuppressClickUntil=0;
 let heartbeatInterval=null, roomListener=null;
 let roundTimerInterval=null, roundTimerSecondsLeft=0;
 let collectingTimerInterval=null, stoppingTimerInterval=null;
@@ -1891,6 +2037,23 @@ function objToCats(o){
 async function updateRoomData(patch){
   setConnStatus("sync"); await update(roomRef(),patch); setConnStatus("ok");
 }
+function connect4PieceCount(board){
+  return normalizeConnect4Board(board).filter(Boolean).length;
+}
+function stabilizeConnect4State(newState){
+  if(newState?.gameType!=="connect4"||!gameState?.connect4||!newState.connect4)return newState;
+  const oldC4=gameState.connect4;
+  const newC4=newState.connect4;
+  const sameRound=String(oldC4.round||0)===String(newC4.round||0);
+  if(newState.phase==="playing"&&gameState.phase==="playing"&&sameRound){
+    const oldMove=safeNum(oldC4.moveCount), newMove=safeNum(newC4.moveCount);
+    const oldCount=connect4PieceCount(oldC4.board), newCount=connect4PieceCount(newC4.board);
+    if(newMove<oldMove||(newMove===oldMove&&newCount<oldCount)){
+      return {...newState, connect4:{...newC4,...oldC4}};
+    }
+  }
+  return newState;
+}
 
 // ─── INIT ────────────────────────────────────────────────────────
 window.addEventListener("DOMContentLoaded",()=>{
@@ -1960,6 +2123,7 @@ function initialConnect4State(){
     turn:"red",
     winner:null,
     winCells:[],
+    lastMove:null,
     moveCount:0,
     round:0
   };
@@ -2002,7 +2166,63 @@ function reconcileConnect4SeatsPatch(state){
     patch["connect4/turn"]="red";
     patch["connect4/winner"]=null;
     patch["connect4/winCells"]=[];
+    patch["connect4/lastMove"]=null;
     patch["connect4/moveCount"]=0;
+  }
+  return patch;
+}
+function initialBattleshipState(){
+  return {
+    seats:{p1:myId,p2:null},
+    phase:"lobby",
+    turn:"p1",
+    boards:{},
+    ready:{},
+    winner:null,
+    lastShot:null,
+    round:0,
+    ships:BATTLESHIP_SHIPS,
+    hitStreak:false
+  };
+}
+function reconcileBattleshipSeatsPatch(state){
+  if(!state||state.gameType!=="battleship")return null;
+  const players=state.players||{};
+  const ids=Object.keys(players);
+  if(ids.length===0)return null;
+  const bs=state.battleship||{};
+  const seats={...(bs.seats||{})};
+  let changed=false;
+  let resetGame=false;
+
+  if(!seats.p1||!players[seats.p1]){
+    seats.p1=(state.host&&players[state.host])?state.host:ids[0];
+    changed=true;
+    resetGame=true;
+  }
+  if(seats.p2&&!players[seats.p2]){
+    seats.p2=null;
+    changed=true;
+    resetGame=true;
+  }
+  if(seats.p2===seats.p1){
+    seats.p2=null;
+    changed=true;
+    resetGame=true;
+  }
+  // Anders als bei Vier gewinnt bleiben freie Plätze bei Schiffe versenken frei,
+  // damit Spieler bewusst einen Platz übernehmen können.
+  if(!changed)return null;
+
+  const patch={"battleship/seats":seats};
+  if(resetGame&&state.phase!=="lobby"){
+    patch.phase="lobby";
+    patch["battleship/phase"]="lobby";
+    patch["battleship/boards"]={};
+    patch["battleship/ready"]={};
+    patch["battleship/turn"]="p1";
+    patch["battleship/winner"]=null;
+    patch["battleship/lastShot"]=null;
   }
   return patch;
 }
@@ -2023,6 +2243,7 @@ function initialRoomData(){
     buzzer:null, buzzerTs:null, collectUntil:null,
     roundAnswers:{}, liveAnswers:{}, finalAnswers:{}, rejections:{}, submittedStatus:{}, roundStartTs:null,
     connect4:selectedGame==="connect4"?initialConnect4State():null,
+    battleship:selectedGame==="battleship"?initialBattleshipState():null,
     createdAt:Date.now()
   };
 }
@@ -2128,6 +2349,11 @@ window.joinExistingRoom=async function(opts={}){
       if(!seats.red) patch[`connect4/seats/red`]=existing.host||myId;
       if(myId!==seats.red && !seats.yellow) patch[`connect4/seats/yellow`]=myId;
     }
+    if(roomGame==="battleship"){
+      const seats=existing.battleship?.seats||{};
+      if(!seats.p1) patch[`battleship/seats/p1`]=existing.host||myId;
+      if(myId!==seats.p1 && !seats.p2) patch[`battleship/seats/p2`]=myId;
+    }
     await updateRoomData(patch);
     await finishRoomConnection();
   }catch(e){
@@ -2167,10 +2393,18 @@ function startHeartbeat(){
 async function processStateUpdate(newState){
   const prevPhase=gameState?.phase;
   const prevBuzzer=prevBuzzerValue;
+  newState=stabilizeConnect4State(newState);
   gameState=newState;
   isHost=gameState.host===myId;
   if(isHost&&gameState.gameType==="connect4"){
     const seatPatch=reconcileConnect4SeatsPatch(gameState);
+    if(seatPatch){
+      await updateRoomData(seatPatch);
+      return;
+    }
+  }
+  if(isHost&&gameState.gameType==="battleship"){
+    const seatPatch=reconcileBattleshipSeatsPatch(gameState);
     if(seatPatch){
       await updateRoomData(seatPatch);
       return;
@@ -2194,7 +2428,7 @@ async function processStateUpdate(newState){
       }
     }
   }
-  if(gameState.phase==="playing" && prevPhase!=="playing" && gameState.gameType!=="connect4"){
+  if(gameState.phase==="playing" && prevPhase!=="playing" && (gameState.gameType||"slf")==="slf"){
     const backup=sessionStorage.getItem("slf_local_answers");
     const rk=String(gameState.round||0);
     const remoteAnswers=gameState.liveAnswers?.[rk]?.[myId]||gameState.roundAnswers?.[myId]||{};
@@ -2254,7 +2488,7 @@ function syncUIWithPhase(){
       flushFinalAnswersNow();
       if(isNewPhase || (isHost && !stoppingTimerInterval)) startStoppingTimerClient();
     }
-    if(isHost&&gameState.gameType!=="connect4")checkHostRoundEnd();
+    if(isHost&&(gameState.gameType||"slf")==="slf")checkHostRoundEnd();
   } else if(p==="results"){
     stopRoundTimer();
     stopCollectingTimer();
@@ -2277,6 +2511,9 @@ function resetRoundData(){
   liveSaveRunning=false;
   localAnswers={};
   lobbyEditorOpen=false;
+  battleshipLocalRound=null;
+  battleshipPlacedShips=[];
+  battleshipOrientation="h";
   stopRoundTimer();
   stopCollectingTimer();
   stopStoppingTimer();
@@ -2410,6 +2647,7 @@ function renderTimerBar(){
 // ─── LOBBY ───────────────────────────────────────────────────────
 function renderLobby(){
   if(gameState?.gameType==="connect4") return renderConnect4Lobby();
+  if(gameState?.gameType==="battleship") return renderBattleshipLobby();
   return renderSlfLobby();
 }
 
@@ -2535,6 +2773,140 @@ window.toggleLobbyEditor=function(){
   renderLobby();
 };
 
+function battleshipPlayerName(id){
+  return id?(gameState.players?.[id]?.name||"?"):"Wartet";
+}
+function renderBattleshipLobby(){
+  if(!gameState)return;
+  document.getElementById("display-roomcode").textContent=myRoom;
+  const hb=document.getElementById("host-badge");
+  if(hb)hb.style.display=isHost?"block":"none";
+  const now=Date.now();
+  const players=gameState.players||{};
+  const bs=gameState.battleship||initialBattleshipState();
+  const seats=bs.seats||{};
+  const p1Id=seats.p1||gameState.host;
+  const p2Id=seats.p2||null;
+  const hitStreak=!!bs.hitStreak;
+  const myRole=battleshipRoleFor(gameState,myId);
+  const spectatorIds=Object.keys(players).filter(id=>id!==p1Id&&id!==p2Id);
+  const p1Action=(!p1Id&&myRole!=="p2")?`<button type="button" class="seat-action" onclick="window.takeBattleshipSeat('p1')">Übernehmen</button>`:`<span class="connect4-seat-role">Flotte 1</span>`;
+  const p2Action=(!p2Id&&myRole!=="p1")?`<button type="button" class="seat-action" onclick="window.takeBattleshipSeat('p2')">Übernehmen</button>`:`<span class="connect4-seat-role">Flotte 2</span>`;
+
+  document.getElementById("players-list").innerHTML=Object.entries(players).map(([id,p])=>{
+    const online=now-(p.hb||0)<PLAYER_STALE_MS;
+    const role=id===p1Id?"Flotte 1":id===p2Id?"Flotte 2":"Zuschauer";
+    return`<div class="player-chip">
+      <div class="online-dot" style="background:${online?"var(--green)":"transparent"}"></div>
+      ${escHtml(p.name)}${id===gameState.host?" ★":""}
+      <span class="pts">${role}</span>
+    </div>`;
+  }).join("");
+
+  const summary=document.getElementById("lobby-summary-area");
+  if(summary){
+    summary.innerHTML=`
+      <div class="connect4-seats">
+        <div class="connect4-seat">
+          <span class="connect4-seat-left"><span class="connect4-disc sea"></span><span class="connect4-seat-name">${escHtml(battleshipPlayerName(p1Id))}</span></span>
+          ${p1Action}
+        </div>
+        <div class="connect4-seat">
+          <span class="connect4-seat-left"><span class="connect4-disc navy"></span><span class="connect4-seat-name">${escHtml(battleshipPlayerName(p2Id))}</span></span>
+          ${p2Action}
+        </div>
+      </div>
+      <div class="lobby-summary-card">
+        <div class="lobby-section-title">Flotte</div>
+        <div class="lobby-meta-line">
+          ${(bs.ships||BATTLESHIP_SHIPS).map(size=>`<span class="lobby-meta-pill">${size}er</span>`).join("")}
+          <span class="lobby-meta-pill">Treffer: ${hitStreak?"nochmal":"Wechsel"}</span>
+        </div>
+      </div>
+      ${spectatorIds.length?`<div class="connect4-spectators"><div class="lobby-section-title">Zuschauer</div><div class="lobby-cats-line">${spectatorIds.map(id=>`<div class="cat-tag">${escHtml(players[id]?.name||"?")}</div>`).join("")}</div></div>`:""}`;
+  }
+  const editor=document.getElementById("lobby-editor-area");
+  if(editor) editor.innerHTML="";
+  const canPrepare=!!p1Id&&!!p2Id&&!!players[p1Id]&&!!players[p2Id];
+  document.getElementById("lobby-host-area").innerHTML=isHost
+    ?`<button type="button" class="btn" ${canPrepare?"":"disabled"} onclick="window.startBattleshipPlacement()">
+        ${canPrepare?"Flotte platzieren":"Warte auf zweiten Spieler"}
+      </button>
+      ${canPrepare?`<button type="button" class="btn btn-outline" onclick="window.swapBattleshipSeats()">Flotten tauschen</button>`:""}
+      <button type="button" class="btn btn-outline" onclick="window.toggleBattleshipHitRule()">Treffer: ${hitStreak?"nochmal dran":"Zug wechseln"}</button>`
+    :`<div style="font-size:16px;color:var(--pencil);font-weight:700;"><span class="pulse-dot"></span>Warte auf den Host</div>`;
+}
+
+window.takeBattleshipSeat=async function(role){
+  if(!gameState||gameState.gameType!=="battleship"||gameState.phase!=="lobby")return;
+  if(!["p1","p2"].includes(role))return;
+  setConnStatus("sync");
+  try{
+    await runTransaction(roomRef(),cur=>{
+      if(!cur||cur.gameType!=="battleship"||cur.phase!=="lobby")return;
+      if(!cur.players?.[myId])return;
+      if(!cur.battleship)cur.battleship=initialBattleshipState();
+      if(!cur.battleship.seats)cur.battleship.seats={};
+      const seats=cur.battleship.seats;
+      if(seats[role]&&seats[role]!==myId)return;
+      if(role==="p1"&&seats.p2===myId)seats.p2=null;
+      if(role==="p2"&&seats.p1===myId)seats.p1=null;
+      seats[role]=myId;
+      cur.battleship.boards={};
+      cur.battleship.ready={};
+      cur.battleship.phase="lobby";
+      cur.battleship.turn="p1";
+      cur.battleship.winner=null;
+      cur.battleship.lastShot=null;
+      return cur;
+    });
+    setConnStatus("ok");
+  }catch(e){
+    setConnStatus("err");
+  }
+};
+window.swapBattleshipSeats=async function(){
+  if(!isHost||!gameState||gameState.gameType!=="battleship"||gameState.phase!=="lobby")return;
+  const bs=gameState.battleship||initialBattleshipState();
+  const seats=bs.seats||{};
+  if(!seats.p1||!seats.p2)return;
+  await updateRoomData({
+    "battleship/seats/p1":seats.p2,
+    "battleship/seats/p2":seats.p1,
+    "battleship/boards":{},
+    "battleship/ready":{},
+    "battleship/phase":"lobby",
+    "battleship/turn":"p1",
+    "battleship/winner":null,
+    "battleship/lastShot":null
+  });
+};
+window.toggleBattleshipHitRule=async function(){
+  if(!isHost||!gameState||gameState.gameType!=="battleship"||gameState.phase!=="lobby")return;
+  const current=!!gameState.battleship?.hitStreak;
+  await updateRoomData({"battleship/hitStreak":!current});
+};
+window.startBattleshipPlacement=async function(){
+  if(!isHost||!gameState||gameState.gameType!=="battleship")return;
+  const bs=gameState.battleship||initialBattleshipState();
+  const seats=bs.seats||{};
+  if(!seats.p1||!seats.p2||!gameState.players?.[seats.p1]||!gameState.players?.[seats.p2])return;
+  await updateRoomData({
+    phase:"playing",
+    battleship:{
+      ...bs,
+      phase:"placing",
+      boards:{},
+      ready:{},
+      turn:"p1",
+      winner:null,
+      lastShot:null,
+      round:(bs.round||0)+1,
+      ships:BATTLESHIP_SHIPS
+    }
+  });
+};
+
 function connect4PlayerName(id){
   return id?(gameState.players?.[id]?.name||"?"):"Wartet";
 }
@@ -2582,9 +2954,25 @@ function renderConnect4Lobby(){
   document.getElementById("lobby-host-area").innerHTML=isHost
     ?`<button type="button" class="btn" ${canStart?"":"disabled"} onclick="window.startConnect4Game()">
         ${canStart?"Spiel starten":"Warte auf zweiten Spieler"}
-      </button>`
+      </button>
+      ${canStart?`<button type="button" class="btn btn-outline" onclick="window.swapConnect4Seats()">Farben tauschen</button>`:""}`
     :`<div style="font-size:16px;color:var(--pencil);font-weight:700;"><span class="pulse-dot"></span>Warte auf den Host</div>`;
 }
+window.swapConnect4Seats=async function(){
+  if(!isHost||!gameState||gameState.gameType!=="connect4"||gameState.phase!=="lobby")return;
+  const c4=gameState.connect4||initialConnect4State();
+  const seats=c4.seats||{};
+  if(!seats.red||!seats.yellow)return;
+  await updateRoomData({
+    "connect4/seats/red":seats.yellow,
+    "connect4/seats/yellow":seats.red,
+    "connect4/board":emptyConnect4Board(),
+    "connect4/turn":"red",
+    "connect4/winner":null,
+    "connect4/winCells":[],
+    "connect4/moveCount":0
+  });
+};
 window.startConnect4Game=async function(){
   if(!isHost||!gameState||gameState.gameType!=="connect4")return;
   setConnStatus("sync");
@@ -2600,6 +2988,7 @@ window.startConnect4Game=async function(){
         turn:"red",
         winner:null,
         winCells:[],
+        lastMove:null,
         moveCount:0,
         round:(cur.connect4?.round||0)+1
       };
@@ -2721,9 +3110,403 @@ window.startRound=async function(){
   });
 };
 
+function battleshipRoleFor(state,playerId){
+  const seats=state?.battleship?.seats||{};
+  if(playerId===seats.p1)return"p1";
+  if(playerId===seats.p2)return"p2";
+  return null;
+}
+function resetBattleshipLocal(round){
+  battleshipLocalRound=round;
+  battleshipPlacedShips=[];
+  battleshipOrientation="h";
+}
+function ensureBattleshipLocal(){
+  const round=String(gameState?.battleship?.round||0);
+  if(battleshipLocalRound!==round) resetBattleshipLocal(round);
+}
+function battleshipPlacedCells(){
+  const taken=new Set();
+  battleshipPlacedShips.forEach(ship=>ship.cells.forEach(c=>taken.add(c)));
+  return taken;
+}
+function battleshipCellsForPlacement(start,size,orientation){
+  const row=Math.floor(start/10), col=start%10;
+  const cells=[];
+  for(let i=0;i<size;i++){
+    const r=row+(orientation==="v"?i:0);
+    const c=col+(orientation==="h"?i:0);
+    if(r<0||r>=10||c<0||c>=10)return null;
+    cells.push(r*10+c);
+  }
+  return cells;
+}
+function battleshipCanPlace(start,size,orientation){
+  const cells=battleshipCellsForPlacement(start,size,orientation);
+  if(!cells)return false;
+  const taken=battleshipPlacedCells();
+  return cells.every(c=>!taken.has(c));
+}
+function battleshipValidateShips(ships,expectedSizes){
+  if(!Array.isArray(ships)||ships.length!==expectedSizes.length)return false;
+  const taken=new Set();
+  for(let i=0;i<expectedSizes.length;i++){
+    const ship=ships[i];
+    if(!ship||ship.size!==expectedSizes[i]||!Array.isArray(ship.cells)||ship.cells.length!==ship.size)return false;
+    for(const c of ship.cells){
+      if(!Number.isInteger(c)||c<0||c>=100||taken.has(c))return false;
+      taken.add(c);
+    }
+  }
+  return true;
+}
+function battleshipCellsFromShips(ships){
+  const cells=new Set();
+  (ships||[]).forEach(ship=>(ship.cells||[]).forEach(c=>cells.add(c)));
+  return cells;
+}
+window.toggleBattleshipOrientation=function(){
+  battleshipOrientation=battleshipOrientation==="h"?"v":"h";
+  renderBattleshipPlacing();
+};
+window.resetBattleshipPlacement=function(){
+  resetBattleshipLocal(String(gameState?.battleship?.round||0));
+  renderBattleshipPlacing();
+};
+window.placeBattleshipShip=function(cell){
+  ensureBattleshipLocal();
+  const ships=gameState?.battleship?.ships||BATTLESHIP_SHIPS;
+  const idx=battleshipPlacedShips.length;
+  const size=ships[idx];
+  const warn=document.getElementById("battleship-warning");
+  if(!size)return;
+  if(!battleshipCanPlace(cell,size,battleshipOrientation)){
+    if(warn) warn.textContent="Passt hier nicht.";
+    return;
+  }
+  battleshipPlacedShips.push({id:`s${idx}`,size,cells:battleshipCellsForPlacement(cell,size,battleshipOrientation)});
+  renderBattleshipPlacing();
+};
+function clearBattleshipPreview(){
+  document.querySelectorAll(".battleship-cell.preview-valid,.battleship-cell.preview-invalid").forEach(el=>{
+    el.classList.remove("preview-valid","preview-invalid");
+  });
+}
+function updateBattleshipPreview(cell){
+  clearBattleshipPreview();
+  const ships=gameState?.battleship?.ships||BATTLESHIP_SHIPS;
+  const size=ships[battleshipPlacedShips.length];
+  if(!size)return;
+  const cells=battleshipCellsForPlacement(cell,size,battleshipOrientation);
+  const valid=battleshipCanPlace(cell,size,battleshipOrientation);
+  const previewCells=cells||[cell];
+  previewCells.forEach(c=>{
+    const el=document.querySelector(`.battleship-cell[data-cell="${c}"]`);
+    if(el&&!el.classList.contains("ship")) el.classList.add(valid?"preview-valid":"preview-invalid");
+  });
+}
+function battleshipCellFromPointer(e){
+  const el=document.elementFromPoint?.(e.clientX,e.clientY)?.closest?.(".battleship-cell[data-cell]");
+  if(!el||el.disabled)return null;
+  const cell=Number(el.dataset.cell);
+  return Number.isInteger(cell)?cell:null;
+}
+function finishBattleshipDrag(cell){
+  if(cell==null)return;
+  battleshipSuppressClickUntil=Date.now()+250;
+  window.placeBattleshipShip(cell);
+}
+window.finishBattleshipPlacement=async function(){
+  if(!gameState||gameState.gameType!=="battleship")return;
+  ensureBattleshipLocal();
+  const role=battleshipRoleFor(gameState,myId);
+  const ships=gameState.battleship?.ships||BATTLESHIP_SHIPS;
+  const warn=document.getElementById("battleship-warning");
+  if(!role)return;
+  if(!battleshipValidateShips(battleshipPlacedShips,ships)){
+    if(warn) warn.textContent="Platziere zuerst alle Schiffe.";
+    return;
+  }
+  const savedShips=battleshipPlacedShips.map(ship=>({id:ship.id,size:ship.size,cells:[...ship.cells]}));
+  setConnStatus("sync");
+  try{
+    await runTransaction(roomRef(),cur=>{
+      if(!cur||cur.gameType!=="battleship"||cur.phase!=="playing")return;
+      if(cur.battleship?.phase!=="placing")return;
+      const curRole=battleshipRoleFor(cur,myId);
+      if(!curRole)return;
+      const expected=cur.battleship?.ships||BATTLESHIP_SHIPS;
+      if(!battleshipValidateShips(savedShips,expected))return;
+      if(!cur.battleship.boards)cur.battleship.boards={};
+      if(!cur.battleship.ready)cur.battleship.ready={};
+      cur.battleship.boards[myId]={ships:savedShips,shotsReceived:{}};
+      cur.battleship.ready[myId]=true;
+      const seats=cur.battleship.seats||{};
+      if(seats.p1&&seats.p2&&cur.battleship.ready[seats.p1]&&cur.battleship.ready[seats.p2]){
+        cur.battleship.phase="battle";
+        cur.battleship.turn="p1";
+        cur.battleship.winner=null;
+        cur.battleship.lastShot=null;
+      }
+      return cur;
+    });
+    setConnStatus("ok");
+  }catch(e){
+    setConnStatus("err");
+  }
+};
+function battleshipShotsSet(boardData){
+  const shots=boardData?.shotsReceived||{};
+  if(Array.isArray(shots)) return new Set(shots.map(Number).filter(n=>Number.isInteger(n)));
+  return new Set(Object.keys(shots).map(Number).filter(n=>Number.isInteger(n)&&shots[n]!==false));
+}
+function battleshipShipCells(boardData){
+  return battleshipCellsFromShips(boardData?.ships||[]);
+}
+function battleshipAllShipsSunk(boardData){
+  const shipCells=battleshipShipCells(boardData);
+  const shots=battleshipShotsSet(boardData);
+  return shipCells.size>0&&[...shipCells].every(c=>shots.has(c));
+}
+function battleshipSunkCells(boardData){
+  const shots=battleshipShotsSet(boardData);
+  const sunk=new Set();
+  (boardData?.ships||[]).forEach(ship=>{
+    const cells=ship.cells||[];
+    if(cells.length>0&&cells.every(c=>shots.has(c))){
+      cells.forEach(c=>sunk.add(c));
+    }
+  });
+  return sunk;
+}
+function battleshipRemainingShips(boardData){
+  const sunk=battleshipSunkCells(boardData);
+  return (boardData?.ships||[]).filter(ship=>!(ship.cells||[]).every(c=>sunk.has(c))).length;
+}
+function battleshipGridHtml(renderCell){
+  const cols=Array.from({length:10},(_,i)=>`<div class="battleship-coord">${i+1}</div>`).join("");
+  const rows=Array.from({length:10},(_,r)=>{
+    const letter=String.fromCharCode(65+r);
+    const cells=Array.from({length:10},(_,c)=>renderCell(r*10+c,r,c)).join("");
+    return `<div class="battleship-coord">${letter}</div>${cells}`;
+  }).join("");
+  return `<div class="battleship-coord"></div>${cols}${rows}`;
+}
+function battleshipBoardHtml({boardData, revealShips=false, title="", enemy=false, interactive=false}){
+  const shipCells=battleshipShipCells(boardData);
+  const shots=battleshipShotsSet(boardData);
+  const sunkCells=battleshipSunkCells(boardData);
+  return `<div class="battleship-board-wrap">
+    ${title?`<div class="battleship-board-title">${escHtml(title)}</div>`:""}
+    <div class="battleship-board ${enemy?"enemy":"own"}">
+      ${battleshipGridHtml((i)=>{
+        const isShip=shipCells.has(i);
+        const wasShot=shots.has(i);
+        const target=interactive&&!wasShot;
+        const cls=wasShot?(isShip?(sunkCells.has(i)?"sunk":"hit"):"miss"):(revealShips&&isShip?"ship":(target?"target":""));
+        return `<button type="button" class="battleship-cell ${cls}" data-cell="${i}" ${target?"":"disabled"}></button>`;
+      })}
+    </div>
+  </div>`;
+}
+function renderBattleshipPlaying(){
+  const bs=gameState?.battleship||initialBattleshipState();
+  if(bs.phase==="placing") return renderBattleshipPlacing();
+  if(bs.phase==="battle") return renderBattleshipBattle();
+  return renderBattleshipPlaceholder();
+}
+function renderBattleshipBattle(){
+  const letterStage=document.querySelector(".letter-stage");
+  if(letterStage) letterStage.style.display="none";
+  const tiEl=document.getElementById("typing-indicators-area"); if(tiEl) tiEl.innerHTML="";
+  const bEl=document.getElementById("buzzer-container"); if(bEl) bEl.innerHTML="";
+  const cEl=document.getElementById("playing-content"); if(!cEl)return;
+  const bs=gameState?.battleship||initialBattleshipState();
+  const role=battleshipRoleFor(gameState,myId);
+  const seats=bs.seats||{};
+  const ownId=role?myId:null;
+  const enemyId=role==="p1"?seats.p2:role==="p2"?seats.p1:null;
+  const turnId=seats[bs.turn]||null;
+  const turnName=battleshipPlayerName(turnId);
+
+  if(!role){
+    cEl.innerHTML=`<div class="battleship-game"><div class="battleship-panel"><div class="battleship-title">Du schaust zu</div><div class="battleship-sub">${escHtml(turnName)} ist dran.</div></div></div>`;
+    return;
+  }
+
+  const ownBoard=bs.boards?.[ownId]||{ships:[],shotsReceived:{}};
+  const enemyBoard=bs.boards?.[enemyId]||{ships:[],shotsReceived:{}};
+  const isMyTurn=turnId===myId;
+  const last=bs.lastShot;
+  const lastText=last?`${last.sunk?"Schiff versenkt":(last.hit?"Treffer":"Wasser")} bei ${battleshipPlayerName(last.by)}`:"";
+  const remainingText=`Gegner: ${battleshipRemainingShips(enemyBoard)} Schiffe · Du: ${battleshipRemainingShips(ownBoard)} Schiffe`;
+  cEl.innerHTML=`
+    <div class="battleship-game">
+      <div class="battleship-panel">
+        <div class="battleship-title">${isMyTurn?"Du bist dran":escHtml(turnName)+" ist dran"}</div>
+        <div class="battleship-sub">${lastText?escHtml(lastText)+" · "+escHtml(remainingText):escHtml(remainingText)}</div>
+      </div>
+      ${battleshipBoardHtml({boardData:enemyBoard,revealShips:false,title:"Gegner",enemy:true,interactive:isMyTurn})}
+      ${battleshipBoardHtml({boardData:ownBoard,revealShips:true,title:"Deine Flotte",enemy:false})}
+    </div>`;
+  cEl.querySelectorAll(".battleship-board.enemy .battleship-cell.target").forEach(btn=>{
+    btn.addEventListener("click",()=>window.makeBattleshipShot(Number(btn.dataset.cell)));
+  });
+}
+window.makeBattleshipShot=async function(cell){
+  cell=Number(cell);
+  if(!Number.isInteger(cell)||cell<0||cell>=100)return;
+  if(!gameState||gameState.gameType!=="battleship"||gameState.phase!=="playing")return;
+  setConnStatus("sync");
+  try{
+    await runTransaction(roomRef(),cur=>{
+      if(!cur||cur.gameType!=="battleship"||cur.phase!=="playing")return;
+      const bs=cur.battleship||{};
+      if(bs.phase!=="battle")return;
+      const role=battleshipRoleFor(cur,myId);
+      if(!role||bs.turn!==role)return;
+      const targetRole=role==="p1"?"p2":"p1";
+      const targetId=bs.seats?.[targetRole];
+      if(!targetId||!bs.boards?.[targetId])return;
+      const targetBoard=bs.boards[targetId];
+      if(!targetBoard.shotsReceived)targetBoard.shotsReceived={};
+      if(targetBoard.shotsReceived[cell])return;
+      const shipCells=battleshipShipCells(targetBoard);
+      const hit=shipCells.has(cell);
+      targetBoard.shotsReceived[cell]=hit?"hit":"miss";
+      const sunkShip=hit?(targetBoard.ships||[]).find(ship=>(ship.cells||[]).includes(cell)&&(ship.cells||[]).every(c=>battleshipShotsSet(targetBoard).has(c))):null;
+      const won=hit&&battleshipAllShipsSunk(targetBoard);
+      bs.lastShot={by:myId,target:targetId,cell,hit,sunk:!!sunkShip,sunkSize:sunkShip?.size||0,won};
+      if(won){
+        bs.winner=role;
+        bs.turn=role;
+        cur.phase="results";
+        if(cur.players?.[myId]) cur.players[myId].score=safeNum(cur.players[myId].score)+1;
+      }else{
+        bs.turn=(hit&&bs.hitStreak)?role:targetRole;
+      }
+      return cur;
+    });
+    setConnStatus("ok");
+  }catch(e){
+    setConnStatus("err");
+  }
+};
+function renderBattleshipPlaceholder(){
+  const letterStage=document.querySelector(".letter-stage");
+  if(letterStage) letterStage.style.display="none";
+  const tiEl=document.getElementById("typing-indicators-area"); if(tiEl) tiEl.innerHTML="";
+  const bEl=document.getElementById("buzzer-container"); if(bEl) bEl.innerHTML="";
+  const cEl=document.getElementById("playing-content"); if(!cEl)return;
+  cEl.innerHTML=`<div class="battleship-game"><div class="battleship-panel"><div class="battleship-title">Schiffe versenken</div><div class="battleship-sub">Diese Phase kommt im nächsten Schritt.</div></div></div>`;
+}
+function renderBattleshipPlacing(){
+  if(!gameState)return;
+  ensureBattleshipLocal();
+  stopRoundTimer();
+  const letterStage=document.querySelector(".letter-stage");
+  if(letterStage) letterStage.style.display="none";
+  const tiEl=document.getElementById("typing-indicators-area"); if(tiEl) tiEl.innerHTML="";
+  const bEl=document.getElementById("buzzer-container"); if(bEl) bEl.innerHTML="";
+  const cEl=document.getElementById("playing-content"); if(!cEl)return;
+  const role=battleshipRoleFor(gameState,myId);
+  const bs=gameState.battleship||initialBattleshipState();
+  const ships=bs.ships||BATTLESHIP_SHIPS;
+  const seats=bs.seats||{};
+  const ready=bs.ready||{};
+  const boards=bs.boards||{};
+  if(!role){
+    cEl.innerHTML=`<div class="battleship-game"><div class="battleship-panel"><div class="battleship-title">Du schaust zu</div><div class="battleship-sub">Die Spieler platzieren ihre Flotten.</div></div></div>`;
+    return;
+  }
+  if(ready[myId]){
+    const ownShips=boards[myId]?.ships||[];
+    const ownCells=battleshipCellsFromShips(ownShips);
+    const opponentId=role==="p1"?seats.p2:seats.p1;
+    const opponentReady=!!ready[opponentId];
+    cEl.innerHTML=`
+      <div class="battleship-game">
+        <div class="battleship-panel">
+          <div class="battleship-title">Flotte bereit</div>
+          <div class="battleship-sub">${opponentReady?"Beide bereit · Spielphase kommt im nächsten Schritt":"Warte auf "+escHtml(battleshipPlayerName(opponentId))}</div>
+        </div>
+        <div class="battleship-ships">
+          ${ships.map(size=>`<span class="battleship-ship-pill done">${size}er</span>`).join("")}
+        </div>
+        <div class="battleship-board" aria-label="Deine platzierte Flotte">
+          ${Array.from({length:100},(_,i)=>`<button type="button" class="battleship-cell ${ownCells.has(i)?"ship":""}" disabled></button>`).join("")}
+        </div>
+      </div>`;
+    return;
+  }
+  const placed=battleshipPlacedCells();
+  const currentSize=ships[battleshipPlacedShips.length];
+  const allPlaced=!currentSize;
+  cEl.innerHTML=`
+    <div class="battleship-game">
+      <div class="battleship-panel">
+        <div class="battleship-title">Flotte platzieren</div>
+        <div class="battleship-sub">${currentSize?`${currentSize}er-Schiff platzieren`:"Alle Schiffe platziert"} · ${battleshipOrientation==="h"?"Horizontal":"Vertikal"}</div>
+        <div class="battleship-toolbar">
+          <button type="button" class="btn btn-outline" onclick="window.toggleBattleshipOrientation()" ${allPlaced?"disabled":""}>${battleshipOrientation==="h"?"Horizontal":"Vertikal"}</button>
+          <button type="button" class="btn btn-outline" onclick="window.resetBattleshipPlacement()">Zurücksetzen</button>
+        </div>
+      </div>
+      <div class="battleship-ships">
+        ${ships.map((size,i)=>`<span class="battleship-ship-pill ${i<battleshipPlacedShips.length?"done":""}">${size}er</span>`).join("")}
+      </div>
+      <div class="battleship-board placing" aria-label="Schiffe platzieren">
+        ${battleshipGridHtml((i)=>`<button type="button" class="battleship-cell ${placed.has(i)?"ship":""}" data-cell="${i}" ${currentSize?"":"disabled"}></button>`)}
+      </div>
+      <div id="battleship-warning" class="battleship-warning"></div>
+      <button type="button" class="btn" ${allPlaced?`onclick="window.finishBattleshipPlacement()"`:"disabled"}>${allPlaced?"Fertig":"Fertig nach dem Platzieren"}</button>
+    </div>`;
+  cEl.querySelectorAll(".battleship-cell:not(:disabled)").forEach(btn=>{
+    const cell=Number(btn.dataset.cell);
+    btn.addEventListener("pointerenter",()=>updateBattleshipPreview(cell));
+    btn.addEventListener("focus",()=>updateBattleshipPreview(cell));
+    btn.addEventListener("touchstart",()=>updateBattleshipPreview(cell),{passive:true});
+    btn.addEventListener("pointerdown",e=>{
+      battleshipDragging=true;
+      battleshipDragCell=cell;
+      updateBattleshipPreview(cell);
+      try{btn.setPointerCapture?.(e.pointerId);}catch(_e){}
+      e.preventDefault();
+    });
+    btn.addEventListener("pointermove",e=>{
+      if(!battleshipDragging)return;
+      const next=battleshipCellFromPointer(e);
+      if(next!=null&&next!==battleshipDragCell){
+        battleshipDragCell=next;
+        updateBattleshipPreview(next);
+      }
+    });
+    btn.addEventListener("pointerup",e=>{
+      if(!battleshipDragging)return;
+      const next=battleshipCellFromPointer(e)??battleshipDragCell;
+      battleshipDragging=false;
+      battleshipDragCell=null;
+      try{btn.releasePointerCapture?.(e.pointerId);}catch(_e){}
+      finishBattleshipDrag(next);
+    });
+    btn.addEventListener("pointercancel",()=>{
+      battleshipDragging=false;
+      battleshipDragCell=null;
+      clearBattleshipPreview();
+    });
+    btn.addEventListener("pointerleave",()=>{ if(!battleshipDragging) clearBattleshipPreview(); });
+    btn.addEventListener("blur",clearBattleshipPreview);
+    btn.addEventListener("click",()=>{
+      if(Date.now()<battleshipSuppressClickUntil)return;
+      window.placeBattleshipShip(cell);
+    });
+  });
+}
+
 // ─── PLAYING ─────────────────────────────────────────────────────
 function renderPlaying(){
   if(gameState?.gameType==="connect4") return renderConnect4Playing();
+  if(gameState?.gameType==="battleship") return renderBattleshipPlaying();
   return renderSlfPlaying();
 }
 function connect4RoleFor(state,playerId){
@@ -2800,18 +3583,36 @@ function renderConnect4Playing(){
           const col=i%7;
           const playable=isMyTurn&&!connect4ColumnFull(board,col);
           const win=(c4.winCells||[]).includes(i)?"win":"";
-          return`<button type="button" class="connect4-cell ${cell||""} ${playable?"playable":""} ${win}"
+          const last=c4.lastMove===i?"last":"";
+          return`<button type="button" class="connect4-cell ${cell||""} ${playable?"playable":""} ${win} ${last}"
             data-cell="${i}"
             data-col="${col}"
             aria-label="Spalte ${col+1}"
             ${playable?"":"disabled"}></button>`;
         }).join("")}
       </div>
+      ${isHost?`<div class="connect4-actions"><button type="button" class="btn btn-outline" onclick="window.abortConnect4Game()">Partie abbrechen</button></div>`:""}
     </div>`;
   cEl.querySelectorAll(".connect4-cell.playable").forEach(btn=>{
     btn.addEventListener("click",()=>window.makeConnect4Move(Number(btn.dataset.col)));
   });
 }
+window.abortConnect4Game=async function(){
+  if(!isHost||!gameState||gameState.gameType!=="connect4"||gameState.phase!=="playing")return;
+  const c4=gameState.connect4||initialConnect4State();
+  await updateRoomData({
+    phase:"lobby",
+    connect4:{
+      ...c4,
+      board:emptyConnect4Board(),
+      turn:"red",
+      winner:null,
+      winCells:[],
+      lastMove:null,
+      moveCount:0
+    }
+  });
+};
 window.makeConnect4Move=async function(col){
   col=Number(col);
   if(!Number.isInteger(col)||col<0||col>6)return;
@@ -2835,6 +3636,7 @@ window.makeConnect4Move=async function(col){
         turn:winCells.length||isDraw?role:(role==="red"?"yellow":"red"),
         winner:winCells.length?role:(isDraw?"draw":null),
         winCells,
+        lastMove:row*7+col,
         moveCount:(c4.moveCount||0)+1
       };
       if(winCells.length){
@@ -3249,6 +4051,7 @@ function calcRoundPoints(state){
 
 function renderResults(){
   if(gameState?.gameType==="connect4") return renderConnect4Results();
+  if(gameState?.gameType==="battleship") return renderBattleshipResults();
   return renderSlfResults();
 }
 function renderConnect4Results(){
@@ -3278,12 +4081,51 @@ function renderConnect4Results(){
   document.getElementById("results-container").innerHTML=`
     <div class="connect4-game">
       <div class="connect4-board" aria-label="Vier gewinnt Endstand">
-        ${board.map((cell,i)=>`<div class="connect4-cell ${cell||""} ${(c4.winCells||[]).includes(i)?"win":""}"></div>`).join("")}
+        ${board.map((cell,i)=>`<div class="connect4-cell ${cell||""} ${(c4.winCells||[]).includes(i)?"win":""} ${c4.lastMove===i?"last":""}"></div>`).join("")}
       </div>
     </div>`;
   document.getElementById("results-actions").innerHTML=isHost
     ?`<button type="button" class="btn" onclick="window.resetConnect4Game()">Nochmal spielen →</button>
       <button type="button" class="btn btn-outline" onclick="window.connect4BackToLobby()">Zur Lobby</button>`
+    :`<button type="button" class="btn btn-outline" disabled>Warte auf den Host…</button>`;
+}
+function renderBattleshipResults(){
+  if(!gameState)return;
+  const bs=gameState.battleship||initialBattleshipState();
+  const seats=bs.seats||{};
+  const players=gameState.players||{};
+  const p1Name=battleshipPlayerName(seats.p1);
+  const p2Name=battleshipPlayerName(seats.p2);
+  const winnerName=bs.winner?battleshipPlayerName(seats[bs.winner]):"?";
+  document.getElementById("results-sub").textContent=`Schiffe versenken · Runde ${bs.round||1}`;
+  const goArea=document.getElementById("gameover-area");
+  if(goArea){
+    goArea.innerHTML=`<div class="gameover-banner">
+      <div class="gameover-title">🏆 ${escHtml(winnerName)} gewinnt!</div>
+      <div class="gameover-winner">+1 Punkt</div>
+    </div>`;
+  }
+  const banner=document.getElementById("validation-banner-area");
+  if(banner){
+    banner.innerHTML=bs.lastShot?`<div class="round-ended-note">${bs.lastShot.sunk?"Schiff versenkt":(bs.lastShot.hit?"Treffer":"Wasser")} · Spiel beendet</div>`:"";
+  }
+  document.getElementById("scoreboard").innerHTML=[
+    [seats.p1,p1Name,"Flotte 1"],[seats.p2,p2Name,"Flotte 2"]
+  ].filter(([id])=>id).map(([id,name,role])=>`
+    <div class="score-row ${id===seats[bs.winner]?"gold":""}">
+      <div class="score-name">🚢 ${escHtml(name)} <span style="color:var(--pencil);font-size:12px">${role}</span></div>
+      <div class="score-pts">${safeNum(players[id]?.score)} Siege</div>
+    </div>`).join("");
+  const p1Board=bs.boards?.[seats.p1]||{ships:[],shotsReceived:{}};
+  const p2Board=bs.boards?.[seats.p2]||{ships:[],shotsReceived:{}};
+  document.getElementById("results-container").innerHTML=`
+    <div class="battleship-game">
+      ${battleshipBoardHtml({boardData:p1Board,revealShips:true,title:`Flotte 1 · ${p1Name}`,enemy:false})}
+      ${battleshipBoardHtml({boardData:p2Board,revealShips:true,title:`Flotte 2 · ${p2Name}`,enemy:false})}
+    </div>`;
+  document.getElementById("results-actions").innerHTML=isHost
+    ?`<button type="button" class="btn" onclick="window.resetBattleshipGame()">Nochmal spielen →</button>
+      <button type="button" class="btn btn-outline" onclick="window.battleshipBackToLobby()">Zur Lobby</button>`
     :`<button type="button" class="btn btn-outline" disabled>Warte auf den Host…</button>`;
 }
 function renderSlfResults(){
@@ -3400,6 +4242,41 @@ function renderSlfResults(){
   }
 }
 
+window.resetBattleshipGame=async function(){
+  if(!isHost||!gameState||gameState.gameType!=="battleship")return;
+  const bs=gameState.battleship||initialBattleshipState();
+  await updateRoomData({
+    phase:"playing",
+    battleship:{
+      ...bs,
+      phase:"placing",
+      boards:{},
+      ready:{},
+      turn:"p1",
+      winner:null,
+      lastShot:null,
+      round:(bs.round||0)+1,
+      ships:BATTLESHIP_SHIPS
+    }
+  });
+};
+window.battleshipBackToLobby=async function(){
+  if(!isHost||!gameState||gameState.gameType!=="battleship")return;
+  const bs=gameState.battleship||initialBattleshipState();
+  await updateRoomData({
+    phase:"lobby",
+    battleship:{
+      ...bs,
+      phase:"lobby",
+      boards:{},
+      ready:{},
+      turn:"p1",
+      winner:null,
+      lastShot:null,
+      ships:BATTLESHIP_SHIPS
+    }
+  });
+};
 window.resetConnect4Game=async function(){
   if(!isHost||!gameState||gameState.gameType!=="connect4")return;
   const c4=gameState.connect4||initialConnect4State();
@@ -3411,6 +4288,7 @@ window.resetConnect4Game=async function(){
       turn:"red",
       winner:null,
       winCells:[],
+      lastMove:null,
       moveCount:0,
       round:(c4.round||0)+1
     }
@@ -3427,6 +4305,7 @@ window.connect4BackToLobby=async function(){
       turn:"red",
       winner:null,
       winCells:[],
+      lastMove:null,
       moveCount:0
     }
   });
@@ -3570,5 +4449,5 @@ function escHtml(s){
     .replace(/'/g,"&#039;");
 }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a176ae2c0e96866e',t:'MTc4MzQyNTUzNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a17718c76c49866e',t:'MTc4MzQyOTkwNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
