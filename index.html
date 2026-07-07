@@ -1938,9 +1938,24 @@ function generateRoomCode(){
   const n=Math.floor(Math.random()*90)+10;
   return normalizeRoomCode(word+n);
 }
+function emptyConnect4Board(){
+  return Array(42).fill("");
+}
+function normalizeConnect4Board(raw){
+  const board=emptyConnect4Board();
+  if(Array.isArray(raw)){
+    raw.slice(0,42).forEach((v,i)=>{ board[i]=(v==="red"||v==="yellow")?v:""; });
+  }else if(raw&&typeof raw==="object"){
+    Object.entries(raw).forEach(([k,v])=>{
+      const i=Number(k);
+      if(Number.isInteger(i)&&i>=0&&i<42) board[i]=(v==="red"||v==="yellow")?v:"";
+    });
+  }
+  return board;
+}
 function initialConnect4State(){
   return {
-    board:Array(42).fill(null),
+    board:emptyConnect4Board(),
     seats:{red:myId,yellow:null},
     turn:"red",
     winner:null,
@@ -1983,7 +1998,7 @@ function reconcileConnect4SeatsPatch(state){
   const patch={"connect4/seats":seats};
   if(resetGame&&state.phase!=="lobby"){
     patch.phase="lobby";
-    patch["connect4/board"]=Array(42).fill(null);
+    patch["connect4/board"]=emptyConnect4Board();
     patch["connect4/turn"]="red";
     patch["connect4/winner"]=null;
     patch["connect4/winCells"]=[];
@@ -2580,7 +2595,7 @@ window.startConnect4Game=async function(){
       if(!seats.red||!seats.yellow||!cur.players?.[seats.red]||!cur.players?.[seats.yellow])return;
       cur.connect4={
         ...(cur.connect4||{}),
-        board:Array(42).fill(null),
+        board:emptyConnect4Board(),
         seats,
         turn:"red",
         winner:null,
@@ -2766,7 +2781,7 @@ function renderConnect4Playing(){
   const turnName=connect4PlayerName(turnId);
   const myRoleKey=connect4RoleFor(gameState,myId);
   const myRole=myRoleKey==="red"?"Rot":myRoleKey==="yellow"?"Gelb":"Zuschauer";
-  const board=c4.board||Array(42).fill(null);
+  const board=normalizeConnect4Board(c4.board);
   const isMyTurn=!!(myRoleKey&&c4.turn===myRoleKey&&!c4.winner);
   const statusText=isMyTurn?"Du bist dran":(myRoleKey?`${turnName} ist dran`:"Du schaust zu");
   const statusSub=myRoleKey?`Du bist ${myRole}`:`${turnName} ist dran`;
@@ -2808,7 +2823,7 @@ window.makeConnect4Move=async function(col){
       const role=connect4RoleFor(cur,myId);
       const c4=cur.connect4||{};
       if(!role||c4.turn!==role||c4.winner)return;
-      const board=Array.isArray(c4.board)?[...c4.board]:Array(42).fill(null);
+      const board=normalizeConnect4Board(c4.board);
       const row=connect4DropRow(board,col);
       if(row<0)return;
       board[row*7+col]=role;
@@ -3252,7 +3267,7 @@ function renderConnect4Results(){
       :`<div class="gameover-banner"><div class="gameover-title">🏆 ${escHtml(winnerName)} gewinnt!</div><div class="gameover-winner">+1 Punkt</div></div>`;
   }
   const banner=document.getElementById("validation-banner-area"); if(banner) banner.innerHTML="";
-  const board=c4.board||Array(42).fill(null);
+  const board=normalizeConnect4Board(c4.board);
   document.getElementById("scoreboard").innerHTML=[
     [seats.red,redName,"Rot"],[seats.yellow,yellowName,"Gelb"]
   ].filter(([id])=>id).map(([id,name,role],i)=>`
@@ -3392,7 +3407,7 @@ window.resetConnect4Game=async function(){
     phase:"playing",
     connect4:{
       ...c4,
-      board:Array(42).fill(null),
+      board:emptyConnect4Board(),
       turn:"red",
       winner:null,
       winCells:[],
@@ -3408,7 +3423,7 @@ window.connect4BackToLobby=async function(){
     phase:"lobby",
     connect4:{
       ...c4,
-      board:Array(42).fill(null),
+      board:emptyConnect4Board(),
       turn:"red",
       winner:null,
       winCells:[],
@@ -3555,5 +3570,5 @@ function escHtml(s){
     .replace(/'/g,"&#039;");
 }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a176a07f5ffcd933',t:'MTc4MzQyNDk3Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a176ae2c0e96866e',t:'MTc4MzQyNTUzNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
