@@ -534,6 +534,32 @@
       color: var(--pencil);
       font-weight: 800;
     }
+    .connect4-drop-row {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 7px;
+      padding: 0 12px;
+    }
+    .connect4-drop-btn {
+      aspect-ratio: 1 / 0.62;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--paper-white);
+      color: var(--ink);
+      font-family: 'Nunito', sans-serif;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, transform 0.15s, border-color 0.15s;
+    }
+    .connect4-drop-btn.red { border-color: #ef4444; color: #ef4444; }
+    .connect4-drop-btn.yellow { border-color: #facc15; color: #b88a00; }
+    .connect4-drop-btn:hover:not(:disabled) { transform: translateY(-1px); background: var(--paper2); }
+    .connect4-drop-btn:disabled { cursor: default; opacity: 0.38; }
+    .connect4-drop-btn.full { opacity: 0.22; }
     .connect4-board {
       width: 100%;
       display: grid;
@@ -570,6 +596,8 @@
     }
     .connect4-legend .connect4-seat { margin: 0; }
     @media (max-width: 430px) {
+      .connect4-drop-row { gap: 5px; padding: 0 10px; }
+      .connect4-drop-btn { font-size: 14px; }
       .connect4-board { gap: 5px; padding: 10px; border-radius: 18px; }
       .connect4-status { padding: 14px; }
     }
@@ -1949,6 +1977,48 @@ function initialConnect4State(){
     round:0
   };
 }
+function reconcileConnect4SeatsPatch(state){
+  if(!state||state.gameType!=="connect4")return null;
+  const players=state.players||{};
+  const ids=Object.keys(players);
+  if(ids.length===0)return null;
+  const c4=state.connect4||{};
+  const seats={...(c4.seats||{})};
+  let changed=false;
+  let resetGame=false;
+
+  if(!seats.red||!players[seats.red]){
+    seats.red=(state.host&&players[state.host])?state.host:ids[0];
+    changed=true;
+    resetGame=true;
+  }
+  if(seats.yellow&&!players[seats.yellow]){
+    seats.yellow=null;
+    changed=true;
+    resetGame=true;
+  }
+  if(seats.yellow===seats.red){
+    seats.yellow=null;
+    changed=true;
+    resetGame=true;
+  }
+  if(!seats.yellow){
+    const next=ids.find(id=>id!==seats.red);
+    if(next){seats.yellow=next;changed=true;}
+  }
+  if(!changed)return null;
+
+  const patch={"connect4/seats":seats};
+  if(resetGame&&state.phase!=="lobby"){
+    patch.phase="lobby";
+    patch["connect4/board"]=Array(42).fill(null);
+    patch["connect4/turn"]="red";
+    patch["connect4/winner"]=null;
+    patch["connect4/winCells"]=[];
+    patch["connect4/moveCount"]=0;
+  }
+  return patch;
+}
 function initialRoomData(){
   return {
     gameType:selectedGame,
@@ -2112,6 +2182,13 @@ async function processStateUpdate(newState){
   const prevBuzzer=prevBuzzerValue;
   gameState=newState;
   isHost=gameState.host===myId;
+  if(isHost&&gameState.gameType==="connect4"){
+    const seatPatch=reconcileConnect4SeatsPatch(gameState);
+    if(seatPatch){
+      await updateRoomData(seatPatch);
+      return;
+    }
+  }
   if(isHost){
     const now=Date.now();
     const stale=Object.entries(gameState.players||{})
@@ -2514,7 +2591,7 @@ function renderConnect4Lobby(){
   }
   const editor=document.getElementById("lobby-editor-area");
   if(editor) editor.innerHTML="";
-  const canStart=!!redId&&!!yellowId;
+  const canStart=!!redId&&!!yellowId&&!!players[redId]&&!!players[yellowId];
   document.getElementById("lobby-host-area").innerHTML=isHost
     ?`<button type="button" class="btn" ${canStart?"":"disabled"} onclick="window.startConnect4Game()">
         ${canStart?"Spiel starten":"Warte auf zweiten Spieler"}
@@ -2528,7 +2605,7 @@ window.startConnect4Game=async function(){
     await runTransaction(roomRef(),cur=>{
       if(!cur||cur.gameType!=="connect4"||cur.phase!=="lobby")return;
       const seats=cur.connect4?.seats||{};
-      if(!seats.red||!seats.yellow)return;
+      if(!seats.red||!seats.yellow||!cur.players?.[seats.red]||!cur.players?.[seats.yellow])return;
       cur.connect4={
         ...(cur.connect4||{}),
         board:Array(42).fill(null),
@@ -2718,24 +2795,30 @@ function renderConnect4Playing(){
   const myRoleKey=connect4RoleFor(gameState,myId);
   const myRole=myRoleKey==="red"?"Rot":myRoleKey==="yellow"?"Gelb":"Zuschauer";
   const board=c4.board||Array(42).fill(null);
-  const isMyTurn=myRoleKey&&c4.turn===myRoleKey&&!c4.winner;
-  const statusText=isMyTurn?"Du bist dran":`${turnName} ist dran`;
+  const isMyTurn=!!(myRoleKey&&c4.turn===myRoleKey&&!c4.winner);
+  const statusText=isMyTurn?"Du bist dran":(myRoleKey?`${turnName} ist dran`:"Du schaust zu");
+  const statusSub=myRoleKey?`Du bist ${myRole}`:`${turnName} ist dran`;
   cEl.innerHTML=`
     <div class="connect4-game">
       <div class="connect4-status">
         ${escHtml(statusText)}
-        <div class="connect4-status-sub">Du bist ${myRole}</div>
+        <div class="connect4-status-sub">${escHtml(statusSub)}</div>
       </div>
       <div class="connect4-legend">
         <div class="connect4-seat"><span class="connect4-seat-left"><span class="connect4-disc red"></span><span class="connect4-seat-name">${escHtml(redName)}</span></span><span class="connect4-seat-role">Rot</span></div>
         <div class="connect4-seat"><span class="connect4-seat-left"><span class="connect4-disc yellow"></span><span class="connect4-seat-name">${escHtml(yellowName)}</span></span><span class="connect4-seat-role">Gelb</span></div>
       </div>
+      <div class="connect4-drop-row" aria-label="Spalte auswählen">
+        ${Array.from({length:7},(_,col)=>{
+          const full=connect4ColumnFull(board,col);
+          const playable=isMyTurn&&!full;
+          return`<button type="button" class="connect4-drop-btn ${c4.turn||"red"} ${full?"full":""}" aria-label="Stein in Spalte ${col+1} werfen" ${playable?`onclick="window.makeConnect4Move(${col})"`:"disabled"}>↓</button>`;
+        }).join("")}
+      </div>
       <div class="connect4-board" aria-label="Vier gewinnt Spielbrett">
         ${board.map((cell,i)=>{
-          const col=i%7;
-          const playable=isMyTurn&&!connect4ColumnFull(board,col);
           const win=(c4.winCells||[]).includes(i)?"win":"";
-          return`<button type="button" class="connect4-cell ${cell||""} ${playable?"playable":""} ${win}" data-cell="${i}" aria-label="Spalte ${col+1}" ${playable?`onclick="window.makeConnect4Move(${col})"`:"disabled"}></button>`;
+          return`<div class="connect4-cell ${cell||""} ${win}" data-cell="${i}"></div>`;
         }).join("")}
       </div>
     </div>`;
@@ -3498,5 +3581,5 @@ function escHtml(s){
     .replace(/'/g,"&#039;");
 }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1767d009d22d933',t:'MTc4MzQyMzUyMw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a17688cbefd0d933',t:'MTc4MzQyNDAwNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
