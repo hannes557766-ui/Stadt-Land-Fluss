@@ -590,12 +590,45 @@
       cursor: pointer;
     }
     .battleship-board.placing { touch-action: none; }
-    .battleship-cell.ship { background: color-mix(in srgb, var(--primary-accent) 24%, var(--paper-white)); border-color: color-mix(in srgb, var(--primary-accent) 70%, var(--line)); }
-    .battleship-cell.ship::after { content: '🚢'; font-size: clamp(9px, 2.6vw, 16px); line-height: 1; }
-    .battleship-cell.preview-valid { background: color-mix(in srgb, var(--primary-accent) 36%, var(--paper-white)); border-color: var(--primary-accent); }
-    .battleship-cell.preview-invalid { background: color-mix(in srgb, var(--red) 18%, var(--paper-white)); border-color: var(--red); }
-    .battleship-cell.hit { background: var(--red); border-color: rgba(0,0,0,0.14); animation: battleHit 0.28s ease-out; }
-    .battleship-cell.sunk { background: #7f1d1d; border-color: #450a0a; outline: 2px solid var(--red); outline-offset: 1px; animation: battleHit 0.28s ease-out; }
+    .battleship-cell.ship,
+    .battleship-cell.hit,
+    .battleship-cell.sunk,
+    .battleship-cell.preview-valid,
+    .battleship-cell.preview-invalid { position: relative; overflow: visible; }
+    .battleship-cell.ship { background: var(--paper-white); border-color: color-mix(in srgb, var(--primary-accent) 46%, var(--line)); }
+    .battleship-cell.ship::after,
+    .battleship-cell.hit::after,
+    .battleship-cell.sunk::after,
+    .battleship-cell.preview-valid::after,
+    .battleship-cell.preview-invalid::after {
+      content: '';
+      position: absolute;
+      z-index: 2;
+      background: #f8c21c;
+      pointer-events: none;
+    }
+    .battleship-cell.hit { background: var(--paper-white); border-color: rgba(0,0,0,0.14); animation: battleHit 0.28s ease-out; }
+    .battleship-cell.hit::after { background: var(--red); }
+    .battleship-cell.sunk { background: var(--paper-white); border-color: #450a0a; outline: 2px solid var(--red); outline-offset: 1px; animation: battleHit 0.28s ease-out; }
+    .battleship-cell.sunk::after { background: #7f1d1d; }
+    .battleship-cell.preview-valid { background: color-mix(in srgb, var(--primary-accent) 8%, var(--paper-white)); border-color: var(--primary-accent); }
+    .battleship-cell.preview-valid::after { background: color-mix(in srgb, var(--primary-accent) 70%, #f8c21c); opacity: 0.72; }
+    .battleship-cell.preview-invalid { background: color-mix(in srgb, var(--red) 10%, var(--paper-white)); border-color: var(--red); }
+    .battleship-cell.preview-invalid::after { background: var(--red); opacity: 0.42; }
+    .battleship-cell.ship-single::after,
+    .battleship-cell.ship-h-start::after,
+    .battleship-cell.ship-h-mid::after,
+    .battleship-cell.ship-h-end::after,
+    .battleship-cell.ship-v-start::after,
+    .battleship-cell.ship-v-mid::after,
+    .battleship-cell.ship-v-end::after { inset: 22%; border-radius: 999px; }
+    .battleship-cell.ship-h-start::after { left: 16%; right: -5px; top: 28%; bottom: 28%; clip-path: polygon(0 50%, 26% 0, 100% 0, 100% 100%, 26% 100%); }
+    .battleship-cell.ship-h-mid::after { left: -5px; right: -5px; top: 28%; bottom: 28%; border-radius: 0; }
+    .battleship-cell.ship-h-end::after { left: -5px; right: 16%; top: 28%; bottom: 28%; clip-path: polygon(0 0, 74% 0, 100% 50%, 74% 100%, 0 100%); }
+    .battleship-cell.ship-v-start::after { top: 16%; bottom: -5px; left: 28%; right: 28%; clip-path: polygon(50% 0, 100% 26%, 100% 100%, 0 100%, 0 26%); }
+    .battleship-cell.ship-v-mid::after { top: -5px; bottom: -5px; left: 28%; right: 28%; border-radius: 0; }
+    .battleship-cell.ship-v-end::after { top: -5px; bottom: 16%; left: 28%; right: 28%; clip-path: polygon(0 0, 100% 0, 100% 74%, 50% 100%, 0 74%); }
+    .battleship-cell.ship-single::after { inset: 20%; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
     .battleship-cell.miss { background: color-mix(in srgb, var(--blue) 18%, var(--paper-white)); position: relative; animation: battleMiss 0.22s ease-out; }
     .battleship-cell.miss::after {
       content: '';
@@ -623,11 +656,18 @@
     .battleship-ship-pill {
       background: var(--paper2);
       color: var(--ink);
+      border: none;
       border-radius: 999px;
       padding: 7px 11px;
+      font-family: 'Nunito', sans-serif;
       font-size: 13px;
       font-weight: 900;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
+    button.battleship-ship-pill { cursor: pointer; }
+    .battleship-ship-pill.current { outline: 2px solid var(--primary-accent); background: color-mix(in srgb, var(--primary-accent) 16%, var(--paper2)); }
     .battleship-ship-pill.done { background: var(--primary-accent); color: var(--accent-text); }
     .battleship-warning { color: var(--red); font-size: 13px; font-weight: 800; min-height: 18px; }
     @media (max-width: 430px) {
@@ -2182,7 +2222,7 @@ function initialBattleshipState(){
     lastShot:null,
     round:0,
     ships:BATTLESHIP_SHIPS,
-    hitStreak:false
+    hitStreak:true
   };
 }
 function reconcileBattleshipSeatsPatch(state){
@@ -2787,7 +2827,7 @@ function renderBattleshipLobby(){
   const seats=bs.seats||{};
   const p1Id=seats.p1||gameState.host;
   const p2Id=seats.p2||null;
-  const hitStreak=!!bs.hitStreak;
+  const hitStreak=true;
   const myRole=battleshipRoleFor(gameState,myId);
   const spectatorIds=Object.keys(players).filter(id=>id!==p1Id&&id!==p2Id);
   const p1Action=(!p1Id&&myRole!=="p2")?`<button type="button" class="seat-action" onclick="window.takeBattleshipSeat('p1')">Übernehmen</button>`:`<span class="connect4-seat-role">Flotte 1</span>`;
@@ -2820,7 +2860,7 @@ function renderBattleshipLobby(){
         <div class="lobby-section-title">Flotte</div>
         <div class="lobby-meta-line">
           ${(bs.ships||BATTLESHIP_SHIPS).map(size=>`<span class="lobby-meta-pill">${size}er</span>`).join("")}
-          <span class="lobby-meta-pill">Treffer: ${hitStreak?"nochmal":"Wechsel"}</span>
+          <span class="lobby-meta-pill">Treffer: nochmal</span>
         </div>
       </div>
       ${spectatorIds.length?`<div class="connect4-spectators"><div class="lobby-section-title">Zuschauer</div><div class="lobby-cats-line">${spectatorIds.map(id=>`<div class="cat-tag">${escHtml(players[id]?.name||"?")}</div>`).join("")}</div></div>`:""}`;
@@ -2832,8 +2872,7 @@ function renderBattleshipLobby(){
     ?`<button type="button" class="btn" ${canPrepare?"":"disabled"} onclick="window.startBattleshipPlacement()">
         ${canPrepare?"Flotte platzieren":"Warte auf zweiten Spieler"}
       </button>
-      ${canPrepare?`<button type="button" class="btn btn-outline" onclick="window.swapBattleshipSeats()">Flotten tauschen</button>`:""}
-      <button type="button" class="btn btn-outline" onclick="window.toggleBattleshipHitRule()">Treffer: ${hitStreak?"nochmal dran":"Zug wechseln"}</button>`
+      ${canPrepare?`<button type="button" class="btn btn-outline" onclick="window.swapBattleshipSeats()">Flotten tauschen</button>`:""}`
     :`<div style="font-size:16px;color:var(--pencil);font-weight:700;"><span class="pulse-dot"></span>Warte auf den Host</div>`;
 }
 
@@ -2883,8 +2922,7 @@ window.swapBattleshipSeats=async function(){
 };
 window.toggleBattleshipHitRule=async function(){
   if(!isHost||!gameState||gameState.gameType!=="battleship"||gameState.phase!=="lobby")return;
-  const current=!!gameState.battleship?.hitStreak;
-  await updateRoomData({"battleship/hitStreak":!current});
+  await updateRoomData({"battleship/hitStreak":true});
 };
 window.startBattleshipPlacement=async function(){
   if(!isHost||!gameState||gameState.gameType!=="battleship")return;
@@ -3165,6 +3203,37 @@ function battleshipCellsFromShips(ships){
   (ships||[]).forEach(ship=>(ship.cells||[]).forEach(c=>cells.add(c)));
   return cells;
 }
+function battleshipShipSegmentClass(ships,cell){
+  const ship=(ships||[]).find(s=>(s.cells||[]).includes(cell));
+  if(!ship)return"";
+  const cells=[...(ship.cells||[])].sort((a,b)=>a-b);
+  if(cells.length<=1)return"ship ship-single";
+  const horizontal=Math.floor(cells[0]/10)===Math.floor(cells[1]/10);
+  const ordered=horizontal?cells.sort((a,b)=>(a%10)-(b%10)):cells.sort((a,b)=>Math.floor(a/10)-Math.floor(b/10));
+  const idx=ordered.indexOf(cell);
+  if(horizontal){
+    if(idx===0)return"ship ship-h-start";
+    if(idx===ordered.length-1)return"ship ship-h-end";
+    return"ship ship-h-mid";
+  }
+  if(idx===0)return"ship ship-v-start";
+  if(idx===ordered.length-1)return"ship ship-v-end";
+  return"ship ship-v-mid";
+}
+function battleshipPreviewSegmentClass(cells,cell,orientation){
+  if(!cells||!cells.includes(cell))return"";
+  if(cells.length<=1)return"ship-single";
+  const ordered=[...cells].sort((a,b)=>orientation==="h"?(a%10)-(b%10):Math.floor(a/10)-Math.floor(b/10));
+  const idx=ordered.indexOf(cell);
+  if(orientation==="h"){
+    if(idx===0)return"ship-h-start";
+    if(idx===ordered.length-1)return"ship-h-end";
+    return"ship-h-mid";
+  }
+  if(idx===0)return"ship-v-start";
+  if(idx===ordered.length-1)return"ship-v-end";
+  return"ship-v-mid";
+}
 window.toggleBattleshipOrientation=function(){
   battleshipOrientation=battleshipOrientation==="h"?"v":"h";
   renderBattleshipPlacing();
@@ -3189,7 +3258,7 @@ window.placeBattleshipShip=function(cell){
 };
 function clearBattleshipPreview(){
   document.querySelectorAll(".battleship-cell.preview-valid,.battleship-cell.preview-invalid").forEach(el=>{
-    el.classList.remove("preview-valid","preview-invalid");
+    el.classList.remove("preview-valid","preview-invalid","ship-single","ship-h-start","ship-h-mid","ship-h-end","ship-v-start","ship-v-mid","ship-v-end");
   });
 }
 function updateBattleshipPreview(cell){
@@ -3202,7 +3271,10 @@ function updateBattleshipPreview(cell){
   const previewCells=cells||[cell];
   previewCells.forEach(c=>{
     const el=document.querySelector(`.battleship-cell[data-cell="${c}"]`);
-    if(el&&!el.classList.contains("ship")) el.classList.add(valid?"preview-valid":"preview-invalid");
+    if(el&&!el.classList.contains("ship")){
+      const seg=cells?battleshipPreviewSegmentClass(cells,c,battleshipOrientation):"ship-single";
+      el.classList.add(valid?"preview-valid":"preview-invalid",seg);
+    }
   });
 }
 function battleshipCellFromPointer(e){
@@ -3303,7 +3375,8 @@ function battleshipBoardHtml({boardData, revealShips=false, title="", enemy=fals
         const isShip=shipCells.has(i);
         const wasShot=shots.has(i);
         const target=interactive&&!wasShot;
-        const cls=wasShot?(isShip?(sunkCells.has(i)?"sunk":"hit"):"miss"):(revealShips&&isShip?"ship":(target?"target":""));
+        const seg=isShip&&(revealShips||wasShot)?battleshipShipSegmentClass(boardData?.ships||[],i):"";
+        const cls=wasShot?(isShip?`${seg} ${sunkCells.has(i)?"sunk":"hit"}`:"miss"):(revealShips&&isShip?seg:(target?"target":""));
         return `<button type="button" class="battleship-cell ${cls}" data-cell="${i}" ${target?"":"disabled"}></button>`;
       })}
     </div>
@@ -3383,7 +3456,7 @@ window.makeBattleshipShot=async function(cell){
         cur.phase="results";
         if(cur.players?.[myId]) cur.players[myId].score=safeNum(cur.players[myId].score)+1;
       }else{
-        bs.turn=(hit&&bs.hitStreak)?role:targetRole;
+        bs.turn=hit?role:targetRole;
       }
       return cur;
     });
@@ -3446,17 +3519,20 @@ function renderBattleshipPlacing(){
     <div class="battleship-game">
       <div class="battleship-panel">
         <div class="battleship-title">Flotte platzieren</div>
-        <div class="battleship-sub">${currentSize?`${currentSize}er-Schiff platzieren`:"Alle Schiffe platziert"} · ${battleshipOrientation==="h"?"Horizontal":"Vertikal"}</div>
+        <div class="battleship-sub">${currentSize?`${currentSize}er-Schiff platzieren`:"Alle Schiffe platziert"} · Schiff antippen zum Drehen</div>
         <div class="battleship-toolbar">
-          <button type="button" class="btn btn-outline" onclick="window.toggleBattleshipOrientation()" ${allPlaced?"disabled":""}>${battleshipOrientation==="h"?"Horizontal":"Vertikal"}</button>
           <button type="button" class="btn btn-outline" onclick="window.resetBattleshipPlacement()">Zurücksetzen</button>
         </div>
       </div>
       <div class="battleship-ships">
-        ${ships.map((size,i)=>`<span class="battleship-ship-pill ${i<battleshipPlacedShips.length?"done":""}">${size}er</span>`).join("")}
+        ${ships.map((size,i)=>{
+          if(i<battleshipPlacedShips.length) return `<span class="battleship-ship-pill done">🚢 ${size}er</span>`;
+          if(i===battleshipPlacedShips.length) return `<button type="button" class="battleship-ship-pill current" onclick="window.toggleBattleshipOrientation()">🚢 ${size}er ${battleshipOrientation==="h"?"↔":"↕"}</button>`;
+          return `<span class="battleship-ship-pill">${size}er</span>`;
+        }).join("")}
       </div>
       <div class="battleship-board placing" aria-label="Schiffe platzieren">
-        ${battleshipGridHtml((i)=>`<button type="button" class="battleship-cell ${placed.has(i)?"ship":""}" data-cell="${i}" ${currentSize?"":"disabled"}></button>`)}
+        ${battleshipGridHtml((i)=>`<button type="button" class="battleship-cell ${battleshipShipSegmentClass(battleshipPlacedShips,i)}" data-cell="${i}" ${currentSize?"":"disabled"}></button>`)}
       </div>
       <div id="battleship-warning" class="battleship-warning"></div>
       <button type="button" class="btn" ${allPlaced?`onclick="window.finishBattleshipPlacement()"`:"disabled"}>${allPlaced?"Fertig":"Fertig nach dem Platzieren"}</button>
@@ -4449,5 +4525,5 @@ function escHtml(s){
     .replace(/'/g,"&#039;");
 }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a17718c76c49866e',t:'MTc4MzQyOTkwNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
