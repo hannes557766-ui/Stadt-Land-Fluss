@@ -1,7 +1,8 @@
-// Lädt die ausgelagerte App aus der gesicherten Quelldatei.
-// Wichtig: index.fixed.html muss auf GitHub neben index.html liegen.
+// Übergangslader: lädt die App aus index.fixed.html.
+// Schritt 1 Ziel bleibt: diese Runtime-Abhängigkeit entfernen und echte App-Logik direkt in src/app.js legen.
+// Cache-Buster verhindert zumindest, dass GitHub Pages eine alte index.fixed.html-Version ohne Kniffel benutzt.
 
-const SOURCE_HTML_URL = new URL("../index.fixed.html", import.meta.url);
+const SOURCE_HTML_URL = new URL(`../index.fixed.html?v=kniffel10&t=${Date.now()}`, import.meta.url);
 
 function showLoaderError(error) {
   console.error("App konnte nicht geladen werden:", error);
@@ -34,44 +35,6 @@ function extractSource(html) {
   return {
     css: styleMatch ? styleMatch[1] : "",
     js: scriptMatch[1]
-  };
-}
-
-function installCss(css) {
-  if (!css || document.getElementById("app-extracted-css")) return;
-  const style = document.createElement("style");
-  style.id = "app-extracted-css";
-  style.textContent = css;
-  document.head.appendChild(style);
-}
-
-async function importAppModule(js) {
-  const blob = new Blob([js], { type: "text/javascript" });
-  const moduleUrl = URL.createObjectURL(blob);
-  try {
-    await import(moduleUrl);
-  } finally {
-    setTimeout(() => URL.revokeObjectURL(moduleUrl), 1000);
-  }
-}
-
-async function boot() {
-  const response = await fetch(SOURCE_HTML_URL, { cache: "no-cache" });
-  if (!response.ok) {
-    throw new Error(`Quelle konnte nicht geladen werden: ${response.status} ${response.statusText}`);
-  }
-  const html = await response.text();
-  const { css, js } = extractSource(html);
-  installCss(css);
-  await importAppModule(js);
-}
-
-try {
-  // Top-level await hält DOMContentLoaded zurück, bis die ausgelagerte App registriert ist.
-  await boot();
-} catch (error) {
-  showLoaderError(error);
-}
   };
 }
 
