@@ -2,7 +2,7 @@
 // Schritt 1 Ziel bleibt: diese Runtime-Abhängigkeit entfernen und echte App-Logik direkt in src/app.js legen.
 // Cache-Buster verhindert zumindest, dass GitHub Pages eine alte index.fixed.html-Version ohne Kniffel benutzt.
 
-const SOURCE_HTML_URL = new URL(`../index.fixed.html?v=kniffel11&t=${Date.now()}`, import.meta.url);
+const SOURCE_HTML_URL = new URL(`../index.fixed.html?v=kniffel12&t=${Date.now()}`, import.meta.url);
 
 function showLoaderError(error) {
   console.error("App konnte nicht geladen werden:", error);
