@@ -1528,6 +1528,18 @@
       text-align: center;
       font-weight: 900;
     }
+    .kniffel-die.rolling {
+      animation: kniffelRoll 0.18s linear infinite;
+      background: color-mix(in srgb, var(--primary-accent) 10%, var(--paper-white));
+      border-color: color-mix(in srgb, var(--primary-accent) 55%, var(--line));
+    }
+    @keyframes kniffelRoll {
+      0% { transform: translateY(0) rotate(0deg) scale(1); }
+      25% { transform: translateY(-3px) rotate(-8deg) scale(1.03); }
+      50% { transform: translateY(2px) rotate(7deg) scale(0.98); }
+      75% { transform: translateY(-2px) rotate(4deg) scale(1.02); }
+      100% { transform: translateY(0) rotate(0deg) scale(1); }
+    }
     .kniffel-actions {
       display: grid;
       gap: 10px;
@@ -1993,6 +2005,7 @@ let roundTimerInterval=null, roundTimerSecondsLeft=0;
 let collectingTimerInterval=null, stoppingTimerInterval=null;
 let typingTimeout=null;
 let prevBuzzerValue=null;
+let kniffelRollTimer=null;
 let syncedPhase=null; // tracks last rendered phase to detect real transitions
 
 let sfxVolume  = parseFloat(localStorage.getItem("slf_sfx_vol")  ?? "0.7");
@@ -2601,6 +2614,7 @@ function initialBattleshipState(){
 }
 function emptyKniffelDice(){ return [0,0,0,0,0]; }
 function emptyKniffelHeld(){ return [false,false,false,false,false]; }
+function emptyKniffelRollingMask(){ return [false,false,false,false,false]; }
 function initialKniffelState(order=[]){
   const cleanOrder=[...new Set((order||[]).filter(Boolean))];
   return {
@@ -2610,7 +2624,10 @@ function initialKniffelState(order=[]){
     dice:emptyKniffelDice(),
     held:emptyKniffelHeld(),
     rolls:0,
-    round:0
+    round:0,
+    rollingUntil:0,
+    rollingNonce:0,
+    rollingMask:emptyKniffelRollingMask()
   };
 }
 function kniffelLobbyStateForPlayers(players={}){
@@ -2626,6 +2643,10 @@ function normalizeKniffelDice(raw){
 function normalizeKniffelHeld(raw){
   const arr=Array.isArray(raw)?raw:[];
   return emptyKniffelHeld().map((_,i)=>!!arr[i]);
+}
+function normalizeKniffelRollingMask(raw){
+  const arr=Array.isArray(raw)?raw:[];
+  return emptyKniffelRollingMask().map((_,i)=>!!arr[i]);
 }
 function kniffelCategoryById(catId){
   return KNIFFEL_CATEGORIES.find(c=>c.id===catId)||null;
@@ -2698,6 +2719,13 @@ function normalizeKniffelState(raw,players={}){
     held=emptyKniffelHeld();
     rolls=0;
   }
+  let rollingUntil=Math.max(0,Math.floor(safeNum(source.rollingUntil)));
+  let rollingNonce=Math.max(0,Math.floor(safeNum(source.rollingNonce)));
+  let rollingMask=normalizeKniffelRollingMask(source.rollingMask);
+  if(phase!=="playing"||rolls===0||rollingUntil<=Date.now()){
+    rollingUntil=0;
+    rollingMask=emptyKniffelRollingMask();
+  }
   let winner=source.winner&&order.includes(source.winner)?source.winner:null;
   if(phase==="results"&&!winner) winner=kniffelWinnerId({players,kniffel:{phase,order,scores}})||null;
   return {
@@ -2709,6 +2737,9 @@ function normalizeKniffelState(raw,players={}){
     held,
     rolls,
     round:Math.max(0,Math.floor(safeNum(source.round))),
+    rollingUntil,
+    rollingNonce,
+    rollingMask,
     winner,
     lastScore:normalizeKniffelLastScore(source.lastScore,order)
   };
@@ -2732,6 +2763,8 @@ function reconcileKniffelStatePatch(state){
     if(JSON.stringify(normalizeKniffelDice(raw.dice))!==JSON.stringify(emptyKniffelDice())) patch["kniffel/dice"]=emptyKniffelDice();
     if(JSON.stringify(normalizeKniffelHeld(raw.held))!==JSON.stringify(emptyKniffelHeld())) patch["kniffel/held"]=emptyKniffelHeld();
     if(raw.turn!=null) patch["kniffel/turn"]=null;
+    if(safeNum(raw.rollingUntil)!==0) patch["kniffel/rollingUntil"]=0;
+    if(JSON.stringify(normalizeKniffelRollingMask(raw.rollingMask))!==JSON.stringify(emptyKniffelRollingMask())) patch["kniffel/rollingMask"]=emptyKniffelRollingMask();
     if(raw.winner!=null) patch["kniffel/winner"]=null;
     if(raw.lastScore!=null) patch["kniffel/lastScore"]=null;
     return Object.keys(patch).length?patch:null;
@@ -2748,6 +2781,8 @@ function reconcileKniffelStatePatch(state){
     patch["kniffel/dice"]=emptyKniffelDice();
     patch["kniffel/held"]=emptyKniffelHeld();
     patch["kniffel/rolls"]=0;
+    patch["kniffel/rollingUntil"]=0;
+    patch["kniffel/rollingMask"]=emptyKniffelRollingMask();
   }
   return Object.keys(patch).length?patch:null;
 }
@@ -3145,6 +3180,7 @@ function resetRoundData(){
   sessionStorage.removeItem("slf_local_answers");
   if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
   localBuzzerCountdown=null;
+  if(kniffelRollTimer){clearTimeout(kniffelRollTimer);kniffelRollTimer=null;}
   visibleSuggestions=[];
 }
 
@@ -4525,7 +4561,25 @@ function kniffelWinnerId(state){
 function kniffelDieFace(n){
   return ["□","⚀","⚁","⚂","⚃","⚄","⚅"][Number(n)]||"□";
 }
-function kniffelDiceReady(dice){
+function kniffelIsRolling(k){
+  return safeNum(k?.rollingUntil)>Date.now();
+}
+function kniffelRandomFace(){
+  return kniffelDieFace(Math.floor(Math.random()*6)+1);
+}
+function scheduleKniffelRollRender(k){
+  if(!kniffelIsRolling(k)||kniffelRollTimer)return;
+  const remaining=Math.max(0,safeNum(k.rollingUntil)-Date.now());
+  kniffelRollTimer=setTimeout(()=>{
+    kniffelRollTimer=null;
+    if(gameState?.gameType==="kniffel"&&gameState.phase==="playing") renderPlaying();
+  }, Math.min(90,remaining+30));
+}
+function kniffelDisplayDieFace(k,dice,index){
+  const mask=normalizeKniffelRollingMask(k?.rollingMask);
+  return kniffelIsRolling(k)&&mask[index]?kniffelRandomFace():kniffelDieFace(dice[index]);
+}
+function kniffelDiceReady(dice){ 
   return Array.isArray(dice)&&dice.length===5&&dice.every(n=>Number.isInteger(Number(n))&&Number(n)>=1&&Number(n)<=6);
 }
 function kniffelCanRoll(k){
@@ -4539,11 +4593,14 @@ function kniffelResetDiceTurn(k,nextTurn){
     turn:nextTurn||null,
     dice:emptyKniffelDice(),
     held:emptyKniffelHeld(),
-    rolls:0
+    rolls:0,
+    rollingUntil:0,
+    rollingNonce:safeNum(k?.rollingNonce),
+    rollingMask:emptyKniffelRollingMask()
   };
 }
 function kniffelEntryChoicesHtml(state,k){
-  if(!k||k.turn!==myId||safeNum(k.rolls)<=0||!kniffelDiceReady(k.dice))return"";
+  if(!k||kniffelIsRolling(k)||k.turn!==myId||safeNum(k.rolls)<=0||!kniffelDiceReady(k.dice))return"";
   const scores=kniffelScoresForPlayer({...state,kniffel:k},myId);
   const sections=["Oben","Unten"].map(section=>{
     const cats=KNIFFEL_CATEGORIES.filter(cat=>cat.section===section&&scores[cat.id]==null);
@@ -4585,7 +4642,7 @@ function kniffelScoreSheetHtml(state,{interactive=false}={}){
       ${order.map(pid=>{
         const scores=kniffelScoresForPlayer(state,pid);
         const val=scores[cat.id];
-        const canPick=interactive&&pid===myId&&k.turn===myId&&k.rolls>0&&val==null;
+        const canPick=interactive&&!kniffelIsRolling(k)&&pid===myId&&k.turn===myId&&k.rolls>0&&val==null;
         if(canPick){
           const preview=kniffelScoreFor(cat.id,k.dice||[]);
           return `<td class="kniffel-current-player"><button type="button" class="kniffel-score-btn" onclick="window.pickKniffelCategory('${cat.id}')">${preview}</button></td>`;
@@ -4615,25 +4672,32 @@ function renderKniffelPlaying(){
   const isMyTurn=k.turn===myId;
   const dice=normalizeKniffelDice(k.dice);
   const held=normalizeKniffelHeld(k.held);
-  const canRoll=isMyTurn&&kniffelCanRoll(k);
-  const canHold=isMyTurn&&k.rolls>0&&kniffelDiceReady(dice);
-  const rollLabel=k.rolls===0?"Würfeln":(held.every(Boolean)?"Alle behalten":(k.rolls>=3?"Keine Würfe übrig":`Nochmal würfeln (${3-k.rolls})`));
+  const rolling=kniffelIsRolling(k);
+  scheduleKniffelRollRender(k);
+  const canRoll=isMyTurn&&!rolling&&kniffelCanRoll(k);
+  const canHold=isMyTurn&&!rolling&&k.rolls>0&&kniffelDiceReady(dice);
+  const rollLabel=rolling?"Würfelt…":(k.rolls===0?"Würfeln":(held.every(Boolean)?"Alle behalten":(k.rolls>=3?"Keine Würfe übrig":`Nochmal würfeln (${3-k.rolls})`)));
   const status=isMyTurn?"Du bist dran":`${turnName} ist dran`;
-  const sub=isMyTurn
-    ?(k.rolls===0?"Würfle bis zu dreimal.":(k.rolls>=3?"Trage jetzt ein Feld ein.":`Wurf ${k.rolls} / 3 · Würfel antippen zum Behalten`))
-    :"Du schaust zu";
+  const sub=rolling
+    ?"Die Würfel rollen…"
+    :(isMyTurn
+      ?(k.rolls===0?"Würfle bis zu dreimal.":(k.rolls>=3?"Trage jetzt ein Feld ein.":`Wurf ${k.rolls} / 3 · Würfel antippen zum Behalten`))
+      :"Du schaust zu");
   cEl.innerHTML=`
     <div class="kniffel-game">
       <div class="kniffel-panel">
         <div class="kniffel-title">${escHtml(status)}</div>
         <div class="kniffel-sub">${escHtml(sub)}</div>
         <div class="kniffel-dice-row">
-          ${dice.map((n,i)=>`<button type="button" class="kniffel-die ${held[i]?"held":""} ${canHold?"clickable":""}" ${canHold?`onclick="window.toggleKniffelHold(${i})"`:"disabled"} aria-label="Würfel ${i+1}${n?`: ${n}`:""}${held[i]?", behalten":""}">${kniffelDieFace(n)}</button>`).join("")}
+          ${dice.map((n,i)=>{
+            const dieRolling=rolling&&normalizeKniffelRollingMask(k.rollingMask)[i];
+            return `<button type="button" class="kniffel-die ${held[i]?"held":""} ${dieRolling?"rolling":""} ${canHold?"clickable":""}" ${canHold?`onclick="window.toggleKniffelHold(${i})"`:"disabled"} aria-label="Würfel ${i+1}${n?`: ${n}`:""}${held[i]?", behalten":""}${dieRolling?", rollt":""}">${kniffelDisplayDieFace(k,dice,i)}</button>`;
+          }).join("")}
         </div>
         <div class="kniffel-actions">
           <button type="button" class="btn" ${canRoll?`onclick="window.rollKniffelDice()"`:"disabled"}>${escHtml(rollLabel)}</button>
-          ${isMyTurn&&k.rolls===0?`<div class="hint">Nach dem ersten Wurf kannst du Würfel behalten und unten ein Feld eintragen.</div>`:""}
-          ${isMyTurn&&k.rolls>0?`<div class="hint">Zum Eintragen unten einen Vorschauwert antippen.</div>`:""}
+          ${isMyTurn&&!rolling&&k.rolls===0?`<div class="hint">Nach dem ersten Wurf kannst du Würfel behalten und unten ein Feld eintragen.</div>`:""}
+          ${isMyTurn&&!rolling&&k.rolls>0?`<div class="hint">Zum Eintragen unten einen Vorschauwert antippen.</div>`:""}
         </div>
       </div>
       ${k.lastScore?`<div class="round-ended-note">${escHtml(gameState.players?.[k.lastScore.player]?.name||"?")} hat ${safeNum(k.lastScore.score)} Punkte bei ${escHtml(KNIFFEL_CATEGORIES.find(c=>c.id===k.lastScore.category)?.name||k.lastScore.category)} eingetragen.</div>`:""}
@@ -4651,7 +4715,7 @@ window.toggleKniffelHold=async function(index){
     await runTransaction(roomRef(),cur=>{
       if(!cur||cur.gameType!=="kniffel"||cur.phase!=="playing")return;
       const k=normalizeKniffelState(cur.kniffel,cur.players||{});
-      if(k.phase!=="playing"||k.turn!==myId||safeNum(k.rolls)<=0||!kniffelDiceReady(k.dice))return;
+      if(kniffelIsRolling(k)||k.phase!=="playing"||k.turn!==myId||safeNum(k.rolls)<=0||!kniffelDiceReady(k.dice))return;
       k.held=normalizeKniffelHeld(k.held);
       k.held[index]=!k.held[index];
       cur.kniffel=k;
@@ -4668,15 +4732,22 @@ window.rollKniffelDice=async function(){
     await runTransaction(roomRef(),cur=>{
       if(!cur||cur.gameType!=="kniffel"||cur.phase!=="playing")return;
       const k=normalizeKniffelState(cur.kniffel,cur.players||{});
-      if(k.phase!=="playing"||k.turn!==myId||!kniffelCanRoll(k))return;
+      if(kniffelIsRolling(k)||k.phase!=="playing"||k.turn!==myId||!kniffelCanRoll(k))return;
       const dice=normalizeKniffelDice(k.dice);
       const held=k.rolls===0?emptyKniffelHeld():normalizeKniffelHeld(k.held);
+      const rollingMask=emptyKniffelRollingMask();
       for(let i=0;i<5;i++){
-        if(k.rolls===0||!held[i]) dice[i]=Math.floor(Math.random()*6)+1;
+        if(k.rolls===0||!held[i]){
+          dice[i]=Math.floor(Math.random()*6)+1;
+          rollingMask[i]=true;
+        }
       }
       k.dice=dice;
       k.held=held;
       k.rolls=safeNum(k.rolls)+1;
+      k.rollingUntil=Date.now()+850;
+      k.rollingNonce=safeNum(k.rollingNonce)+1;
+      k.rollingMask=rollingMask;
       cur.kniffel=k;
       didRoll=true;
       return cur;
@@ -4694,7 +4765,7 @@ window.pickKniffelCategory=async function(catId){
     await runTransaction(roomRef(),cur=>{
       if(!cur||cur.gameType!=="kniffel"||cur.phase!=="playing")return;
       let k=normalizeKniffelState(cur.kniffel,cur.players||{});
-      if(k.phase!=="playing"||k.turn!==myId||safeNum(k.rolls)<=0||!kniffelDiceReady(k.dice))return;
+      if(kniffelIsRolling(k)||k.phase!=="playing"||k.turn!==myId||safeNum(k.rolls)<=0||!kniffelDiceReady(k.dice))return;
       if(!k.scores)k.scores={};
       if(!k.scores[myId])k.scores[myId]={};
       if(k.scores[myId][catId]!=null)return;
@@ -4706,7 +4777,7 @@ window.pickKniffelCategory=async function(catId){
       const allDone=order.length>0&&order.every(pid=>kniffelPlayerComplete(k.scores?.[pid]||{}));
       if(allDone){
         const winner=kniffelWinnerId(stateForCalc);
-        k={...k,winner,phase:"results",turn:null,dice:emptyKniffelDice(),held:emptyKniffelHeld(),rolls:0};
+        k={...k,winner,phase:"results",turn:null,dice:emptyKniffelDice(),held:emptyKniffelHeld(),rolls:0,rollingUntil:0,rollingMask:emptyKniffelRollingMask()};
         cur.phase="results";
         if(winner&&cur.players?.[winner]) cur.players[winner].score=safeNum(cur.players[winner].score)+1;
       }else{
@@ -5753,5 +5824,5 @@ function escHtml(s){
     .replace(/'/g,"&#039;");
 }
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a17f34fcc855e509',t:'MTc4MzUxNDk0Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
