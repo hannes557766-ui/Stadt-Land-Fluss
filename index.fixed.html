@@ -2603,19 +2603,14 @@ function emptyKniffelDice(){ return [0,0,0,0,0]; }
 function emptyKniffelHeld(){ return [false,false,false,false,false]; }
 function initialKniffelState(order=[]){
   const cleanOrder=[...new Set((order||[]).filter(Boolean))];
-  const scores={};
-  cleanOrder.forEach(id=>{ scores[id]={}; });
   return {
     phase:"lobby",
     order:cleanOrder,
-    turn:null,
-    scores,
+    scores:{},
     dice:emptyKniffelDice(),
     held:emptyKniffelHeld(),
     rolls:0,
-    round:0,
-    winner:null,
-    lastScore:null
+    round:0
   };
 }
 function kniffelLobbyStateForPlayers(players={}){
@@ -2649,13 +2644,14 @@ function normalizeKniffelScores(rawScores,order){
   const out={};
   (order||[]).forEach(id=>{
     const src=(rawScores&&typeof rawScores==="object"&&rawScores[id]&&typeof rawScores[id]==="object")?rawScores[id]:{};
-    out[id]={};
+    const playerScores={};
     KNIFFEL_CATEGORIES.forEach(cat=>{
       if(src[cat.id]!=null){
         const normalizedScore=normalizeKniffelCategoryScore(cat.id,src[cat.id]);
-        if(normalizedScore!=null) out[id][cat.id]=normalizedScore;
+        if(normalizedScore!=null) playerScores[cat.id]=normalizedScore;
       }
     });
+    if(Object.keys(playerScores).length>0) out[id]=playerScores;
   });
   return out;
 }
@@ -2720,15 +2716,38 @@ function normalizeKniffelState(raw,players={}){
 function reconcileKniffelStatePatch(state){
   if(!state||state.gameType!=="kniffel")return null;
   const players=state.players||{};
-  let normalized=normalizeKniffelState(state.kniffel,players);
-  if(state.phase==="lobby") normalized=kniffelLobbyStateForPlayers(players);
+  const raw=state.kniffel||{};
+  const normalized=normalizeKniffelState(raw,players);
   const patch={};
-  if(JSON.stringify(normalized)!==JSON.stringify(state.kniffel||{})) patch.kniffel=normalized;
+
+  // Wichtig: Firebase speichert leere Objekte und null-Felder nicht zuverlässig.
+  // Deshalb nicht den kompletten normalisierten State zurückschreiben, sonst entsteht
+  // in der Lobby eine Endlos-Reparatur und der Raum wird scheinbar nicht erstellt.
+  if(state.phase==="lobby"){
+    const desiredOrder=Object.keys(players||{});
+    const rawOrder=Array.isArray(raw.order)?raw.order.filter(id=>players[id]):[];
+    if(raw.phase!=="lobby") patch["kniffel/phase"]="lobby";
+    if(JSON.stringify(rawOrder)!==JSON.stringify(desiredOrder)) patch["kniffel/order"]=desiredOrder;
+    if(safeNum(raw.rolls)!==0) patch["kniffel/rolls"]=0;
+    if(JSON.stringify(normalizeKniffelDice(raw.dice))!==JSON.stringify(emptyKniffelDice())) patch["kniffel/dice"]=emptyKniffelDice();
+    if(JSON.stringify(normalizeKniffelHeld(raw.held))!==JSON.stringify(emptyKniffelHeld())) patch["kniffel/held"]=emptyKniffelHeld();
+    if(raw.turn!=null) patch["kniffel/turn"]=null;
+    if(raw.winner!=null) patch["kniffel/winner"]=null;
+    if(raw.lastScore!=null) patch["kniffel/lastScore"]=null;
+    return Object.keys(patch).length?patch:null;
+  }
+
   if(state.phase!=="results"&&normalized.phase==="results"){
     patch.phase="results";
-    if(normalized.winner&&players[normalized.winner]){
-      patch[`players/${normalized.winner}/score`]=safeNum(players[normalized.winner].score)+1;
+    patch["kniffel/phase"]="results";
+    if(normalized.winner){
+      patch["kniffel/winner"]=normalized.winner;
+      if(players[normalized.winner]) patch[`players/${normalized.winner}/score`]=safeNum(players[normalized.winner].score)+1;
     }
+    patch["kniffel/turn"]=null;
+    patch["kniffel/dice"]=emptyKniffelDice();
+    patch["kniffel/held"]=emptyKniffelHeld();
+    patch["kniffel/rolls"]=0;
   }
   return Object.keys(patch).length?patch:null;
 }
