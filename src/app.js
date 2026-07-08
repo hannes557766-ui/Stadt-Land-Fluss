@@ -72,3 +72,41 @@ try {
 } catch (error) {
   showLoaderError(error);
 }
+  };
+}
+
+function installCss(css) {
+  if (!css || document.getElementById("app-extracted-css")) return;
+  const style = document.createElement("style");
+  style.id = "app-extracted-css";
+  style.textContent = css;
+  document.head.appendChild(style);
+}
+
+async function importAppModule(js) {
+  const blob = new Blob([js], { type: "text/javascript" });
+  const moduleUrl = URL.createObjectURL(blob);
+  try {
+    await import(moduleUrl);
+  } finally {
+    setTimeout(() => URL.revokeObjectURL(moduleUrl), 1000);
+  }
+}
+
+async function boot() {
+  const response = await fetch(SOURCE_HTML_URL, { cache: "no-cache" });
+  if (!response.ok) {
+    throw new Error(`Quelle konnte nicht geladen werden: ${response.status} ${response.statusText}`);
+  }
+  const html = await response.text();
+  const { css, js } = extractSource(html);
+  installCss(css);
+  await importAppModule(js);
+}
+
+try {
+  // Top-level await hält DOMContentLoaded zurück, bis die ausgelagerte App registriert ist.
+  await boot();
+} catch (error) {
+  showLoaderError(error);
+}
