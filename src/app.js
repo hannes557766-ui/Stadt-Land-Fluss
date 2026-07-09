@@ -2,7 +2,7 @@
 // Schritt 1 Ziel bleibt: diese Runtime-Abhängigkeit entfernen und echte App-Logik direkt in src/app.js legen.
 // Cache-Buster verhindert zumindest, dass GitHub Pages eine alte index.fixed.html-Version ohne Kniffel benutzt.
 
-const SOURCE_HTML_URL = new URL(`../index.fixed.html?v=maumausort1&t=${Date.now()}`, import.meta.url);
+const SOURCE_HTML_URL = new URL(`../index.fixed.html?v=loadfix1&t=${Date.now()}`, import.meta.url);
 
 function showLoaderError(error) {
   console.error("App konnte nicht geladen werden:", error);
@@ -18,9 +18,11 @@ function showLoaderError(error) {
     "color: #343a40",
     "line-height: 1.45"
   ].join(";");
+  const detail = String(error?.message || error || "Unbekannter Fehler");
   message.innerHTML = `
     <strong>Das Spiel konnte nicht geladen werden.</strong><br>
-    Bitte prüfe, ob <code>index.fixed.html</code>, <code>src/app.js</code> und <code>styles/app.css</code> alle auf GitHub hochgeladen wurden.
+    Bitte prüfe, ob <code>index.fixed.html</code>, <code>src/app.js</code> und <code>styles/app.css</code> alle auf GitHub hochgeladen wurden.<br><br>
+    <small><strong>Technischer Fehler:</strong> ${detail.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</small>
   `;
   document.body.innerHTML = "";
   document.body.appendChild(message);
