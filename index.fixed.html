@@ -778,6 +778,34 @@
       gap: 10px;
     }
     .connect4-actions .btn { margin-top: 0; }
+    .connect4-result-stage {
+      width: 100%;
+      max-width: 480px;
+      display: grid;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .connect4-result-stage .connect4-status {
+      margin: 0;
+    }
+    .connect4-cell.win {
+      position: relative;
+      z-index: 1;
+      outline: 3px solid var(--primary-accent);
+      outline-offset: 2px;
+      box-shadow: inset 0 0 0 4px rgba(255,255,255,0.30), 0 0 0 2px rgba(52,58,64,0.08);
+      transform: scale(1.04);
+    }
+    #screen-results.connect4-results-screen {
+      padding-top: 56px;
+    }
+    #screen-results.connect4-results-screen > .game-header {
+      display: none;
+    }
+    #screen-results.connect4-results-screen #gameover-area {
+      width: 100%;
+      max-width: 480px;
+    }
     @media (max-width: 430px) {
       .connect4-board { gap: 5px; padding: 10px; border-radius: 18px; }
       .connect4-status { padding: 14px; }
@@ -1325,17 +1353,7 @@
       color: var(--pencil);
       white-space: nowrap;
     }
-    .join-back-btn {
-      width: auto;
-      margin-top: 22px;
-      padding: 10px 0;
-      border: none;
-      background: transparent;
-      color: var(--pencil);
-      font-family: 'Nunito', sans-serif;
-      font-weight: 900;
-      cursor: pointer;
-    }
+    .join-back-btn { display: none !important; }
 
     /* ── Settings Modal ── */
     .settings-overlay {
@@ -1428,14 +1446,33 @@
     }
 
     .leave-btn {
-      position: fixed; top: 16px; left: 16px; z-index: 100;
-      background: var(--paper-white); border: 1px solid var(--paper2);
-      border-radius: 20px; padding: 8px 16px;
-      font-size: 13px; font-weight: 800; color: var(--red); cursor: pointer;
-      display: none; transition: all 0.2s;
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 260;
+      background: var(--paper-white);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 9px 15px;
+      min-height: 42px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--ink);
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.18s, border-color 0.18s, transform 0.18s;
       box-shadow: none;
+      touch-action: manipulation;
     }
-    .leave-btn:hover { background: var(--paper2); }
+    .leave-btn:hover {
+      background: var(--paper2);
+      border-color: color-mix(in srgb, var(--primary-accent) 42%, var(--line));
+      transform: translateY(-1px);
+    }
 
     .error-msg { color: var(--red); font-size: 14px; margin-top: 12px; font-weight: 700; text-align: center; }
     .hint { font-size: 13px; color: var(--pencil); text-align: center; margin-top: 16px; font-weight: 600; }
@@ -1458,6 +1495,417 @@
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .toggle-switch.on::after { transform: translateX(22px); border-color: var(--green); }
+
+    /* ── Mau Mau ── */
+    .maumau-game {
+      width: 100%;
+      max-width: 560px;
+      display: grid;
+      gap: 16px;
+    }
+    .maumau-panel {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--paper-white);
+      padding: 16px;
+    }
+    .maumau-title { font-size: 1.15rem; font-weight: 900; margin-bottom: 4px; }
+    .maumau-sub { color: var(--pencil); font-size: 13px; font-weight: 800; }
+    .maumau-active-color {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--paper-white);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-weight: 900;
+    }
+    .maumau-active-color .label {
+      color: var(--pencil);
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .maumau-active-color .value {
+      font-size: 1.05rem;
+      white-space: nowrap;
+    }
+    .maumau-active-color.red { border-color: rgba(239,68,68,0.35); background: #fee2e2; }
+    .maumau-active-color.yellow { border-color: rgba(234,179,8,0.35); background: #fef3c7; }
+    .maumau-active-color.green { border-color: rgba(34,197,94,0.35); background: #dcfce7; }
+    .maumau-active-color.blue { border-color: rgba(51,154,240,0.35); background: #dbeafe; }
+    .maumau-action-banner {
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--primary-accent) 14%, var(--paper-white));
+      border: 1px solid color-mix(in srgb, var(--primary-accent) 35%, var(--line));
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 900;
+      text-align: center;
+    }
+    .maumau-table {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+    .maumau-pile {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--primary-accent) 8%, var(--paper-white));
+      padding: 14px;
+      display: grid;
+      place-items: center;
+      gap: 8px;
+      min-height: 150px;
+    }
+    .maumau-pile-label {
+      color: var(--pencil);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .maumau-card {
+      width: 78px;
+      min-height: 112px;
+      border-radius: 14px;
+      border: 2px solid rgba(52,58,64,0.14);
+      background: var(--paper-white);
+      display: grid;
+      place-items: center;
+      padding: 10px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      box-shadow: 0 2px 0 rgba(52,58,64,0.08);
+      user-select: none;
+    }
+    .maumau-card.red { background: #fee2e2; color: #b91c1c; }
+    .maumau-card.yellow { background: #fef3c7; color: #92400e; }
+    .maumau-card.green { background: #dcfce7; color: #166534; }
+    .maumau-card.blue { background: #dbeafe; color: #1d4ed8; }
+    .maumau-card.wild { background: linear-gradient(135deg,#fee2e2,#fef3c7,#dcfce7,#dbeafe); color: #343a40; }
+    .maumau-card.back {
+      background: color-mix(in srgb, var(--primary-accent) 22%, var(--paper2));
+      color: var(--ink);
+    }
+    .maumau-card-symbol { font-size: 1.55rem; line-height: 1; }
+    .maumau-card-label { font-size: 0.78rem; text-align: center; margin-top: 6px; }
+    .maumau-hand {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 2px 8px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .maumau-hand .maumau-card,
+    .maumau-hand .maumau-card-btn { flex: 0 0 auto; width: 70px; min-height: 102px; }
+    .maumau-card-btn {
+      border: none;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .maumau-card-btn:disabled { cursor: default; opacity: 0.58; }
+    .maumau-card-btn .maumau-card { width: 100%; min-height: 100%; }
+    .maumau-card.playable {
+      outline: 3px solid var(--primary-accent);
+      outline-offset: 2px;
+      transform: translateY(-2px);
+    }
+    .maumau-card.unplayable { filter: grayscale(0.22); }
+    .maumau-card.placed { animation: mauMauPlace 0.34s ease-out; }
+    .maumau-card.drawn { animation: mauMauDraw 0.34s ease-out; }
+    .maumau-card-btn:not(:disabled):active .maumau-card { transform: translateY(1px) scale(0.98); }
+    .maumau-action-banner { animation: mauMauActionPop 0.32s ease-out; }
+    @keyframes mauMauPlace {
+      from { transform: translateY(-18px) rotate(-4deg) scale(0.92); opacity: 0.55; }
+      to { transform: translateY(0) rotate(0) scale(1); opacity: 1; }
+    }
+    @keyframes mauMauDraw {
+      from { transform: translateY(12px) scale(0.94); opacity: 0.55; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @keyframes mauMauActionPop {
+      from { transform: scale(0.98); opacity: 0.35; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .maumau-players { display: grid; gap: 8px; }
+    .maumau-player-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--paper-white);
+      padding: 10px 12px;
+      font-weight: 900;
+    }
+    .maumau-player-row.active { border-color: var(--primary-accent); background: color-mix(in srgb, var(--primary-accent) 10%, var(--paper-white)); }
+    .maumau-card-count.warn {
+      color: var(--red);
+      font-weight: 900;
+    }
+    .maumau-mau-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: var(--red);
+      color: white;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 900;
+      margin-left: 6px;
+    }
+    .maumau-mau-badge.called {
+      background: var(--primary-accent);
+      color: var(--accent-text);
+    }
+    .maumau-actions { display: grid; gap: 10px; }
+    .maumau-actions .btn { margin-top: 0; }
+    .maumau-color-choice {
+      display: grid;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--paper-white);
+      padding: 14px;
+    }
+    .maumau-color-row { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; }
+    .maumau-color-btn {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--paper2);
+      padding: 10px 8px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      cursor: pointer;
+      touch-action: manipulation;
+      min-height: 46px;
+      transition: transform 0.12s ease, border-color 0.12s ease;
+    }
+    .maumau-color-btn:hover { transform: translateY(-1px); }
+    .maumau-color-btn.red { background:#fee2e2; color:#b91c1c; border-color:rgba(185,28,28,0.28); }
+    .maumau-color-btn.yellow { background:#fef3c7; color:#92400e; border-color:rgba(146,64,14,0.24); }
+    .maumau-color-btn.green { background:#dcfce7; color:#166534; border-color:rgba(22,101,52,0.24); }
+    .maumau-color-btn.blue { background:#dbeafe; color:#1d4ed8; border-color:rgba(29,78,216,0.24); }
+    @media (max-width: 430px) {
+      .maumau-panel { padding: 14px; }
+      .maumau-table { gap: 10px; }
+      .maumau-pile { min-height: 132px; padding: 12px; }
+      .maumau-card { width: 66px; min-height: 96px; border-radius: 12px; }
+      .maumau-hand .maumau-card { width: 62px; min-height: 92px; }
+      .maumau-card-symbol { font-size: 1.35rem; }
+      .maumau-card-label { font-size: 0.7rem; }
+    }
+
+    /* ── Montagsmaler ── */
+    .drawing-game {
+      width: 100%;
+      max-width: 560px;
+      display: grid;
+      gap: 16px;
+    }
+    .drawing-panel {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--paper-white);
+      padding: 16px;
+    }
+    .drawing-title {
+      font-size: 1.15rem;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+    .drawing-sub {
+      color: var(--pencil);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .drawing-timer {
+      margin-top: 12px;
+      display: grid;
+      gap: 7px;
+    }
+    .drawing-timer-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--pencil);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+    .drawing-timer-track {
+      height: 10px;
+      border-radius: 999px;
+      background: var(--paper2);
+      overflow: hidden;
+    }
+    .drawing-timer-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--primary-accent);
+      transition: width 0.35s linear, background 0.2s ease;
+    }
+    .drawing-timer-fill.urgent { background: var(--red); }
+    .drawing-word-card {
+      border: 1px solid color-mix(in srgb, var(--primary-accent) 45%, var(--line));
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--primary-accent) 12%, var(--paper-white));
+      padding: 14px 16px;
+    }
+    .drawing-word {
+      font-size: 1.4rem;
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+    .drawing-canvas-wrap {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--paper-white);
+      padding: 8px;
+      touch-action: none;
+    }
+    .drawing-canvas {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      display: block;
+      border-radius: 12px;
+      background: white;
+      touch-action: none;
+      cursor: default;
+    }
+    .drawing-canvas.drawable { cursor: crosshair; }
+    .drawing-tools {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .drawing-tools .btn { margin-top: 0; }
+    .drawing-tool-panel {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+    }
+    .drawing-tool-title {
+      color: var(--pencil);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .drawing-tool-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .drawing-color-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid var(--line);
+      cursor: pointer;
+      padding: 0;
+      touch-action: manipulation;
+    }
+    .drawing-color-btn.active {
+      border-color: var(--ink);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-accent) 30%, transparent);
+    }
+    .drawing-tool-btn {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--paper-white);
+      color: var(--ink);
+      padding: 8px 12px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .drawing-tool-btn.active {
+      background: var(--primary-accent);
+      border-color: var(--primary-accent);
+      color: var(--accent-text);
+    }
+    .drawing-guess-row {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+      margin-top: 12px;
+    }
+    .drawing-guess-row input { height: 48px; }
+    .drawing-guess-row .btn {
+      width: auto;
+      min-width: 118px;
+      margin-top: 0;
+      height: 48px;
+      padding: 0 16px;
+    }
+    .drawing-guesses {
+      display: grid;
+      gap: 6px;
+      margin-top: 12px;
+      max-height: 132px;
+      overflow-y: auto;
+    }
+    .drawing-guess-chip {
+      display: grid;
+      grid-template-columns: minmax(72px, auto) 1fr;
+      gap: 8px;
+      align-items: start;
+      border-radius: 11px;
+      background: var(--paper2);
+      padding: 6px 9px;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+    .drawing-guess-chip.correct { background: color-mix(in srgb, var(--primary-accent) 22%, var(--paper2)); }
+    .drawing-guess-name { color: var(--pencil); overflow-wrap: anywhere; }
+    .drawing-guess-word { overflow-wrap: anywhere; text-align: right; }
+    .drawing-correct-banner {
+      animation: drawingPop 0.42s ease-out;
+    }
+    @keyframes drawingPop {
+      0% { transform: scale(0.96); opacity: 0.2; }
+      70% { transform: scale(1.025); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .drawing-pill-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .drawing-pill {
+      border-radius: 999px;
+      background: var(--paper2);
+      padding: 7px 11px;
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--ink);
+    }
+    @media (max-width: 430px) {
+      .drawing-panel, .drawing-word-card { padding: 14px; }
+      .drawing-canvas-wrap { padding: 6px; border-radius: 16px; }
+      .drawing-tools { grid-template-columns: 1fr; }
+      .drawing-tool-row { gap: 7px; }
+      .drawing-color-btn { width: 32px; height: 32px; }
+      .drawing-tool-btn { padding: 8px 10px; font-size: 12px; }
+      .drawing-guess-row { display: grid; grid-template-columns: 1fr; }
+      .drawing-guess-row .btn { width: 100%; }
+      .drawing-word { font-size: 1.25rem; }
+    }
 
     /* ── Kniffel ── */
     .kniffel-game {
@@ -1528,16 +1976,26 @@
       text-align: center;
       font-weight: 900;
     }
+    .kniffel-die-face {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      pointer-events: none;
+      transform-origin: center;
+    }
     .kniffel-die.rolling {
-      animation: kniffelRoll 0.18s linear infinite;
       background: color-mix(in srgb, var(--primary-accent) 10%, var(--paper-white));
       border-color: color-mix(in srgb, var(--primary-accent) 55%, var(--line));
     }
+    .kniffel-die-face.rolling {
+      animation: kniffelRoll 0.18s linear infinite;
+    }
     @keyframes kniffelRoll {
       0% { transform: translateY(0) rotate(0deg) scale(1); }
-      25% { transform: translateY(-3px) rotate(-8deg) scale(1.03); }
-      50% { transform: translateY(2px) rotate(7deg) scale(0.98); }
-      75% { transform: translateY(-2px) rotate(4deg) scale(1.02); }
+      25% { transform: translateY(-2px) rotate(-10deg) scale(1.08); }
+      50% { transform: translateY(1px) rotate(9deg) scale(0.96); }
+      75% { transform: translateY(-1px) rotate(5deg) scale(1.05); }
       100% { transform: translateY(0) rotate(0deg) scale(1); }
     }
     .kniffel-actions {
@@ -1800,6 +2258,16 @@
       <span class="game-card-title">Kniffel</span>
       <span class="game-card-status">bis 8 Spieler</span>
     </button>
+    <button type="button" class="game-card-btn" onclick="window.selectGame('drawing')">
+      <span class="game-card-icon">🖌️</span>
+      <span class="game-card-title">Montagsmaler</span>
+      <span class="game-card-status">2–12 Spieler</span>
+    </button>
+    <button type="button" class="game-card-btn" onclick="window.selectGame('maumau')">
+      <span class="game-card-icon">🃏</span>
+      <span class="game-card-title">Mau Mau</span>
+      <span class="game-card-status">2–8 Spieler</span>
+    </button>
   </div>
 </div>
 
@@ -1919,9 +2387,22 @@ const GAMES = {
     name:"Kniffel",
     titleHtml:"Kniffel",
     enabled:true
+  },
+  drawing: {
+    id:"drawing",
+    name:"Montagsmaler",
+    titleHtml:"Montagsmaler",
+    enabled:true
+  },
+  maumau: {
+    id:"maumau",
+    name:"Mau Mau",
+    titleHtml:"Mau Mau",
+    enabled:true
   }
 };
 let selectedGame="slf";
+let currentScreen="home";
 const SELECTED_GAME_SESSION_KEY="slf_game";
 function validGameId(gameId){
   return (gameId&&GAMES[gameId]?.enabled)?gameId:"slf";
@@ -1983,6 +2464,56 @@ const KNIFFEL_SCORE_TEST_CASES = [
   {cat:"chance", dice:[1,3,4,5,6], expected:19},
   {cat:"chance", dice:[0,3,4,5,6], expected:0}
 ];
+const DRAWING_MIN_PLAYERS = 2;
+const DRAWING_MAX_PLAYERS = 12;
+const DRAWING_DEFAULT_DURATION = 90;
+const DRAWING_TIMER_PRESETS = [60,90,120,180];
+const DRAWING_COLORS = [
+  {name:"Schwarz", hex:"#343a40"},
+  {name:"Rot", hex:"#ef4444"},
+  {name:"Blau", hex:"#339af0"},
+  {name:"Grün", hex:"#22c55e"},
+  {name:"Gelb", hex:"#facc15"},
+  {name:"Lila", hex:"#8b5cf6"}
+];
+const DRAWING_WIDTHS = [
+  {label:"Dünn", width:3},
+  {label:"Mittel", width:5},
+  {label:"Dick", width:9}
+];
+const DRAWING_ERASER_WIDTH = 18;
+const DRAWING_WORD_PACKS = {
+  easy: [
+    "Haus","Baum","Katze","Hund","Auto","Sonne","Mond","Stern","Pizza","Schiff",
+    "Blume","Ball","Tasse","Buch","Stuhl","Tisch","Apfel","Banane","Bett","Tür",
+    "Schuh","Fisch","Vogel","Herz","Kerze","Uhr","Lampe","Brille","Krone","Schlüssel",
+    "Maus","Käse","Wolke","Regen","Schnee","Eis","Mütze","Hut","Jacke","Hose",
+    "Löffel","Gabel","Topf","Kuchen","Brot","Milch","Ei","Biene","Schaf","Pferd"
+  ],
+  mixed: [
+    "Fahrrad","Schule","Rakete","Regenschirm","Schneemann","Roboter","Drache","Fußball","Gitarre","Kamera",
+    "Burg","Zahnbürste","Elefant","Pinguin","Torte","Flugzeug","Koffer","Feuerwehr","Krokodil","Geschenk",
+    "Zirkus","Zauberer","Krankenhaus","Supermarkt","Polizei","Bahnhof","Spielplatz","Computer","Mikrofon","Schokolade",
+    "Rucksack","Kopfhörer","Waschmaschine","Briefkasten","Bücherei","Schwimmbad","Dinosaurier","Hubschrauber","Kaktus","Einhorn",
+    "Taschenrechner","Sonnenbrille","Handschuh","Wasserflasche","Pfannkuchen","Roller","Skateboard","Leuchtturm","Bauernhof","Aquarium"
+  ],
+  hard: [
+    "Stromausfall","Geburtstagsfeier","Schatzkarte","Zeitmaschine","Weltreise","Hausaufgaben","Geheimagent","Drachenhöhle","Schneeballschlacht","Wasserschlacht",
+    "Kopfschmerzen","Urlaubsfoto","Piratenschiff","Mondlandung","Dschungelcamp","Küchenunfall","Verkehrsstau","Lagerfeuer","Fernbedienung","Taschenlampe",
+    "Zahnarztbesuch","Gewitterwolke","Flaschenpost","Klettergerüst","Eisverkäufer","Schulbus","Monstertruck","Zaubertrick","Kinoabend","Schlafwandler",
+    "Schneckenrennen","Unterwasserwelt","Flughafenkontrolle","Gebrochener Arm","Verlorener Schlüssel","Spukschloss","Wackelzahn","Doppelgänger","Zeitungsartikel","Rettungsboot",
+    "Drachensteigen","Müllabfuhr","Vulkanausbruch","Geisterbahn","Taucherausrüstung","Schokoladenbrunnen","Gummistiefel","Sternschnuppe","Marionette","Labyrinth"
+  ]
+};
+const DRAWING_WORD_MODE_LABELS = { easy:"Einfach", mixed:"Gemischt", hard:"Schwer" };
+const DRAWING_WORDS = [...new Set(Object.values(DRAWING_WORD_PACKS).flat())];
+const MAUMAU_MIN_PLAYERS = 2;
+const MAUMAU_MAX_PLAYERS = 8;
+const MAUMAU_COLORS = ["red","yellow","green","blue"];
+const MAUMAU_COLOR_LABELS = {red:"Rot",yellow:"Gelb",green:"Grün",blue:"Blau"};
+const MAUMAU_COLOR_DOTS = {red:"🔴",yellow:"🟡",green:"🟢",blue:"🔵"};
+const MAUMAU_VALUES = ["0","1","2","3","4","5","6","7","8","9","skip","reverse","draw2"];
+const MAUMAU_SPECIAL_LABELS = {skip:"Aussetzen",reverse:"Richtung",draw2:"+2",wild:"Farbwahl"};
 const ROOM_EXPIRY_MS = 24*60*60*1000;
 const PLAYER_STALE_MS = 90*1000; // Spieler bleiben sichtbar; nur Online-Status/aktive Runden nutzen diesen Timeout
 const TIMER_PRESETS = [0,60,90,120,180];
@@ -2006,6 +2537,11 @@ let collectingTimerInterval=null, stoppingTimerInterval=null;
 let typingTimeout=null;
 let prevBuzzerValue=null;
 let kniffelRollTimer=null;
+let drawingToolColor = DRAWING_COLORS.some(c=>c.hex===localStorage.getItem("drawing_color")) ? localStorage.getItem("drawing_color") : "#343a40";
+let drawingToolWidth = DRAWING_WIDTHS.some(w=>w.width===Number(localStorage.getItem("drawing_width"))) ? Number(localStorage.getItem("drawing_width")) : 5;
+let drawingToolMode = "pen";
+let drawingActiveStrokeId=null, drawingActiveStroke=null, drawingSyncTimer=null, drawingTickTimer=null, drawingTimerInterval=null;
+let mauMauPendingWildIndex=null, mauMauLastAnimatedTopId=null;
 let syncedPhase=null; // tracks last rendered phase to detect real transitions
 
 let sfxVolume  = parseFloat(localStorage.getItem("slf_sfx_vol")  ?? "0.7");
@@ -2399,6 +2935,7 @@ function setConnStatus(s){
   l.textContent=s==="ok"?"Verbunden":s==="sync"?"Sync…":"Fehler";
 }
 function showScreen(id){
+  currentScreen=id;
   ["home","join","lobby","playing","results"].forEach(s=>{
     const el=document.getElementById(`screen-${s}`);
     if(!el)return;
@@ -2406,7 +2943,11 @@ function showScreen(id){
     el.classList.toggle("hidden",hide);
     el.hidden=hide;
   });
-  document.getElementById("btn-leave").style.display=(id==="home"||id==="join")?"none":"block";
+  const backBtn=document.getElementById("btn-leave");
+  if(backBtn){
+    backBtn.textContent="← Zurück";
+    backBtn.style.display=id==="home"?"none":"inline-flex";
+  }
   const hb=document.getElementById("host-badge");
   if(hb) hb.style.display=(id==="lobby"&&isHost)?"block":"none";
 }
@@ -2454,6 +2995,21 @@ async function updateRoomData(patch){
 function connect4PieceCount(board){
   return normalizeConnect4Board(board).filter(Boolean).length;
 }
+function mergeConnect4Boards(primary, fallback){
+  const board=normalizeConnect4Board(primary);
+  const old=normalizeConnect4Board(fallback);
+  for(let i=0;i<42;i++){
+    // Vier-gewinnt-Steine verschwinden innerhalb einer laufenden Runde nie.
+    // Wenn ein Firebase-Update kurzzeitig eine ältere/ausgedünnte Board-Version liefert,
+    // behalten wir bekannte belegte Felder bei.
+    if(!board[i]&&old[i]) board[i]=old[i];
+  }
+  return board;
+}
+function connect4BoardsEqual(a,b){
+  const aa=normalizeConnect4Board(a), bb=normalizeConnect4Board(b);
+  return aa.every((v,i)=>v===bb[i]);
+}
 function stabilizeConnect4State(newState){
   if(newState?.gameType!=="connect4"||!gameState?.connect4||!newState.connect4)return newState;
   const oldC4=gameState.connect4;
@@ -2461,9 +3017,18 @@ function stabilizeConnect4State(newState){
   const sameRound=String(oldC4.round||0)===String(newC4.round||0);
   if(newState.phase==="playing"&&gameState.phase==="playing"&&sameRound){
     const oldMove=safeNum(oldC4.moveCount), newMove=safeNum(newC4.moveCount);
-    const oldCount=connect4PieceCount(oldC4.board), newCount=connect4PieceCount(newC4.board);
-    if(newMove<oldMove||(newMove===oldMove&&newCount<oldCount)){
-      return {...newState, connect4:{...newC4,...oldC4}};
+    const oldBoard=normalizeConnect4Board(oldC4.board);
+    const newBoard=normalizeConnect4Board(newC4.board);
+    const oldCount=connect4PieceCount(oldBoard), newCount=connect4PieceCount(newBoard);
+    if(newMove<oldMove){
+      return {...newState, connect4:{...newC4,...oldC4,board:oldBoard}};
+    }
+    if(newMove===oldMove&&newCount<oldCount){
+      return {...newState, connect4:{...newC4,...oldC4,board:oldBoard}};
+    }
+    const mergedBoard=mergeConnect4Boards(newBoard,oldBoard);
+    if(!connect4BoardsEqual(mergedBoard,newBoard)){
+      return {...newState, connect4:{...newC4,board:mergedBoard}};
     }
   }
   return newState;
@@ -2543,6 +3108,20 @@ function normalizeConnect4Board(raw){
   }
   return board;
 }
+function randomConnect4Turn(){
+  return Math.random()<0.5?"red":"yellow";
+}
+function otherConnect4Turn(role){
+  return role==="red"?"yellow":"red";
+}
+function isConnect4Role(role){
+  return role==="red"||role==="yellow";
+}
+function connect4StarterForNextRound(c4={}){
+  if(isConnect4Role(c4.nextStarter)) return c4.nextStarter;
+  if(isConnect4Role(c4.winner)) return otherConnect4Turn(c4.winner);
+  return randomConnect4Turn();
+}
 function initialConnect4State(){
   return {
     board:emptyConnect4Board(),
@@ -2552,7 +3131,8 @@ function initialConnect4State(){
     winCells:[],
     lastMove:null,
     moveCount:0,
-    round:0
+    round:0,
+    nextStarter:null
   };
 }
 function reconcileConnect4SeatsPatch(state){
@@ -2590,11 +3170,13 @@ function reconcileConnect4SeatsPatch(state){
   if(resetGame&&state.phase!=="lobby"){
     patch.phase="lobby";
     patch["connect4/board"]=emptyConnect4Board();
-    patch["connect4/turn"]="red";
+    const starter=connect4StarterForNextRound(state.connect4||{});
+    patch["connect4/turn"]=starter;
     patch["connect4/winner"]=null;
     patch["connect4/winCells"]=[];
     patch["connect4/lastMove"]=null;
     patch["connect4/moveCount"]=0;
+    patch["connect4/nextStarter"]=starter;
   }
   return patch;
 }
@@ -2786,7 +3368,439 @@ function reconcileKniffelStatePatch(state){
   }
   return Object.keys(patch).length?patch:null;
 }
-function reconcileBattleshipSeatsPatch(state){
+function initialDrawingState(order=[]){
+  const cleanOrder=[...new Set((order||[]).filter(Boolean))];
+  return {
+    phase:"lobby",
+    order:cleanOrder,
+    round:0,
+    drawer:null,
+    word:"",
+    wordIndex:0,
+    wordMode:"mixed",
+    usedWords:[],
+    roundDuration:DRAWING_DEFAULT_DURATION,
+    roundStartTs:null,
+    strokes:{},
+    guesses:{},
+    guessed:{},
+    lastCorrect:null,
+    winner:null
+  };
+}
+function drawingLobbyStateForPlayers(players={},previous={}){
+  const state=initialDrawingState(Object.keys(players||{}));
+  state.wordMode=drawingWordMode(previous?.wordMode||"mixed");
+  state.usedWords=Array.isArray(previous?.usedWords)?previous.usedWords.slice(-drawingWordPool(state.wordMode).length):[];
+  state.roundDuration=Math.max(30,Math.min(300,safeNum(previous?.roundDuration)||DRAWING_DEFAULT_DURATION));
+  return state;
+}
+function drawingOrder(state){
+  const players=state?.players||{};
+  const d=state?.drawing||{};
+  const existing=(Array.isArray(d.order)?d.order:[]).filter(id=>players[id]);
+  const missing=Object.keys(players).filter(id=>!existing.includes(id));
+  return [...existing,...missing];
+}
+function drawingPlayerName(id){
+  return id?(gameState.players?.[id]?.name||"?"):"?";
+}
+function drawingGuessesArray(guesses){
+  if(!guesses)return[];
+  const arr=Array.isArray(guesses)?guesses.filter(Boolean):Object.values(guesses).filter(Boolean);
+  return arr.sort((a,b)=>safeNum(a.ts)-safeNum(b.ts));
+}
+function drawingNextDrawer(order,currentDrawer){
+  const clean=(order||[]).filter(Boolean);
+  if(!clean.length)return null;
+  const idx=clean.indexOf(currentDrawer);
+  return clean[(idx>=0?idx+1:0)%clean.length];
+}
+function drawingWordMode(mode){
+  return DRAWING_WORD_PACKS[mode]?mode:"mixed";
+}
+function drawingWordPool(mode){
+  return DRAWING_WORD_PACKS[drawingWordMode(mode)]||DRAWING_WORD_PACKS.mixed;
+}
+function drawingPickWord(usedWords=[],mode="mixed"){
+  const pool=drawingWordPool(mode);
+  const used=new Set((usedWords||[]).map(String));
+  let available=pool.filter(w=>!used.has(w));
+  if(available.length===0){
+    available=[...pool];
+    used.clear();
+  }
+  const word=available[Math.floor(Math.random()*available.length)]||pool[0]||"Haus";
+  return {word,usedWords:[...used,word].slice(-pool.length)};
+}
+function drawingRoundState(order,round,drawer=null,previous={}){
+  const clean=[...new Set((order||[]).filter(Boolean))];
+  const chosenDrawer=drawer&&clean.includes(drawer)?drawer:(drawingFirstDrawer(clean));
+  const wordMode=drawingWordMode(previous?.wordMode||"mixed");
+  const picked=drawingPickWord(previous?.usedWords||[],wordMode);
+  const duration=Math.max(30,Math.min(300,safeNum(previous?.roundDuration)||DRAWING_DEFAULT_DURATION));
+  return {
+    ...initialDrawingState(clean),
+    phase:"playing",
+    order:clean,
+    round:safeNum(round)+1,
+    drawer:chosenDrawer,
+    word:picked.word,
+    wordIndex:Math.max(0,DRAWING_WORDS.indexOf(picked.word)),
+    wordMode,
+    usedWords:picked.usedWords,
+    roundDuration:duration,
+    roundStartTs:Date.now(),
+    strokes:{},
+    guesses:{},
+    guessed:{},
+    lastCorrect:null,
+    winner:null
+  };
+}
+function drawingRecentGuessesHtml(d){
+  const guesses=drawingGuessesArray(d?.guesses).slice(-8).reverse();
+  if(!guesses.length)return`<div class="drawing-sub" style="margin-top:12px">Noch keine Rateversuche.</div>`;
+  return `<div class="drawing-guesses">${guesses.map(g=>`
+    <div class="drawing-guess-chip ${g.correct?"correct":""}">
+      <span class="drawing-guess-name">${escHtml(g.name||"?")}</span>
+      <span class="drawing-guess-word">${escHtml(g.guess||"")}${g.correct?" ✓":""}</span>
+    </div>`).join("")}</div>`;
+}
+function drawingEndTime(d){
+  return safeNum(d?.roundStartTs)+safeNum(d?.roundDuration||DRAWING_DEFAULT_DURATION)*1000;
+}
+function stopDrawingTimer(){
+  if(drawingTimerInterval){
+    clearInterval(drawingTimerInterval);
+    drawingTimerInterval=null;
+  }
+}
+function startDrawingTimerClient(){
+  if(drawingTimerInterval)return;
+  drawingTimerInterval=setInterval(()=>{
+    if(!gameState||gameState.gameType!=="drawing"||gameState.phase!=="playing"){
+      stopDrawingTimer();
+      return;
+    }
+    const d=gameState.drawing||{};
+    if(isHost&&Date.now()>=drawingEndTime(d)){
+      window.endDrawingRoundTimeout();
+    }
+  },500);
+}
+function reconcileDrawingStatePatch(state){
+  if(!state||state.gameType!=="drawing")return null;
+  const players=state.players||{};
+  const playerIds=Object.keys(players);
+  const d=state.drawing||{};
+  const patch={};
+  const roomPhase=state.phase||"lobby";
+
+  if(roomPhase==="lobby"){
+    const desiredOrder=playerIds;
+    const rawOrder=Array.isArray(d.order)?d.order.filter(id=>players[id]):[];
+    if(d.phase!=="lobby") patch["drawing/phase"]="lobby";
+    if(JSON.stringify(rawOrder)!==JSON.stringify(desiredOrder)) patch["drawing/order"]=desiredOrder;
+    if(!DRAWING_WORD_PACKS[d.wordMode||""]) patch["drawing/wordMode"]="mixed";
+    if(d.drawer!=null) patch["drawing/drawer"]=null;
+    if(d.word) patch["drawing/word"]="";
+    if(d.roundStartTs!=null) patch["drawing/roundStartTs"]=null;
+    if(d.strokes) patch["drawing/strokes"]=null;
+    if(d.guesses) patch["drawing/guesses"]=null;
+    if(d.guessed) patch["drawing/guessed"]=null;
+    if(d.lastCorrect!=null) patch["drawing/lastCorrect"]=null;
+    if(d.winner!=null) patch["drawing/winner"]=null;
+    return Object.keys(patch).length?patch:null;
+  }
+
+  if(roomPhase==="playing"){
+    if(playerIds.length<DRAWING_MIN_PLAYERS||!players[d.drawer]){
+      patch.phase="lobby";
+      patch["drawing/phase"]="lobby";
+      patch["drawing/order"]=playerIds;
+      patch["drawing/drawer"]=null;
+      patch["drawing/word"]="";
+      patch["drawing/roundStartTs"]=null;
+      patch["drawing/strokes"]=null;
+      patch["drawing/guesses"]=null;
+      patch["drawing/guessed"]=null;
+      patch["drawing/lastCorrect"]=null;
+      patch["drawing/winner"]=null;
+      return patch;
+    }
+    if(d.phase!=="playing") patch["drawing/phase"]="playing";
+    if(!d.word){
+      const mode=drawingWordMode(d.wordMode||"mixed");
+      const picked=drawingPickWord(d.usedWords||[],mode);
+      patch["drawing/word"]=picked.word;
+      patch["drawing/wordIndex"]=Math.max(0,DRAWING_WORDS.indexOf(picked.word));
+      patch["drawing/wordMode"]=mode;
+      patch["drawing/usedWords"]=picked.usedWords;
+    }
+    if(!safeNum(d.roundStartTs)) patch["drawing/roundStartTs"]=Date.now();
+    if(Date.now()>=drawingEndTime(d)){
+      patch.phase="results";
+      patch["drawing/phase"]="results";
+      patch["drawing/lastCorrect"]=null;
+      patch["drawing/winner"]=null;
+    }
+    return Object.keys(patch).length?patch:null;
+  }
+
+  if(roomPhase==="results"&&d.phase!=="results"){
+    patch["drawing/phase"]="results";
+  }
+  return Object.keys(patch).length?patch:null;
+}
+function initialMauMauState(order=[]){
+  const cleanOrder=[...new Set((order||[]).filter(Boolean))];
+  return {
+    phase:"lobby",
+    order:cleanOrder,
+    round:0,
+    direction:1,
+    dealer:null,
+    turn:null,
+    activeColor:"",
+    drawnThisTurn:null,
+    drawStack:0,
+    mauCalled:{},
+    moveCount:0,
+    lastAction:""
+  };
+}
+function mauMauLobbyStateForPlayers(players={},previous={}){
+  const state=initialMauMauState(Object.keys(players||{}));
+  state.round=safeNum(previous?.round)||0;
+  state.direction=safeNum(previous?.direction)||1;
+  return state;
+}
+function mauMauOrder(state){
+  const players=state?.players||{};
+  const m=state?.maumau||{};
+  const existing=(Array.isArray(m.order)?m.order:[]).filter(id=>players[id]);
+  const missing=Object.keys(players).filter(id=>!existing.includes(id));
+  return [...existing,...missing];
+}
+function mauMauPlayerName(id){
+  return id?(gameState.players?.[id]?.name||"?"):"?";
+}
+function mauMauCardLabel(card){
+  if(!card)return"?";
+  if(card.value==="wild")return"Farbwahl";
+  return MAUMAU_SPECIAL_LABELS[card.value]||String(card.value||"?");
+}
+function mauMauCardSymbol(card){
+  if(!card)return"?";
+  if(card.value==="wild")return"🌈";
+  if(card.value==="skip")return"⛔";
+  if(card.value==="reverse")return"↻";
+  if(card.value==="draw2")return"+2";
+  return String(card.value||"?");
+}
+function mauMauColorRank(color){
+  const idx=MAUMAU_COLORS.indexOf(color);
+  return idx>=0?idx:99;
+}
+function mauMauValueRank(value){
+  if(/^\d$/.test(String(value)))return Number(value);
+  const ranks={skip:10,reverse:11,draw2:12,wild:13};
+  return ranks[value]??99;
+}
+function mauMauSortedHandEntries(hand){
+  return (Array.isArray(hand)?hand:[])
+    .map((card,index)=>({card,index}))
+    .sort((a,b)=>{
+      const colorDiff=mauMauColorRank(a.card?.color)-mauMauColorRank(b.card?.color);
+      if(colorDiff!==0)return colorDiff;
+      const valueDiff=mauMauValueRank(a.card?.value)-mauMauValueRank(b.card?.value);
+      if(valueDiff!==0)return valueDiff;
+      return String(a.card?.id||"").localeCompare(String(b.card?.id||""));
+    });
+}
+function mauMauCardHtml(card,{back=false,className=""}={}){
+  if(back){
+    return `<div class="maumau-card back ${escHtml(className)}"><div class="maumau-card-symbol">🃏</div><div class="maumau-card-label">Karte</div></div>`;
+  }
+  const color=card?.color||"wild";
+  return `<div class="maumau-card ${escHtml(color)} ${escHtml(className)}">
+    <div class="maumau-card-symbol">${escHtml(MAUMAU_COLOR_DOTS[color]||"")} ${escHtml(mauMauCardSymbol(card))}</div>
+    <div class="maumau-card-label">${escHtml(mauMauCardLabel(card))}</div>
+  </div>`;
+}
+function mauMauCreateDeck(){
+  const deck=[];
+  MAUMAU_COLORS.forEach(color=>{
+    deck.push({id:`${color}_0_0`,color,value:"0"});
+    for(let copy=0;copy<2;copy++){
+      for(let n=1;n<=9;n++) deck.push({id:`${color}_${n}_${copy}`,color,value:String(n)});
+      ["skip","reverse","draw2"].forEach(v=>deck.push({id:`${color}_${v}_${copy}`,color,value:v}));
+    }
+  });
+  for(let i=0;i<4;i++) deck.push({id:`wild_${i}`,color:"wild",value:"wild"});
+  return deck;
+}
+function mauMauShuffle(deck){
+  const arr=(deck||[]).map(card=>({...card}));
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+function mauMauIsNumberCard(card){
+  return !!card&&MAUMAU_COLORS.includes(card.color)&&/^\d$/.test(String(card.value));
+}
+function mauMauDeal(order){
+  const deck=mauMauShuffle(mauMauCreateDeck());
+  const hands={};
+  order.forEach(id=>{hands[id]=[];});
+  for(let r=0;r<7;r++){
+    order.forEach(id=>{
+      const card=deck.shift();
+      if(card) hands[id].push(card);
+    });
+  }
+  let firstIndex=deck.findIndex(mauMauIsNumberCard);
+  if(firstIndex<0) firstIndex=0;
+  const firstCard=deck.splice(firstIndex,1)[0]||null;
+  return {hands,drawPile:deck,discardPile:firstCard?[firstCard]:[],firstCard};
+}
+function mauMauRandomTurn(order){
+  const clean=(order||[]).filter(Boolean);
+  return clean.length?clean[Math.floor(Math.random()*clean.length)]:null;
+}
+function mauMauRoundState(order,round=0){
+  const clean=[...new Set((order||[]).filter(Boolean))];
+  const dealt=mauMauDeal(clean);
+  return {
+    ...initialMauMauState(clean),
+    phase:"playing",
+    order:clean,
+    round:safeNum(round)+1,
+    direction:1,
+    dealer:null,
+    turn:mauMauRandomTurn(clean),
+    activeColor:dealt.firstCard?.color||"red",
+    drawPile:dealt.drawPile,
+    discardPile:dealt.discardPile,
+    hands:dealt.hands,
+    drawnThisTurn:null,
+    drawStack:0,
+    mauCalled:{},
+    moveCount:0,
+    winner:null,
+    lastAction:"Karten ausgeteilt" I accidentally typed? Need check. I need be careful. The new_text in tool includes extra 
+  };
+}
+function mauMauHandCount(state,pid){
+  const hand=state?.maumau?.hands?.[pid];
+  return Array.isArray(hand)?hand.length:0;
+}
+function mauMauTopCard(m){
+  const pile=Array.isArray(m?.discardPile)?m.discardPile:[];
+  return pile[pile.length-1]||null;
+}
+function mauMauCanPlay(card,m){
+  if(!card||!m)return false;
+  if(safeNum(m.drawStack)>0){
+    return card.value==="draw2";
+  }
+  if(card.value==="wild")return true;
+  const top=mauMauTopCard(m);
+  if(!top)return true;
+  return card.color===m.activeColor||card.color===top.color||card.value===top.value;
+}
+function mauMauHasPlayable(hand,m){
+  return (hand||[]).some(card=>mauMauCanPlay(card,m));
+}
+function mauMauNextPlayer(order,currentId,direction=1,steps=1){
+  const clean=(order||[]).filter(Boolean);
+  if(!clean.length)return null;
+  const idx=Math.max(0,clean.indexOf(currentId));
+  const dir=direction===-1?-1:1;
+  const next=(idx+(steps*dir)+clean.length*10)%clean.length;
+  return clean[next];
+}
+function mauMauEnsurePiles(m){
+  if(!Array.isArray(m.drawPile))m.drawPile=[];
+  if(!Array.isArray(m.discardPile))m.discardPile=[];
+  if(m.drawPile.length===0&&m.discardPile.length>1){
+    const top=m.discardPile[m.discardPile.length-1];
+    m.drawPile=mauMauShuffle(m.discardPile.slice(0,-1));
+    m.discardPile=[top];
+  }
+}
+function mauMauDrawCards(m,pid,count=1){
+  if(!m.hands)m.hands={};
+  if(!Array.isArray(m.hands[pid]))m.hands[pid]=[];
+  for(let i=0;i<count;i++){
+    mauMauEnsurePiles(m);
+    const card=m.drawPile.shift();
+    if(card)m.hands[pid].push(card);
+  }
+  if(m.mauCalled) delete m.mauCalled[pid];
+}
+function mauMauApplyCardEffect(m,playerId,card,chosenColor){
+  m.drawnThisTurn=null;
+  const order=(m.order||[]).filter(Boolean);
+  let direction=safeNum(m.direction)===-1?-1:1;
+  let steps=1;
+  let action=`${mauMauPlayerName(playerId)} legt ${mauMauCardLabel(card)}`;
+  if(card.value==="wild"){
+    m.activeColor=MAUMAU_COLORS.includes(chosenColor)?chosenColor:"red";
+    action=`${mauMauPlayerName(playerId)} wählt ${MAUMAU_COLOR_LABELS[m.activeColor]}`;
+  }else{
+    m.activeColor=card.color;
+  }
+  if(card.value==="skip"){
+    steps=2;
+    action=`${mauMauPlayerName(playerId)} setzt aus`;
+  }else if(card.value==="reverse"){
+    direction=direction===1?-1:1;
+    steps=order.length===2?2:1;
+    action=`${mauMauPlayerName(playerId)} wechselt die Richtung`;
+  }else if(card.value==="draw2"){
+    m.drawStack=safeNum(m.drawStack)+2;
+    steps=1;
+    action=`${mauMauPlayerName(playerId)} legt +2 · Stapel: ${m.drawStack}`;
+  }else{
+    m.drawStack=0;
+  }
+  m.direction=direction;
+  m.turn=mauMauNextPlayer(order,playerId,direction,steps);
+  m.lastAction=action;
+}
+function mauMauHandCardHtml(card,index,playable,isMyTurn,extraClass=""){
+  const cls=`${playable&&isMyTurn?"playable":"unplayable"} ${extraClass}`.trim();
+  return `<button type="button" class="maumau-card-btn" ${isMyTurn&&playable?`onclick="window.playMauMauCard(${index})"`:"disabled"}>${mauMauCardHtml(card,{className:cls})}</button>`;
+}
+function reconcileMauMauStatePatch(state){
+  if(!state||state.gameType!=="maumau")return null;
+  const players=state.players||{};
+  const raw=state.maumau||{};
+  const patch={};
+  if((state.phase||"lobby")==="lobby"){
+    const desiredOrder=Object.keys(players||{});
+    const rawOrder=Array.isArray(raw.order)?raw.order.filter(id=>players[id]):[];
+    if(raw.phase!=="lobby") patch["maumau/phase"]="lobby";
+    if(JSON.stringify(rawOrder)!==JSON.stringify(desiredOrder)) patch["maumau/order"]=desiredOrder;
+    if(raw.turn!=null) patch["maumau/turn"]=null;
+    if(raw.activeColor) patch["maumau/activeColor"]="";
+    if(raw.drawnThisTurn!=null) patch["maumau/drawnThisTurn"]=null;
+    if(safeNum(raw.drawStack)!==0) patch["maumau/drawStack"]=0;
+    if(raw.mauCalled!=null) patch["maumau/mauCalled"]=null;
+    if(raw.drawPile!=null) patch["maumau/drawPile"]=null;
+    if(raw.discardPile!=null) patch["maumau/discardPile"]=null;
+    if(raw.hands!=null) patch["maumau/hands"]=null;
+    if(raw.winner!=null) patch["maumau/winner"]=null;
+    if(raw.lastAction) patch["maumau/lastAction"]="";
+    return Object.keys(patch).length?patch:null;
+  }
+  return null;
+}
+function reconcileBattleshipSeatsPatch(state){ 
   if(!state||state.gameType!=="battleship")return null;
   const players=state.players||{};
   const ids=Object.keys(players);
@@ -2847,6 +3861,8 @@ function initialRoomData(){
     connect4:selectedGame==="connect4"?initialConnect4State():null,
     battleship:selectedGame==="battleship"?initialBattleshipState():null,
     kniffel:selectedGame==="kniffel"?initialKniffelState():null,
+    drawing:selectedGame==="drawing"?initialDrawingState():null,
+    maumau:selectedGame==="maumau"?initialMauMauState():null,
     createdAt:Date.now()
   };
 }
@@ -2954,6 +3970,16 @@ window.joinExistingRoom=async function(opts={}){
       setJoinBusy(false);
       return;
     }
+    if(roomGame==="drawing"&&!existing.players?.[myId]&&Object.keys(existing.players||{}).length>=DRAWING_MAX_PLAYERS){
+      showError(`Montagsmaler ist voll (${DRAWING_MAX_PLAYERS} Spieler).`);
+      setJoinBusy(false);
+      return;
+    }
+    if(roomGame==="maumau"&&!existing.players?.[myId]&&Object.keys(existing.players||{}).length>=MAUMAU_MAX_PLAYERS){
+      showError(`Mau Mau ist voll (${MAUMAU_MAX_PLAYERS} Spieler).`);
+      setJoinBusy(false);
+      return;
+    }
     isHost=existing.host===myId;
     const patch={[`players/${myId}`]:{name:myName,score:Number(existing.players?.[myId]?.score)||0,hb:Date.now()}};
     if(roomGame==="connect4"){
@@ -2968,6 +3994,12 @@ window.joinExistingRoom=async function(opts={}){
     }
     if(roomGame==="kniffel"&&!existing.kniffel){
       patch.kniffel=initialKniffelState();
+    }
+    if(roomGame==="drawing"&&!existing.drawing){
+      patch.drawing=initialDrawingState();
+    }
+    if(roomGame==="maumau"&&!existing.maumau){
+      patch.maumau=initialMauMauState();
     }
     await updateRoomData(patch);
     await finishRoomConnection();
@@ -2996,6 +4028,11 @@ window.leaveRoom=async function(){
   showScreen("home");
 };
 window.handleBackButton=async function(){
+  if(currentScreen==="home") return;
+  if(currentScreen==="join"){
+    window.backToHome();
+    return;
+  }
   if(!gameState||gameState.phase==="lobby"){
     await window.leaveRoom();
     return;
@@ -3006,9 +4043,10 @@ window.handleBackButton=async function(){
   const type=gameState.gameType||"slf";
   if(type==="connect4"){
     const c4=gameState.connect4||initialConnect4State();
+    const starter=connect4StarterForNextRound(c4);
     await updateRoomData({
       phase:"lobby",
-      connect4:{...c4,board:emptyConnect4Board(),turn:"red",winner:null,winCells:[],lastMove:null,moveCount:0}
+      connect4:{...c4,board:emptyConnect4Board(),turn:starter,winner:null,winCells:[],lastMove:null,moveCount:0,nextStarter:starter}
     });
   }else if(type==="battleship"){
     const bs=gameState.battleship||initialBattleshipState();
@@ -3020,6 +4058,31 @@ window.handleBackButton=async function(){
     await updateRoomData({
       phase:"lobby",
       kniffel:kniffelLobbyStateForPlayers(gameState.players||{})
+    });
+  }else if(type==="maumau"){
+    mauMauPendingWildIndex=null;
+    await updateRoomData({
+      phase:"lobby",
+      maumau:mauMauLobbyStateForPlayers(gameState.players||{},gameState.maumau||{})
+    });
+  }else if(type==="drawing"){
+    if(drawingSyncTimer){clearTimeout(drawingSyncTimer);drawingSyncTimer=null;}
+    if(drawingTickTimer){clearTimeout(drawingTickTimer);drawingTickTimer=null;}
+    drawingActiveStrokeId=null;
+    drawingActiveStroke=null;
+    if(drawingSyncTimer){clearTimeout(drawingSyncTimer);drawingSyncTimer=null;}
+    if(drawingTickTimer){clearTimeout(drawingTickTimer);drawingTickTimer=null;}
+    stopDrawingTimer();
+    drawingActiveStrokeId=null;
+    drawingActiveStroke=null;
+    await updateRoomData({
+      phase:"lobby",
+      drawing:drawingLobbyStateForPlayers(gameState.players||{},gameState.drawing||{})
+    });
+  }else if(type==="maumau"){
+    await updateRoomData({
+      phase:"lobby",
+      maumau:mauMauLobbyStateForPlayers(gameState.players||{},gameState.maumau||{})
     });
   }else{
     resetRoundData();
@@ -3047,6 +4110,8 @@ async function processStateUpdate(newState){
   const prevBuzzer=prevBuzzerValue;
   newState=stabilizeConnect4State(newState);
   const kniffelPatch=newState?.gameType==="kniffel"?reconcileKniffelStatePatch(newState):null;
+  const drawingPatch=newState?.gameType==="drawing"?reconcileDrawingStatePatch(newState):null;
+  const mauMauPatch=newState?.gameType==="maumau"?reconcileMauMauStatePatch(newState):null;
   if(newState?.gameType==="kniffel"){
     newState={...newState,kniffel:normalizeKniffelState(newState.kniffel,newState.players||{})};
   }
@@ -3068,6 +4133,14 @@ async function processStateUpdate(newState){
   }
   if(isHost&&gameState.gameType==="kniffel"&&kniffelPatch){
     await updateRoomData(kniffelPatch);
+    return;
+  }
+  if(isHost&&gameState.gameType==="drawing"&&drawingPatch){
+    await updateRoomData(drawingPatch);
+    return;
+  }
+  if(isHost&&gameState.gameType==="maumau"&&mauMauPatch){
+    await updateRoomData(mauMauPatch);
     return;
   }
   if(isHost){
@@ -3130,6 +4203,7 @@ function syncUIWithPhase(){
   const isNewPhase = p !== syncedPhase;
   syncedPhase = p;
   if(p==="lobby"){
+    stopDrawingTimer();
     if(isNewPhase) resetRoundData(); // nur bei echtem Phasenwechsel zurücksetzen
     showScreen("lobby");
     renderLobby();
@@ -3138,7 +4212,9 @@ function syncUIWithPhase(){
     showScreen("playing");
     renderPlaying();
     if(p==="playing") playGameMusic();
-    if(p==="collecting"){
+    if((gameState.gameType||"slf")==="drawing"&&p==="playing") startDrawingTimerClient();
+    else stopDrawingTimer();
+    if(p==="collecting"){ 
       stopRoundTimer();
       if(!submitted) submitAnswers();
       if(isNewPhase || (isHost && !collectingTimerInterval)) startCollectingTimerClient();
@@ -3150,6 +4226,7 @@ function syncUIWithPhase(){
     }
     if(isHost&&(gameState.gameType||"slf")==="slf")checkHostRoundEnd();
   } else if(p==="results"){
+    stopDrawingTimer();
     stopRoundTimer();
     stopCollectingTimer();
     stopStoppingTimer();
@@ -3181,6 +4258,11 @@ function resetRoundData(){
   if(localBuzzerCountdown)clearInterval(localBuzzerCountdown);
   localBuzzerCountdown=null;
   if(kniffelRollTimer){clearTimeout(kniffelRollTimer);kniffelRollTimer=null;}
+  if(drawingSyncTimer){clearTimeout(drawingSyncTimer);drawingSyncTimer=null;}
+  if(drawingTickTimer){clearTimeout(drawingTickTimer);drawingTickTimer=null;}
+  stopDrawingTimer();
+  drawingActiveStrokeId=null;
+  drawingActiveStroke=null;
   visibleSuggestions=[];
 }
 
@@ -3310,6 +4392,8 @@ function renderLobby(){
   if(gameState?.gameType==="connect4") return renderConnect4Lobby();
   if(gameState?.gameType==="battleship") return renderBattleshipLobby();
   if(gameState?.gameType==="kniffel") return renderKniffelLobby();
+  if(gameState?.gameType==="drawing") return renderDrawingLobby();
+  if(gameState?.gameType==="maumau") return renderMauMauLobby();
   return renderSlfLobby();
 }
 
@@ -3497,6 +4581,171 @@ function renderBattleshipLobby(){
       ${canPrepare?`<button type="button" class="btn btn-outline" onclick="window.swapBattleshipSeats()">Flotten tauschen</button>`:""}`
     :`<div style="font-size:16px;color:var(--pencil);font-weight:700;"><span class="pulse-dot"></span>Warte auf den Host</div>`;
 }
+
+function renderMauMauLobby(){
+  if(!gameState)return;
+  document.getElementById("display-roomcode").textContent=myRoom;
+  const hb=document.getElementById("host-badge");
+  if(hb)hb.style.display=isHost?"block":"none";
+  const now=Date.now();
+  const players=gameState.players||{};
+  const order=mauMauOrder(gameState);
+  const playerCount=Object.keys(players).length;
+  const canStart=playerCount>=MAUMAU_MIN_PLAYERS&&playerCount<=MAUMAU_MAX_PLAYERS;
+
+  document.getElementById("players-list").innerHTML=Object.entries(players).map(([id,p])=>{
+    const online=now-(p.hb||0)<PLAYER_STALE_MS;
+    return`<div class="player-chip">
+      <div class="online-dot" style="background:${online?"var(--green)":"transparent"}"></div>
+      ${escHtml(p.name)}${id===gameState.host?" ★":""}
+      <span class="pts">${safeNum(p.score)} Siege</span>
+    </div>`;
+  }).join("");
+
+  const summary=document.getElementById("lobby-summary-area");
+  if(summary){
+    summary.innerHTML=`
+      <div class="lobby-summary-card">
+        <div class="lobby-section-title">Spiel</div>
+        <div class="lobby-meta-line">
+          <span class="lobby-meta-pill">${playerCount}/${MAUMAU_MAX_PLAYERS} Spieler</span>
+          <span class="lobby-meta-pill">7 Karten</span>
+          <span class="lobby-meta-pill">Zahlen 0–9</span>
+          <span class="lobby-meta-pill">Aussetzen</span>
+          <span class="lobby-meta-pill">+2</span>
+          <span class="lobby-meta-pill">Farbwahl</span>
+        </div>
+      </div>
+      <div class="lobby-summary-card">
+        <div class="lobby-section-title">Reihenfolge</div>
+        <div class="lobby-cats-line">${order.map((id,i)=>`<div class="cat-tag">${i+1}. ${escHtml(players[id]?.name||"?")}</div>`).join("")}</div>
+      </div>`;
+  }
+  const editor=document.getElementById("lobby-editor-area");
+  if(editor) editor.innerHTML="";
+  document.getElementById("lobby-host-area").innerHTML=isHost
+    ?`<button type="button" class="btn" ${canStart?`onclick="window.startMauMauGame()"`:"disabled"}>${playerCount<MAUMAU_MIN_PLAYERS?`Warte auf ${MAUMAU_MIN_PLAYERS}. Spieler`:(playerCount>MAUMAU_MAX_PLAYERS?"Zu viele Spieler":"Spiel starten")}</button>`
+    :`<div style="font-size:16px;color:var(--pencil);font-weight:700;"><span class="pulse-dot"></span>Warte auf den Host</div>`;
+}
+window.startMauMauGame=async function(){
+  if(!isHost||!gameState||gameState.gameType!=="maumau")return;
+  setConnStatus("sync");
+  try{
+    await runTransaction(roomRef(),cur=>{
+      if(!cur||cur.gameType!=="maumau"||cur.phase!=="lobby")return;
+      const order=Object.keys(cur.players||{});
+      if(order.length<MAUMAU_MIN_PLAYERS||order.length>MAUMAU_MAX_PLAYERS)return;
+      cur.maumau=mauMauRoundState(order,cur.maumau?.round||0);
+      cur.phase="playing";
+      return cur;
+    });
+    setConnStatus("ok");
+  }catch(e){
+    setConnStatus("err");
+  }
+};
+
+function renderDrawingLobby(){
+  if(!gameState)return;
+  document.getElementById("display-roomcode").textContent=myRoom;
+  const hb=document.getElementById("host-badge");
+  if(hb)hb.style.display=isHost?"block":"none";
+  const now=Date.now();
+  const players=gameState.players||{};
+  const order=drawingOrder(gameState);
+  const playerCount=Object.keys(players).length;
+  const canStart=playerCount>=DRAWING_MIN_PLAYERS&&playerCount<=DRAWING_MAX_PLAYERS;
+  const wordMode=drawingWordMode(gameState.drawing?.wordMode||"mixed");
+  const drawingDuration=Math.max(30,Math.min(300,safeNum(gameState.drawing?.roundDuration)||DRAWING_DEFAULT_DURATION));
+
+  document.getElementById("players-list").innerHTML=Object.entries(players).map(([id,p])=>{
+    const online=now-(p.hb||0)<PLAYER_STALE_MS;
+    return`<div class="player-chip">
+      <div class="online-dot" style="background:${online?"var(--green)":"transparent"}"></div>
+      ${escHtml(p.name)}${id===gameState.host?" ★":""}
+      <span class="pts">${safeNum(p.score)}P</span>
+    </div>`;
+  }).join("");
+
+  const summary=document.getElementById("lobby-summary-area");
+  if(summary){
+    summary.innerHTML=`
+      <div class="lobby-summary-card">
+        <div class="lobby-section-title">Spiel</div>
+        <div class="lobby-meta-line">
+          <span class="lobby-meta-pill">${playerCount}/${DRAWING_MAX_PLAYERS} Spieler</span>
+          <span class="lobby-meta-pill">${drawingDuration}s</span>
+          <span class="lobby-meta-pill">Wörter: ${escHtml(DRAWING_WORD_MODE_LABELS[wordMode]||"Gemischt")}</span>
+          <span class="lobby-meta-pill">Zeichnen</span>
+          <span class="lobby-meta-pill">Raten</span>
+        </div>
+      </div>
+      <div class="lobby-summary-card">
+        <div class="lobby-section-title">Zeichner-Reihenfolge</div>
+        <div class="lobby-cats-line">${order.map((id,i)=>`<div class="cat-tag">${i+1}. ${escHtml(players[id]?.name||"?")}</div>`).join("")}</div>
+      </div>`;
+  }
+  const editor=document.getElementById("lobby-editor-area");
+  if(editor){
+    editor.innerHTML=isHost?`
+      <div class="lobby-editor">
+        <div class="lobby-editor-group">
+          <div class="lobby-editor-title">Wörter</div>
+          <div class="validation-presets">
+            ${Object.keys(DRAWING_WORD_PACKS).map(mode=>`<button type="button" class="validation-preset ${wordMode===mode?"active":""}" onclick="window.setDrawingWordMode('${mode}')">${escHtml(DRAWING_WORD_MODE_LABELS[mode]||mode)}</button>`).join("")}
+          </div>
+        </div>
+        <div class="lobby-editor-group">
+          <div class="lobby-editor-title">Zeit</div>
+          <div class="timer-presets">
+            ${DRAWING_TIMER_PRESETS.map(sec=>`<button type="button" class="timer-preset ${drawingDuration===sec?"active":""}" onclick="window.setDrawingDuration(${sec})">${sec}s</button>`).join("")}
+          </div>
+        </div>
+      </div>`:"";
+  }
+  document.getElementById("lobby-host-area").innerHTML=isHost
+    ?`<button type="button" class="btn" ${canStart?`onclick="window.startDrawingGame()"`:"disabled"}>${playerCount<DRAWING_MIN_PLAYERS?`Warte auf ${DRAWING_MIN_PLAYERS}. Spieler`:(playerCount>DRAWING_MAX_PLAYERS?"Zu viele Spieler":"Spiel starten")}</button>`
+    :`<div style="font-size:16px;color:var(--pencil);font-weight:700;"><span class="pulse-dot"></span>Warte auf den Host</div>`;
+}
+window.setDrawingWordMode=async function(mode){
+  if(!isHost||!gameState||gameState.gameType!=="drawing"||gameState.phase!=="lobby")return;
+  mode=drawingWordMode(mode);
+  await updateRoomData({
+    "drawing/wordMode":mode,
+    "drawing/usedWords":[]
+  });
+};
+window.setDrawingDuration=async function(seconds){
+  if(!isHost||!gameState||gameState.gameType!=="drawing"||gameState.phase!=="lobby")return;
+  seconds=Math.max(30,Math.min(300,Math.floor(safeNum(seconds))));
+  if(!DRAWING_TIMER_PRESETS.includes(seconds))return;
+  await updateRoomData({"drawing/roundDuration":seconds});
+};
+function drawingRandomWord(){
+  return DRAWING_WORDS[Math.floor(Math.random()*DRAWING_WORDS.length)]||"Haus";
+}
+function drawingFirstDrawer(order){
+  const clean=(order||[]).filter(Boolean);
+  if(!clean.length)return null;
+  return clean[Math.floor(Math.random()*clean.length)];
+}
+window.startDrawingGame=async function(){
+  if(!isHost||!gameState||gameState.gameType!=="drawing")return;
+  setConnStatus("sync");
+  try{
+    await runTransaction(roomRef(),cur=>{
+      if(!cur||cur.gameType!=="drawing"||cur.phase!=="lobby")return;
+      const order=Object.keys(cur.players||{});
+      if(order.length<DRAWING_MIN_PLAYERS||order.length>DRAWING_MAX_PLAYERS)return;
+      cur.drawing=drawingRoundState(order,cur.drawing?.round||0,drawingFirstDrawer(order),cur.drawing||{});
+      cur.phase="playing";
+      return cur;
+    });
+    setConnStatus("ok");
+  }catch(e){
+    setConnStatus("err");
+  }
+};
 
 function kniffelPlayerName(id){
   return id?(gameState.players?.[id]?.name||"?"):"?";
@@ -3695,14 +4944,16 @@ window.swapConnect4Seats=async function(){
   const c4=gameState.connect4||initialConnect4State();
   const seats=c4.seats||{};
   if(!seats.red||!seats.yellow)return;
+  const swappedStarter=isConnect4Role(c4.nextStarter)?otherConnect4Turn(c4.nextStarter):c4.nextStarter;
   await updateRoomData({
     "connect4/seats/red":seats.yellow,
     "connect4/seats/yellow":seats.red,
     "connect4/board":emptyConnect4Board(),
-    "connect4/turn":"red",
+    "connect4/turn":isConnect4Role(swappedStarter)?swappedStarter:"red",
     "connect4/winner":null,
     "connect4/winCells":[],
-    "connect4/moveCount":0
+    "connect4/moveCount":0,
+    "connect4/nextStarter":swappedStarter||null
   });
 };
 window.startConnect4Game=async function(){
@@ -3711,18 +4962,21 @@ window.startConnect4Game=async function(){
   try{
     await runTransaction(roomRef(),cur=>{
       if(!cur||cur.gameType!=="connect4"||cur.phase!=="lobby")return;
-      const seats=cur.connect4?.seats||{};
+      const c4=cur.connect4||{};
+      const seats=c4.seats||{};
       if(!seats.red||!seats.yellow||!cur.players?.[seats.red]||!cur.players?.[seats.yellow])return;
+      const starter=connect4StarterForNextRound(c4);
       cur.connect4={
-        ...(cur.connect4||{}),
+        ...c4,
         board:emptyConnect4Board(),
         seats,
-        turn:"red",
+        turn:starter,
         winner:null,
         winCells:[],
         lastMove:null,
         moveCount:0,
-        round:(cur.connect4?.round||0)+1
+        round:(c4.round||0)+1,
+        nextStarter:null
       };
       cur.phase="playing";
       return cur;
@@ -4427,7 +5681,536 @@ function renderPlaying(){
   if(gameState?.gameType==="connect4") return renderConnect4Playing();
   if(gameState?.gameType==="battleship") return renderBattleshipPlaying();
   if(gameState?.gameType==="kniffel") return renderKniffelPlaying();
+  if(gameState?.gameType==="drawing") return renderDrawingPlaying();
+  if(gameState?.gameType==="maumau") return renderMauMauPlaying();
   return renderSlfPlaying();
+}
+window.playMauMauCard=async function(index,chosenColor=null){
+  index=Number(index);
+  if(!Number.isInteger(index)||index<0)return;
+  if(!gameState||gameState.gameType!=="maumau"||gameState.phase!=="playing")return;
+  const localHand=gameState.maumau?.hands?.[myId]||[];
+  const localCard=localHand[index];
+  if(localCard?.value==="wild"&&!MAUMAU_COLORS.includes(chosenColor)){
+    mauMauPendingWildIndex=index;
+    renderPlaying();
+    return;
+  }
+  setConnStatus("sync");
+  try{
+    await runTransaction(roomRef(),cur=>{
+      if(!cur||cur.gameType!=="maumau"||cur.phase!=="playing")return;
+      const m=cur.maumau||{};
+      if(m.phase!=="playing"||m.turn!==myId)return;
+      if(!m.hands||!Array.isArray(m.hands[myId]))return;
+      const card=m.hands[myId][index];
+      if(!card||!mauMauCanPlay(card,m))return;
+      const pending=m.drawnThisTurn||null;
+      if(pending?.player===myId&&pending.cardId&&card.id!==pending.cardId)return;
+      if(card.value==="wild"&&!MAUMAU_COLORS.includes(chosenColor))return;
+      m.hands[myId].splice(index,1);
+      if(!Array.isArray(m.discardPile))m.discardPile=[];
+      m.discardPile.push(card);
+      m.moveCount=safeNum(m.moveCount)+1;
+      if(!m.mauCalled)m.mauCalled={};
+      delete m.mauCalled[myId];
+      if(m.hands[myId].length===0){
+        m.drawnThisTurn=null;
+        m.winner=myId;
+        m.phase="results";
+        m.lastAction=`${cur.players?.[myId]?.name||myName||"?"} gewinnt`;
+        cur.phase="results";
+        if(cur.players?.[myId]) cur.players[myId].score=safeNum(cur.players[myId].score)+1;
+      }else{
+        mauMauApplyCardEffect(m,myId,card,chosenColor);
+      }
+      cur.maumau=m;
+      return cur;
+    });
+    mauMauPendingWildIndex=null;
+    setConnStatus("ok");
+  }catch(e){setConnStatus("err");}
+};
+window.callMauMau=async function(){
+  if(!gameState||gameState.gameType!=="maumau"||gameState.phase!=="playing")return;
+  if(mauMauHandCount(gameState,myId)!==1)return;
+  setConnStatus("sync");
+  try{
+    await runTransaction(roomRef(),cur=>{
+      if(!cur||cur.gameType!=="maumau"||cur.phase!=="playing")return;
+      const m=cur.maumau||{};
+      const hand=Array.isArray(m.hands?.[myId])?m.hands[myId]:[];
+      if(hand.length!==1)return;
+      if(!m.mauCalled)m.mauCalled={};
+      m.mauCalled[myId]=true;
+      m.lastAction=`${cur.players?.[myId]?.name||myName||"?"} ruft Mau!`;
+      cur.maumau=m;
+      return cur;
+    });
+    setConnStatus("ok");
+  }catch(e){setConnStatus("err");}
+};
+window.drawMauMauCard=async function(){
+  if(!gameState||gameState.gameType!=="maumau"||gameState.phase!=="playing")return;
+  setConnStatus("sync");
+  try{
+    await runTransaction(roomRef(),cur=>{
+      if(!cur||cur.gameType!=="maumau"||cur.phase!=="playing")return;
+      const m=cur.maumau||{};
+      if(m.phase!=="playing"||m.turn!==myId||m.drawnThisTurn?.player===myId)return;
+      const hand=Array.isArray(m.hands?.[myId])?m.hands[myId]:[];
+      const pendingDraw=safeNum(m.drawStack);
+      if(pendingDraw>0){
+        mauMauDrawCards(m,myId,pendingDraw);
+        m.drawStack=0;
+        m.drawnThisTurn=null;
+        m.turn=mauMauNextPlayer(m.order||[],myId,safeNum(m.direction)===-1?-1:1,1);
+        m.lastAction=`${cur.players?.[myId]?.name||myName||"?"} zieht ${pendingDraw} Karten`;
+        cur.maumau=m;
+        return cur;
+      }
+      if(mauMauHasPlayable(hand,m))return;
+      mauMauDrawCards(m,myId,1);
+      const newHand=Array.isArray(m.hands?.[myId])?m.hands[myId]:[];
+      const drawnCard=newHand[newHand.length-1]||null;
+      if(drawnCard&&mauMauCanPlay(drawnCard,m)){
+        m.drawnThisTurn={player:myId,cardId:drawnCard.id};
+        m.lastAction=`${cur.players?.[myId]?.name||myName||"?"} zieht eine passende Karte`;
+      }else{
+        m.drawnThisTurn=null;
+        m.turn=mauMauNextPlayer(m.order||[],myId,safeNum(m.direction)===-1?-1:1,1);
+        m.lastAction=`${cur.players?.[myId]?.name||myName||"?"} zieht eine Karte`;
+      }
+      cur.maumau=m;
+      return cur;
+    });
+    setConnStatus("ok");
+  }catch(e){setConnStatus("err");}
+};
+window.passMauMauAfterDraw=async function(){
+  if(!gameState||gameState.gameType!=="maumau"||gameState.phase!=="playing")return;
+  setConnStatus("sync");
+  try{
+    await runTransaction(roomRef(),cur=>{
+      if(!cur||cur.gameType!=="maumau"||cur.phase!=="playing")return;
+      const m=cur.maumau||{};
+      if(m.phase!=="playing"||m.turn!==myId||m.drawnThisTurn?.player!==myId)return;
+      m.drawnThisTurn=null;
+      m.turn=mauMauNextPlayer(m.order||[],myId,safeNum(m.direction)===-1?-1:1,1);
+      m.lastAction=`${cur.players?.[myId]?.name||myName||"?"} passt`;
+      cur.maumau=m;
+      return cur;
+    });
+    setConnStatus("ok");
+  }catch(e){setConnStatus("err");}
+};
+function renderMauMauPlaying(){
+  stopRoundTimer();
+  const letterStage=document.querySelector(".letter-stage");
+  if(letterStage) letterStage.style.display="none";
+  const tiEl=document.getElementById("typing-indicators-area"); if(tiEl) tiEl.innerHTML="";
+  const bEl=document.getElementById("buzzer-container"); if(bEl) bEl.innerHTML="";
+  const cEl=document.getElementById("playing-content"); if(!cEl)return;
+  const m=gameState.maumau||initialMauMauState();
+  const order=mauMauOrder(gameState);
+  const turnName=mauMauPlayerName(m.turn);
+  const isMyTurn=m.turn===myId;
+  const topCard=(m.discardPile||[])[(m.discardPile||[]).length-1]||null;
+  const myHand=Array.isArray(m.hands?.[myId])?m.hands[myId]:[];
+  const activeColor=m.activeColor||topCard?.color||"";
+  if(!isMyTurn)mauMauPendingWildIndex=null;
+  const pendingDraw=m.drawnThisTurn?.player===myId?m.drawnThisTurn:null;
+  const drawStack=safeNum(m.drawStack);
+  const canDraw=isMyTurn&&!pendingDraw&&(drawStack>0||!mauMauHasPlayable(myHand,m));
+  const pendingWild=Number.isInteger(mauMauPendingWildIndex)&&myHand[mauMauPendingWildIndex]?.value==="wild";
+  const topCardKey=topCard?.id||"";
+  const animateTop=!!(topCardKey&&topCardKey!==mauMauLastAnimatedTopId&&m.moveCount!==0);
+  cEl.innerHTML=`
+    <div class="maumau-game">
+      <div class="maumau-panel">
+        <div class="maumau-title">${isMyTurn?"Du bist dran":`${escHtml(turnName)} ist dran`}</div>
+        <div class="maumau-sub">Runde ${safeNum(m.round)||1} · Richtung ${safeNum(m.direction)===-1?"gegen den Uhrzeigersinn":"im Uhrzeigersinn"}</div>
+      </div>
+      <div class="maumau-active-color ${escHtml(activeColor)}">
+        <span class="label">Aktive Farbe</span>
+        <span class="value">${MAUMAU_COLOR_DOTS[activeColor]||""} ${escHtml(MAUMAU_COLOR_LABELS[activeColor]||"—")}</span>
+      </div>
+      ${drawStack>0?`<div class="maumau-action-banner">+2-Stapel: ${drawStack} Karten · Lege +2 oder ziehe.</div>`:""}
+      <div class="maumau-table">
+        <div class="maumau-pile">
+          <div class="maumau-pile-label">Ablage</div>
+          ${mauMauCardHtml(topCard,{className:animateTop?"placed":""})}
+          <div class="maumau-sub">Aktiv: ${MAUMAU_COLOR_DOTS[activeColor]||""} ${escHtml(MAUMAU_COLOR_LABELS[activeColor]||"—")}</div>
+        </div>
+        <div class="maumau-pile">
+          <div class="maumau-pile-label">Ziehstapel</div>
+          ${mauMauCardHtml(null,{back:true})}
+          <div class="maumau-sub">${(m.drawPile||[]).length} Karten</div>
+        </div>
+      </div>
+      <div class="maumau-panel">
+        <div class="maumau-title">Spieler</div>
+        <div class="maumau-players">
+          ${order.map(id=>{
+            const count=mauMauHandCount(gameState,id);
+            const called=!!m.mauCalled?.[id];
+            return `<div class="maumau-player-row ${id===m.turn?"active":""}">
+              <span>${escHtml(gameState.players?.[id]?.name||"?")}${id===myId?" · Du":""}${count===1?`<span class="maumau-mau-badge ${called?"called":""}">${called?"Mau!":"1 Karte"}</span>`:""}</span>
+              <span class="maumau-card-count ${count===1?"warn":""}">${count} Karten</span>
+            </div>`;
+          }).join("")}
+        </div>
+      </div>
+      ${myHand.length===1?`<div class="maumau-action-banner">${m.mauCalled?.[myId]?"Mau gerufen!":"Du hast nur noch eine Karte."}</div>`:""}
+      <div class="maumau-panel">
+        <div class="maumau-title">Deine Karten</div>
+        <div class="maumau-sub">${drawStack>0&&isMyTurn?`Lege +2 oder ziehe ${drawStack} Karten.`:(pendingDraw?"Du kannst die gezogene Karte legen oder passen.":(isMyTurn?"Lege eine passende Karte oder ziehe.":"Warte, bis du dran bist."))}</div>
+        <div class="maumau-hand">
+          ${mauMauSortedHandEntries(myHand).map(({card,index})=>mauMauHandCardHtml(card,index,mauMauCanPlay(card,m)&&(!pendingDraw||pendingDraw.cardId===card.id),isMyTurn,pendingDraw?.cardId===card.id?"drawn":"")).join("")||`<div class="maumau-sub">Keine Karten.</div>`}
+        </div>
+        ${pendingWild?`<div class="maumau-color-choice">
+          <div class="maumau-title">Farbe wählen</div>
+          <div class="maumau-color-row">
+            ${MAUMAU_COLORS.map(color=>`<button type="button" class="maumau-color-btn ${color}" onclick="window.playMauMauCard(${mauMauPendingWildIndex},'${color}')">${MAUMAU_COLOR_DOTS[color]} ${MAUMAU_COLOR_LABELS[color]}</button>`).join("")}
+          </div>
+        </div>`:""}
+        ${myHand.length===1&&!m.mauCalled?.[myId]?`<div class="maumau-actions"><button type="button" class="btn" onclick="window.callMauMau()">Mau rufen</button></div>`:""}
+        ${isMyTurn?`<div class="maumau-actions">${pendingDraw?`<button type="button" class="btn btn-outline" onclick="window.passMauMauAfterDraw()">Passen</button><div class="hint">Gezogene Karte legen oder passen.</div>`:`<button type="button" class="btn btn-outline" ${canDraw?`onclick="window.drawMauMauCard()"`:"disabled"}>${drawStack>0?`${drawStack} Karten ziehen`:"Karte ziehen"}</button>${!canDraw?`<div class="hint">${drawStack>0?"Du kannst +2 legen.":"Du hast eine passende Karte."}</div>`:""}`}</div>`:""}
+      </div>
+      ${m.lastAction?`<div class="maumau-action-banner">${escHtml(m.lastAction)}</div>`:""}
+    </div>`;
+  if(topCardKey) mauMauLastAnimatedTopId=topCardKey;
+}
+function drawingStrokesArray(strokes){
+  if(!strokes)return[];
+  if(Array.isArray(strokes))return strokes.filter(Boolean);
+  if(typeof strokes==="object")return Object.values(strokes).filter(Boolean).sort((a,b)=>safeNum(a.ts)-safeNum(b.ts));
+  return[];
+}
+function drawingPointFromEvent(canvas,e){
+  const rect=canvas.getBoundingClientRect();
+  const x=Math.max(0,Math.min(1000,Math.round(((e.clientX-rect.left)/Math.max(1,rect.width))*1000)));
+  const y=Math.max(0,Math.min(1000,Math.round(((e.clientY-rect.top)/Math.max(1,rect.height))*1000)));
+  return{x,y};
+}
+function drawingPointDistance(a,b){
+  if(!a||!b)return Infinity;
+  return Math.hypot(a.x-b.x,a.y-b.y);
+}
+function drawingPrepareCanvas(canvas){
+  const rect=canvas.getBoundingClientRect();
+  const dpr=Math.max(1,window.devicePixelRatio||1);
+  const w=Math.max(1,Math.round(rect.width*dpr));
+  const h=Math.max(1,Math.round(rect.height*dpr));
+  if(canvas.width!==w||canvas.height!==h){
+    canvas.width=w;
+    canvas.height=h;
+  }
+  const ctx=canvas.getContext("2d");
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return{ctx,width:rect.width,height:rect.height};
+}
+function drawingBrushColor(){
+  return drawingToolMode==="eraser"?"#ffffff":drawingToolColor;
+}
+function drawingBrushWidth(){
+  return drawingToolMode==="eraser"?DRAWING_ERASER_WIDTH:drawingToolWidth;
+}
+function drawingDrawStroke(ctx,stroke,width,height){
+  const pts=(stroke?.points||[]).filter(p=>p&&Number.isFinite(Number(p.x))&&Number.isFinite(Number(p.y)));
+  if(!pts.length)return;
+  ctx.lineCap="round";
+  ctx.lineJoin="round";
+  ctx.strokeStyle=stroke.color||"#343a40";
+  ctx.lineWidth=Math.max(1,Number(stroke.width)||4);
+  ctx.beginPath();
+  pts.forEach((p,i)=>{
+    const x=(Number(p.x)/1000)*width;
+    const y=(Number(p.y)/1000)*height;
+    if(i===0)ctx.moveTo(x,y);
+    else ctx.lineTo(x,y);
+  });
+  if(pts.length===1){
+    const p=pts[0];
+    const x=(Number(p.x)/1000)*width;
+    const y=(Number(p.y)/1000)*height;
+    ctx.lineTo(x+0.1,y+0.1);
+  }
+  ctx.stroke();
+}
+function drawingDrawCanvas(canvas,strokes){
+  if(!canvas)return;
+  const {ctx,width,height}=drawingPrepareCanvas(canvas);
+  ctx.clearRect(0,0,width,height);
+  ctx.fillStyle="#ffffff";
+  ctx.fillRect(0,0,width,height);
+  drawingStrokesArray(strokes).forEach(stroke=>drawingDrawStroke(ctx,stroke,width,height));
+  if(drawingActiveStroke) drawingDrawStroke(ctx,drawingActiveStroke,width,height);
+}
+function drawingToolsHtml(){
+  return `<div class="drawing-tool-panel">
+    <div class="drawing-tool-title">Werkzeuge</div>
+    <div class="drawing-tool-row" aria-label="Farben">
+      ${DRAWING_COLORS.map(c=>`<button type="button" class="drawing-color-btn ${drawingToolMode==="pen"&&drawingToolColor===c.hex?"active":""}" style="background:${c.hex}" title="${escHtml(c.name)}" aria-label="${escHtml(c.name)}" onclick="window.pickDrawingColor('${c.hex}')"></button>`).join("")}
+    </div>
+    <div class="drawing-tool-row" aria-label="Stiftdicke">
+      ${DRAWING_WIDTHS.map(w=>`<button type="button" class="drawing-tool-btn ${drawingToolMode==="pen"&&drawingToolWidth===w.width?"active":""}" onclick="window.pickDrawingWidth(${w.width})">${escHtml(w.label)}</button>`).join("")}
+      <button type="button" class="drawing-tool-btn ${drawingToolMode==="eraser"?"active":""}" onclick="window.toggleDrawingEraser()">Radierer</button>
+      <button type="button" class="drawing-tool-btn" onclick="window.undoDrawingStroke()">Rückgängig</button>
+      <button type="button" class="drawing-tool-btn" onclick="window.clearDrawingCanvas()">Alles löschen</button>
+    </div>
+  </div>`;
+}
+window.pickDrawingColor=function(hex){
+  if(!DRAWING_COLORS.some(c=>c.hex===hex))return;
+  drawingToolColor=hex;
+  drawingToolMode="pen";
+  localStorage.setItem("drawing_color",hex);
+  renderPlaying();
+};
+window.pickDrawingWidth=function(width){
+  width=Number(width);
+  if(!DRAWING_WIDTHS.some(w=>w.width===width))return;
+  drawingToolWidth=width;
+  drawingToolMode="pen";
+  localStorage.setItem("drawing_width",String(width));
+  renderPlaying();
+};
+window.toggleDrawingEraser=function(){
+  drawingToolMode=drawingToolMode==="eraser"?"pen":"eraser";
+  renderPlaying();
+};
+function scheduleDrawingStrokeSync(){
+  if(drawingSyncTimer)return;
+  drawingSyncTimer=setTimeout(()=>{
+    drawingSyncTimer=null;
+    syncDrawingActiveStroke(false);
+  },110);
+}
+async function syncDrawingActiveStroke(final=false){
+  if(!drawingActiveStrokeId||!drawingActiveStroke||!myRoom)return;
+  const stroke={...drawingActiveStroke,points:(drawingActiveStroke.points||[]).slice(0,260)};
+  try{
+    await update(roomRef(),{[`drawing/strokes/${drawingActiveStrokeId}`]:stroke});
+  }catch(e){ setConnStatus("err"); }
+  if(final){
+    drawingActiveStrokeId=null;
+    drawingActiveStroke=null;
+  }
+}
+function setupDrawingCanvas(d,isDrawer){
+  const canvas=document.getElementById("drawing-canvas");
+  if(!canvas)return;
+  drawingDrawCanvas(canvas,d.strokes||{});
+  if(!isDrawer)return;
+  canvas.onpointerdown=e=>{
+    e.preventDefault();
+    const p=drawingPointFromEvent(canvas,e);
+    drawingActiveStrokeId=`${myId}_${Date.now()}_${Math.floor(Math.random()*10000)}`;
+    drawingActiveStroke={by:myId,ts:Date.now(),color:drawingBrushColor(),width:drawingBrushWidth(),tool:drawingToolMode,points:[p]};
+    try{canvas.setPointerCapture?.(e.pointerId);}catch(_e){}
+    drawingDrawCanvas(canvas,d.strokes||{});
+    scheduleDrawingStrokeSync();
+  };
+  canvas.onpointermove=e=>{
+    if(!drawingActiveStroke)return;
+    e.preventDefault();
+    const p=drawingPointFromEvent(canvas,e);
+    const pts=drawingActiveStroke.points;
+    if(drawingPointDistance(pts[pts.length-1],p)<7)return;
+    pts.push(p);
+    if(pts.length>260) pts.splice(1,pts.length-260);
+    drawingDrawCanvas(canvas,d.strokes||{});
+    scheduleDrawingStrokeSync();
+  };
+  const end=e=>{
+    if(!drawingActiveStroke)return;
+    e.preventDefault();
+    try{canvas.releasePointerCapture?.(e.pointerId);}catch(_e){}
+    if(drawingSyncTimer){clearTimeout(drawingSyncTimer);drawingSyncTimer=null;}
+    syncDrawingActiveStroke(true);
+  };
+  canvas.onpointerup=end;
+  canvas.onpointercancel=end;
+  canvas.onpointerleave=e=>{ if(e.buttons===0&&drawingActiveStroke) end(e); };
+}
+function scheduleDrawingTick(remaining){
+  if(drawingTickTimer)clearTimeout(drawingTickTimer);
+  if(remaining>0&&gameState?.gameType==="drawing"&&gameState.phase==="playing"){
+    drawingTickTimer=setTimeout(()=>{
+      drawingTickTimer=null;
+      if(gameState?.gameType==="drawing"&&gameState.phase==="playing") renderPlaying();
+    },1000);
+  }
+}
+window.clearDrawingCanvas=async function(){
+  if(!gameState||gameState.gameType!=="drawing"||gameState.phase!=="playing")return;
+  const d=gameState.drawing||{};
+  if(d.drawer!==myId)return;
+  drawingActiveStrokeId=null;
+  drawingActiveStroke=null;
+  if(drawingSyncTimer){clearTimeout(drawingSyncTimer);drawingSyncTimer=null;}
+  try{await update(roomRef(),{"drawing/strokes":null});}catch(e){setConnStatus("err");}
+};
+window.undoDrawingStroke=async function(){
+  if(!gameState||gameState.gameType!=="drawing"||gameState.phase!=="playing")return;
+  const d=gameState.drawing||{};
+  if(d.drawer!==myId)return;
+  if(drawingActiveStroke){
+    drawingActiveStrokeId=null;
+    drawingActiveStroke=null;
+    if(drawingSyncTimer){clearTimeout(drawingSyncTimer);drawingSyncTimer=null;}
+    renderPlaying();
+    return;
+  }
+  const strokes=d.strokes||{};
+  let entries=[];
+  if(Array.isArray(strokes)) entries=strokes.map((v,i)=>[String(i),v]).filter(([,v])=>v);
+  else if(strokes&&typeof strokes==="object") entries=Object.entries(strokes).filter(([,v])=>v);
+  const own=entries
+    .filter(([,stroke])=>!stroke.by||stroke.by===myId)
+    .sort((a,b)=>safeNum(a[1]?.ts)-safeNum(b[1]?.ts));
+  const last=own[own.length-1];
+  if(!last)return;
+  setConnStatus("sync");
+  try{
+    await update(roomRef(),{[`drawing/strokes/${last[0]}`]:null});
+    setConnStatus("ok");
+  }catch(e){setConnStatus("err");}
+};
+window.submitDrawingGuess=async function(){
+  if(!gameState||gameState.gameType!=="drawing"||gameState.phase!=="playing")return;
+  const input=document.getElementById("drawing-guess-input");
+  const guess=(input?.value||"").trim();
+  if(!guess)return;
+  if(input) input.value="";
+  const guessKey=`${myId}_${Date.now()}_${Math.floor(Math.random()*10000)}`;
+  setConnStatus("sync");
+  try{
+    await runTransaction(roomRef(),cur=>{
+      if(!cur||cur.gameType!=="drawing"||cur.phase!=="playing")return;
+      const d=cur.drawing||{};
+      if(d.phase!=="playing"||d.drawer===myId||d.guessed?.[myId])return;
+      if(Date.now()>=drawingEndTime(d))return;
+      const word=String(d.word||"");
+      const correct=!!word&&normalizeAnswer(guess)===normalizeAnswer(word);
+      if(!d.guesses)d.guesses={};
+      d.guesses[guessKey]={player:myId,name:cur.players?.[myId]?.name||myName||"?",guess,correct,ts:Date.now()};
+      if(correct){
+        if(!d.guessed)d.guessed={};
+        d.guessed[myId]=true;
+        d.lastCorrect={player:myId,name:cur.players?.[myId]?.name||myName||"?",guess,word,ts:Date.now()};
+        d.winner=myId;
+        d.phase="results";
+        cur.phase="results";
+        if(cur.players?.[myId]) cur.players[myId].score=safeNum(cur.players[myId].score)+2;
+        if(d.drawer&&cur.players?.[d.drawer]) cur.players[d.drawer].score=safeNum(cur.players[d.drawer].score)+1;
+      }
+      cur.drawing=d;
+      return cur;
+    });
+    setConnStatus("ok");
+  }catch(e){setConnStatus("err");}
+};
+window.endDrawingRoundTimeout=async function(){
+  if(!isHost||!gameState||gameState.gameType!=="drawing"||gameState.phase!=="playing")return;
+  setConnStatus("sync");
+  try{
+    await runTransaction(roomRef(),cur=>{
+      if(!cur||cur.gameType!=="drawing"||cur.phase!=="playing")return;
+      const d=cur.drawing||{};
+      if(d.phase!=="playing")return;
+      if(Date.now()<drawingEndTime(d))return;
+      d.phase="results";
+      d.lastCorrect=null;
+      d.winner=null;
+      cur.phase="results";
+      cur.drawing=d;
+      return cur;
+    });
+    setConnStatus("ok");
+  }catch(e){setConnStatus("err");}
+};
+window.nextDrawingRound=async function(){
+  if(!isHost||!gameState||gameState.gameType!=="drawing")return;
+  setConnStatus("sync");
+  try{
+    await runTransaction(roomRef(),cur=>{
+      if(!cur||cur.gameType!=="drawing")return;
+      const order=drawingOrder(cur);
+      if(order.length<DRAWING_MIN_PLAYERS||order.length>DRAWING_MAX_PLAYERS)return;
+      const current=cur.drawing?.drawer||null;
+      const drawer=drawingNextDrawer(order,current);
+      cur.drawing=drawingRoundState(order,cur.drawing?.round||0,drawer,cur.drawing||{});
+      cur.phase="playing";
+      return cur;
+    });
+    setConnStatus("ok");
+  }catch(e){setConnStatus("err");}
+};
+function renderDrawingPlaying(){
+  stopRoundTimer();
+  const letterStage=document.querySelector(".letter-stage");
+  if(letterStage) letterStage.style.display="none";
+  const tiEl=document.getElementById("typing-indicators-area"); if(tiEl) tiEl.innerHTML="";
+  const bEl=document.getElementById("buzzer-container"); if(bEl) bEl.innerHTML="";
+  const cEl=document.getElementById("playing-content"); if(!cEl)return;
+  const d=gameState?.drawing||initialDrawingState();
+  const drawer=d.drawer||drawingFirstDrawer(drawingOrder(gameState));
+  const isDrawer=drawer===myId;
+  const drawerName=drawingPlayerName(drawer);
+  const elapsed=Math.max(0,Math.floor((Date.now()-(d.roundStartTs||Date.now()))/1000));
+  const duration=Math.max(1,safeNum(d.roundDuration||DRAWING_DEFAULT_DURATION));
+  const remaining=Math.max(0,duration-elapsed);
+  const timerPct=Math.max(0,Math.min(100,(remaining/duration)*100));
+  const word=(d.word||"").trim();
+  if(remaining<=0&&isHost){
+    window.endDrawingRoundTimeout();
+  }
+  const guessed=!!d.guessed?.[myId];
+  const existingCanvas=document.getElementById("drawing-canvas");
+  if(drawingActiveStroke&&existingCanvas){
+    drawingDrawCanvas(existingCanvas,d.strokes||{});
+    scheduleDrawingTick(remaining);
+    return;
+  }
+  cEl.innerHTML=`
+    <div class="drawing-game">
+      <div class="drawing-panel">
+        <div class="drawing-title">${isDrawer?"Du malst":`${escHtml(drawerName)} malt`}</div>
+        <div class="drawing-sub">Runde ${safeNum(d.round)||1} · ${remaining}s</div>
+        <div class="drawing-pill-row" style="margin-top:10px">
+          <span class="drawing-pill">${isDrawer?"Zeichner":"Rater"}</span>
+          <span class="drawing-pill">${drawingStrokesArray(d.strokes).length} Striche</span>
+          ${guessed?`<span class="drawing-pill">Richtig geraten ✓</span>`:""}
+        </div>
+        <div class="drawing-timer">
+          <div class="drawing-timer-head"><span>Zeit</span><span>${remaining}s</span></div>
+          <div class="drawing-timer-track"><div class="drawing-timer-fill ${remaining<=10?"urgent":""}" style="width:${timerPct}%"></div></div>
+        </div>
+      </div>
+      <div class="drawing-word-card">
+        <div class="drawing-sub">${isDrawer?"Dein Wort":"Geheimes Wort"}</div>
+        <div class="drawing-word">${isDrawer?escHtml(word||"?"):"••••••"}</div>
+      </div>
+      <div class="drawing-canvas-wrap">
+        <canvas id="drawing-canvas" class="drawing-canvas ${isDrawer?"drawable":""}" aria-label="Montagsmaler Zeichenfläche"></canvas>
+        ${isDrawer?`<div class="drawing-tools"><span class="drawing-sub">Mit Finger oder Maus zeichnen</span></div>${drawingToolsHtml()}`:`<div class="drawing-tools"><span class="drawing-sub">Rate unten das geheime Wort.</span></div>`}
+      </div>
+      ${!isDrawer?`<div class="drawing-panel">
+        <div class="drawing-title">Raten</div>
+        ${guessed?`<div class="drawing-sub">Du hast das Wort richtig geraten.</div>`:`<div class="drawing-guess-row">
+          <input type="text" id="drawing-guess-input" placeholder="Dein Tipp…" maxlength="40" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();window.submitDrawingGuess();}"/>
+          <button type="button" class="btn btn-sm" onclick="window.submitDrawingGuess()">Raten</button>
+        </div>`}
+        ${drawingRecentGuessesHtml(d)}
+      </div>`:`<div class="drawing-panel">
+        <div class="drawing-title">Rateversuche</div>
+        ${drawingRecentGuessesHtml(d)}
+      </div>`}
+    </div>`;
+  setupDrawingCanvas(d,isDrawer);
+  scheduleDrawingTick(remaining);
 }
 function kniffelDiceSum(dice){
   return (dice||[]).reduce((sum,n)=>sum+safeNum(n),0);
@@ -4691,19 +6474,18 @@ function renderKniffelPlaying(){
         <div class="kniffel-dice-row">
           ${dice.map((n,i)=>{
             const dieRolling=rolling&&normalizeKniffelRollingMask(k.rollingMask)[i];
-            return `<button type="button" class="kniffel-die ${held[i]?"held":""} ${dieRolling?"rolling":""} ${canHold?"clickable":""}" ${canHold?`onclick="window.toggleKniffelHold(${i})"`:"disabled"} aria-label="Würfel ${i+1}${n?`: ${n}`:""}${held[i]?", behalten":""}${dieRolling?", rollt":""}">${kniffelDisplayDieFace(k,dice,i)}</button>`;
+            return `<button type="button" class="kniffel-die ${held[i]?"held":""} ${dieRolling?"rolling":""} ${canHold?"clickable":""}" ${canHold?`onclick="window.toggleKniffelHold(${i})"`:"disabled"} aria-label="Würfel ${i+1}${n?`: ${n}`:""}${held[i]?", behalten":""}${dieRolling?", rollt":""}"><span class="kniffel-die-face ${dieRolling?"rolling":""}">${kniffelDisplayDieFace(k,dice,i)}</span></button>`;
           }).join("")}
         </div>
-        <div class="kniffel-actions">
+        ${isMyTurn?`<div class="kniffel-actions">
           <button type="button" class="btn" ${canRoll?`onclick="window.rollKniffelDice()"`:"disabled"}>${escHtml(rollLabel)}</button>
-          ${isMyTurn&&!rolling&&k.rolls===0?`<div class="hint">Nach dem ersten Wurf kannst du Würfel behalten und unten ein Feld eintragen.</div>`:""}
-          ${isMyTurn&&!rolling&&k.rolls>0?`<div class="hint">Zum Eintragen unten einen Vorschauwert antippen.</div>`:""}
-        </div>
+          ${!rolling&&k.rolls===0?`<div class="hint">Nach dem ersten Wurf kannst du Würfel behalten und unten ein Feld eintragen.</div>`:""}
+          ${!rolling&&k.rolls>0?`<div class="hint">Zum Eintragen unten einen Vorschauwert antippen.</div>`:""}
+        </div>`:""}
       </div>
       ${k.lastScore?`<div class="round-ended-note">${escHtml(gameState.players?.[k.lastScore.player]?.name||"?")} hat ${safeNum(k.lastScore.score)} Punkte bei ${escHtml(KNIFFEL_CATEGORIES.find(c=>c.id===k.lastScore.category)?.name||k.lastScore.category)} eingetragen.</div>`:""}
       ${kniffelEntryChoicesHtml(gameState,k)}
       ${kniffelScoreSheetHtml({...gameState,kniffel:k},{interactive:false})}
-      ${isHost?`<div class="kniffel-actions"><button type="button" class="btn btn-outline" onclick="window.kniffelBackToLobby()">Partie abbrechen</button></div>`:""}
     </div>`;
 }
 window.toggleKniffelHold=async function(index){
@@ -4878,7 +6660,6 @@ function renderConnect4Playing(){
             ${playable?"":"disabled"}></button>`;
         }).join("")}
       </div>
-      ${isHost?`<div class="connect4-actions"><button type="button" class="btn btn-outline" onclick="window.abortConnect4Game()">Partie abbrechen</button></div>`:""}
     </div>`;
   cEl.querySelectorAll(".connect4-cell.playable").forEach(btn=>{
     btn.addEventListener("click",()=>window.makeConnect4Move(Number(btn.dataset.col)));
@@ -4888,16 +6669,18 @@ function renderConnect4Playing(){
 window.abortConnect4Game=async function(){
   if(!isHost||!gameState||gameState.gameType!=="connect4"||gameState.phase!=="playing")return;
   const c4=gameState.connect4||initialConnect4State();
+  const starter=connect4StarterForNextRound(c4);
   await updateRoomData({
     phase:"lobby",
     connect4:{
       ...c4,
       board:emptyConnect4Board(),
-      turn:"red",
+      turn:starter,
       winner:null,
       winCells:[],
       lastMove:null,
-      moveCount:0
+      moveCount:0,
+      nextStarter:starter
     }
   });
 };
@@ -4912,20 +6695,26 @@ window.makeConnect4Move=async function(col){
       const role=connect4RoleFor(cur,myId);
       const c4=cur.connect4||{};
       if(!role||c4.turn!==role||c4.winner)return;
-      const board=normalizeConnect4Board(c4.board);
+      let board=normalizeConnect4Board(c4.board);
+      const localC4=gameState?.connect4;
+      if(localC4&&String(localC4.round||0)===String(c4.round||0)){
+        board=mergeConnect4Boards(board,localC4.board);
+      }
       const row=connect4DropRow(board,col);
       if(row<0)return;
       board[row*7+col]=role;
       const winCells=connect4CheckWin(board,row,col,role);
       const isDraw=!winCells.length&&connect4BoardFull(board);
+      const nextStarter=winCells.length?otherConnect4Turn(role):(isDraw?randomConnect4Turn():(c4.nextStarter||null));
       cur.connect4={
         ...c4,
         board,
-        turn:winCells.length||isDraw?role:(role==="red"?"yellow":"red"),
+        turn:winCells.length||isDraw?role:otherConnect4Turn(role),
         winner:winCells.length?role:(isDraw?"draw":null),
         winCells,
         lastMove:row*7+col,
-        moveCount:(c4.moveCount||0)+1
+        moveCount:(c4.moveCount||0)+1,
+        nextStarter
       };
       if(winCells.length){
         const winnerId=c4.seats?.[role];
@@ -5339,19 +7128,83 @@ function calcRoundPoints(state){
   return result;
 }
 
+function setResultsMode(mode=""){
+  const screen=document.getElementById("screen-results");
+  if(!screen)return;
+  screen.classList.toggle("connect4-results-screen",mode==="connect4");
+}
 function setResultLabels(primary,secondary){
   const labels=document.querySelectorAll("#screen-results .section-label");
-  if(labels[0]) labels[0].textContent=primary;
-  if(labels[1]) labels[1].textContent=secondary;
+  if(labels[0]){ labels[0].textContent=primary; labels[0].style.display=""; }
+  if(labels[1]){ labels[1].textContent=secondary; labels[1].style.display=""; }
 }
 function renderResults(){
   if(gameState?.gameType==="connect4") return renderConnect4Results();
   if(gameState?.gameType==="battleship") return renderBattleshipResults();
   if(gameState?.gameType==="kniffel") return renderKniffelResults();
+  if(gameState?.gameType==="drawing") return renderDrawingResults();
+  if(gameState?.gameType==="maumau") return renderMauMauResults();
   return renderSlfResults();
+}
+function renderMauMauResults(){
+  setResultsMode("");
+  setResultLabels("Siege","Endstand");
+  const m=gameState.maumau||initialMauMauState();
+  const players=gameState.players||{};
+  const winner=m.winner||null;
+  const winnerName=winner?(players[winner]?.name||"?"):"?";
+  const goArea=document.getElementById("gameover-area");
+  if(goArea){
+    goArea.innerHTML=winner?`<div class="gameover-banner"><div class="gameover-title">🏆 ${escHtml(winnerName)} gewinnt!</div><div class="gameover-winner">+1 Sieg</div></div>`:"";
+  }
+  document.getElementById("validation-banner-area").innerHTML=m.lastAction?`<div class="round-ended-note">${escHtml(m.lastAction)}</div>`:"";
+  document.getElementById("scoreboard").innerHTML=Object.entries(players).sort((a,b)=>safeNum(b[1].score)-safeNum(a[1].score)).map(([id,p],i)=>`
+    <div class="score-row ${id===winner?"gold":""}">
+      <div class="score-name">${["①","②","③"][i]||"  "} ${escHtml(p.name)}</div>
+      <div class="score-pts">${safeNum(p.score)} Siege</div>
+    </div>`).join("");
+  const order=mauMauOrder(gameState);
+  document.getElementById("results-container").innerHTML=`<div class="maumau-game"><div class="maumau-panel"><div class="maumau-title">Karten übrig</div><div class="maumau-players">${order.map(id=>`<div class="maumau-player-row ${id===winner?"active":""}"><span>${escHtml(players[id]?.name||"?")}</span><span>${mauMauHandCount(gameState,id)} Karten</span></div>`).join("")}</div></div></div>`;
+  document.getElementById("results-actions").innerHTML=isHost?`<button type="button" class="btn" onclick="window.resetMauMauGame()">Nochmal spielen →</button>`:`<button type="button" class="btn btn-outline" disabled>Warte auf den Host…</button>`;
+}
+function renderDrawingResults(){
+  setResultsMode("");
+  setResultLabels("Punkte","Auflösung");
+  const d=gameState.drawing||initialDrawingState();
+  const correct=d.lastCorrect;
+  const word=String(d.word||"?");
+  const drawerName=drawingPlayerName(d.drawer);
+  const winnerName=correct?(gameState.players?.[correct.player]?.name||correct.name||"?"):"";
+  const goArea=document.getElementById("gameover-area");
+  if(goArea){
+    goArea.innerHTML=correct
+      ?`<div class="gameover-banner drawing-correct-banner"><div class="gameover-title">✅ ${escHtml(winnerName)} hat es erraten!</div><div class="gameover-winner">${escHtml(drawerName)} +1 · ${escHtml(winnerName)} +2</div></div>`
+      :`<div class="gameover-banner drawing-correct-banner"><div class="gameover-title">⏱️ Zeit abgelaufen</div><div class="gameover-winner">Das Wort war: ${escHtml(word)}</div></div>`;
+  }
+  document.getElementById("validation-banner-area").innerHTML=`<div class="round-ended-note">Wort: <strong>${escHtml(word)}</strong></div>`;
+  document.getElementById("scoreboard").innerHTML=Object.entries(gameState.players||{}).sort((a,b)=>safeNum(b[1].score)-safeNum(a[1].score)).map(([id,p],i)=>`
+    <div class="score-row ${i===0?"gold":""}">
+      <div class="score-name">${["①","②","③"][i]||"  "} ${escHtml(p.name)}</div>
+      <div class="score-pts">${safeNum(p.score)} Punkte</div>
+    </div>`).join("");
+  document.getElementById("results-container").innerHTML=`
+    <div class="drawing-game">
+      <div class="drawing-canvas-wrap">
+        <canvas id="drawing-result-canvas" class="drawing-canvas" aria-label="Montagsmaler Ergebniszeichnung"></canvas>
+      </div>
+      <div class="drawing-panel">
+        <div class="drawing-title">Rateversuche</div>
+        ${drawingRecentGuessesHtml(d)}
+      </div>
+    </div>`;
+  setTimeout(()=>drawingDrawCanvas(document.getElementById("drawing-result-canvas"),d.strokes||{}),0);
+  document.getElementById("results-actions").innerHTML=isHost
+    ?`<button type="button" class="btn" onclick="window.nextDrawingRound()">Nächste Runde →</button>`
+    :`<button type="button" class="btn btn-outline" disabled>Warte auf den Host…</button>`;
 }
 function renderKniffelResults(){
   if(!gameState)return;
+  setResultsMode("");
   setResultLabels("Endstand","Wertungsblock");
   const k=normalizeKniffelState(gameState.kniffel,gameState.players||{});
   const resultState={...gameState,kniffel:k};
@@ -5381,14 +7234,16 @@ function renderKniffelResults(){
       ${kniffelScoreSheetHtml(resultState,{interactive:false})}
     </div>`;
   document.getElementById("results-actions").innerHTML=isHost
-    ?`<button type="button" class="btn" onclick="window.resetKniffelGame()">Nochmal spielen →</button>
-      <button type="button" class="btn btn-outline" onclick="window.kniffelBackToLobby()">Zur Lobby</button>`
+    ?`<button type="button" class="btn" onclick="window.resetKniffelGame()">Nochmal spielen →</button>`
     :`<button type="button" class="btn btn-outline" disabled>Warte auf den Host…</button>`;
 }
 
 function renderConnect4Results(){
   if(!gameState)return;
-  setResultLabels("Siege","Spielfeld");
+  setResultsMode("connect4");
+  setResultLabels("Siege","");
+  const labels=document.querySelectorAll("#screen-results .section-label");
+  if(labels[1]) labels[1].style.display="none";
   const c4=gameState.connect4||initialConnect4State();
   const seats=c4.seats||{};
   const players=gameState.players||{};
@@ -5396,14 +7251,26 @@ function renderConnect4Results(){
   const yellowName=connect4PlayerName(seats.yellow);
   const winnerName=c4.winner==="draw"?"Unentschieden":connect4PlayerName(seats[c4.winner]);
   document.getElementById("results-sub").textContent=`Vier gewinnt · Runde ${c4.round||1}`;
+  const board=normalizeConnect4Board(c4.board);
+  if(c4.winner&&c4.winner!=="draw"){
+    (c4.winCells||[]).forEach(i=>{
+      if(Number.isInteger(i)&&i>=0&&i<42&&!board[i]) board[i]=c4.winner;
+    });
+  }
+  const boardHtml=`<div class="connect4-board" aria-label="Vier gewinnt Endstand">
+    ${board.map((cell,i)=>`<div class="connect4-cell ${cell||""} ${(c4.winCells||[]).includes(i)?"win":""}"></div>`).join("")}
+  </div>`;
   const goArea=document.getElementById("gameover-area");
   if(goArea){
-    goArea.innerHTML=c4.winner==="draw"
-      ?`<div class="gameover-banner"><div class="gameover-title">Unentschieden</div></div>`
-      :`<div class="gameover-banner"><div class="gameover-title">🏆 ${escHtml(winnerName)} gewinnt!</div><div class="gameover-winner">+1 Punkt</div></div>`;
+    goArea.innerHTML=`<div class="connect4-result-stage">
+      <div class="connect4-status">
+        ${c4.winner==="draw"?"Unentschieden":`🏆 ${escHtml(winnerName)} gewinnt!`}
+        <div class="connect4-status-sub">${c4.winner==="draw"?"Keine freien Felder mehr":`${escHtml(winnerName)} hat vier in einer Reihe`}</div>
+      </div>
+      ${boardHtml}
+    </div>`;
   }
   const banner=document.getElementById("validation-banner-area"); if(banner) banner.innerHTML="";
-  const board=normalizeConnect4Board(c4.board);
   document.getElementById("scoreboard").innerHTML=[
     [seats.red,redName,"Rot"],[seats.yellow,yellowName,"Gelb"]
   ].filter(([id])=>id).map(([id,name,role],i)=>`
@@ -5411,19 +7278,14 @@ function renderConnect4Results(){
       <div class="score-name">${role==="Rot"?"🔴":"🟡"} ${escHtml(name)}</div>
       <div class="score-pts">${safeNum(players[id]?.score)} Siege</div>
     </div>`).join("");
-  document.getElementById("results-container").innerHTML=`
-    <div class="connect4-game">
-      <div class="connect4-board" aria-label="Vier gewinnt Endstand">
-        ${board.map((cell,i)=>`<div class="connect4-cell ${cell||""} ${(c4.winCells||[]).includes(i)?"win":""}"></div>`).join("")}
-      </div>
-    </div>`;
+  document.getElementById("results-container").innerHTML="";
   document.getElementById("results-actions").innerHTML=isHost
-    ?`<button type="button" class="btn" onclick="window.resetConnect4Game()">Nochmal spielen →</button>
-      <button type="button" class="btn btn-outline" onclick="window.connect4BackToLobby()">Zur Lobby</button>`
+    ?`<button type="button" class="btn" onclick="window.resetConnect4Game()">Nochmal spielen →</button>`
     :`<button type="button" class="btn btn-outline" disabled>Warte auf den Host…</button>`;
 }
 function renderBattleshipResults(){
   if(!gameState)return;
+  setResultsMode("");
   setResultLabels("Siege","Flotten");
   const bs=gameState.battleship||initialBattleshipState();
   const seats=bs.seats||{};
@@ -5458,12 +7320,12 @@ function renderBattleshipResults(){
       ${battleshipBoardHtml({boardData:p2Board,revealShips:true,title:`Flotte 2 · ${p2Name}`,enemy:false})}
     </div>`;
   document.getElementById("results-actions").innerHTML=isHost
-    ?`<button type="button" class="btn" onclick="window.resetBattleshipGame()">Nochmal spielen →</button>
-      <button type="button" class="btn btn-outline" onclick="window.battleshipBackToLobby()">Zur Lobby</button>`
+    ?`<button type="button" class="btn" onclick="window.resetBattleshipGame()">Nochmal spielen →</button>`
     :`<button type="button" class="btn btn-outline" disabled>Warte auf den Host…</button>`;
 }
 function renderSlfResults(){
   if(!gameState)return;
+  setResultsMode("");
   setResultLabels("Punkte gesamt","Antworten dieser Runde");
   const cats=objToCats(gameState.cats);
   const rejections=gameState.rejections||{};
@@ -5577,6 +7439,21 @@ function renderSlfResults(){
   }
 }
 
+window.resetMauMauGame=async function(){
+  if(!isHost||!gameState||gameState.gameType!=="maumau")return;
+  setConnStatus("sync");
+  try{
+    await runTransaction(roomRef(),cur=>{
+      if(!cur||cur.gameType!=="maumau")return;
+      const order=Object.keys(cur.players||{});
+      if(order.length<MAUMAU_MIN_PLAYERS||order.length>MAUMAU_MAX_PLAYERS)return;
+      cur.maumau=mauMauRoundState(order,cur.maumau?.round||0);
+      cur.phase="playing";
+      return cur;
+    });
+    setConnStatus("ok");
+  }catch(e){setConnStatus("err");}
+};
 window.resetKniffelGame=async function(){
   if(!isHost||!gameState||gameState.gameType!=="kniffel")return;
   setConnStatus("sync");
@@ -5643,33 +7520,37 @@ window.battleshipBackToLobby=async function(){
 window.resetConnect4Game=async function(){
   if(!isHost||!gameState||gameState.gameType!=="connect4")return;
   const c4=gameState.connect4||initialConnect4State();
+  const starter=connect4StarterForNextRound(c4);
   await updateRoomData({
     phase:"playing",
     connect4:{
       ...c4,
       board:emptyConnect4Board(),
-      turn:"red",
+      turn:starter,
       winner:null,
       winCells:[],
       lastMove:null,
       moveCount:0,
-      round:(c4.round||0)+1
+      round:(c4.round||0)+1,
+      nextStarter:null
     }
   });
 };
 window.connect4BackToLobby=async function(){
   if(!isHost||!gameState||gameState.gameType!=="connect4")return;
   const c4=gameState.connect4||initialConnect4State();
+  const starter=connect4StarterForNextRound(c4);
   await updateRoomData({
     phase:"lobby",
     connect4:{
       ...c4,
       board:emptyConnect4Board(),
-      turn:"red",
+      turn:starter,
       winner:null,
       winCells:[],
       lastMove:null,
-      moveCount:0
+      moveCount:0,
+      nextStarter:starter
     }
   });
 };
@@ -5824,5 +7705,5 @@ function escHtml(s){
     .replace(/'/g,"&#039;");
 }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a17f34fcc855e509',t:'MTc4MzUxNDk0Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a187189828f6c8b6',t:'MTc4MzU5NzY2OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
