@@ -1561,6 +1561,20 @@
       gap: 8px;
       min-height: 150px;
     }
+    .maumau-pile-draw {
+      border: none;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .maumau-pile-draw:disabled { cursor: default; }
+    .maumau-pile-draw.active .maumau-card {
+      outline: 3px solid var(--primary-accent);
+      outline-offset: 2px;
+      transform: translateY(-2px);
+    }
+    .maumau-pile-draw.active:active .maumau-card { transform: translateY(1px) scale(0.98); }
     .maumau-pile-label {
       color: var(--pencil);
       font-size: 11px;
@@ -1571,28 +1585,46 @@
     .maumau-card {
       width: 78px;
       min-height: 112px;
-      border-radius: 14px;
+      border-radius: 16px;
       border: 2px solid rgba(52,58,64,0.14);
       background: var(--paper-white);
       display: grid;
+      grid-template-rows: 1fr auto;
       place-items: center;
-      padding: 10px;
+      padding: 12px 9px 10px;
       font-family: 'Nunito', sans-serif;
       font-weight: 900;
-      box-shadow: 0 2px 0 rgba(52,58,64,0.08);
+      box-shadow: 0 2px 0 rgba(52,58,64,0.08), inset 0 0 0 2px rgba(255,255,255,0.35);
       user-select: none;
+      position: relative;
+      overflow: hidden;
     }
-    .maumau-card.red { background: #fee2e2; color: #b91c1c; }
-    .maumau-card.yellow { background: #fef3c7; color: #92400e; }
-    .maumau-card.green { background: #dcfce7; color: #166534; }
-    .maumau-card.blue { background: #dbeafe; color: #1d4ed8; }
-    .maumau-card.wild { background: linear-gradient(135deg,#fee2e2,#fef3c7,#dcfce7,#dbeafe); color: #343a40; }
+    .maumau-card::after {
+      content: '';
+      position: absolute;
+      inset: 7px;
+      border-radius: 11px;
+      border: 1px solid rgba(255,255,255,0.45);
+      pointer-events: none;
+    }
+    .maumau-card.red { background: linear-gradient(160deg,#fee2e2,#fecaca); color: #991b1b; border-color: rgba(153,27,27,0.22); }
+    .maumau-card.yellow { background: linear-gradient(160deg,#fef3c7,#fde68a); color: #78350f; border-color: rgba(120,53,15,0.22); }
+    .maumau-card.green { background: linear-gradient(160deg,#dcfce7,#bbf7d0); color: #14532d; border-color: rgba(20,83,45,0.22); }
+    .maumau-card.blue { background: linear-gradient(160deg,#dbeafe,#bfdbfe); color: #1e3a8a; border-color: rgba(30,58,138,0.22); }
+    .maumau-card.wild { background: linear-gradient(135deg,#fecaca 0 25%,#fde68a 25% 50%,#bbf7d0 50% 75%,#bfdbfe 75%); color: #343a40; }
     .maumau-card.back {
       background: color-mix(in srgb, var(--primary-accent) 22%, var(--paper2));
       color: var(--ink);
     }
-    .maumau-card-symbol { font-size: 1.55rem; line-height: 1; }
-    .maumau-card-label { font-size: 0.78rem; text-align: center; margin-top: 6px; }
+    .maumau-card-symbol {
+      font-size: 1.55rem;
+      line-height: 1;
+      text-align: center;
+      letter-spacing: -0.03em;
+    }
+    .maumau-card.number .maumau-card-symbol { font-size: 2.65rem; }
+    .maumau-card.special .maumau-card-symbol { font-size: 1.75rem; }
+    .maumau-card-label { font-size: 0.72rem; text-align: center; margin-top: 7px; line-height: 1.05; }
     .maumau-hand {
       display: flex;
       gap: 8px;
@@ -1612,11 +1644,10 @@
     .maumau-card-btn:disabled { cursor: default; opacity: 0.58; }
     .maumau-card-btn .maumau-card { width: 100%; min-height: 100%; }
     .maumau-card.playable {
-      outline: 3px solid var(--primary-accent);
-      outline-offset: 2px;
-      transform: translateY(-2px);
+      outline: none;
+      transform: none;
     }
-    .maumau-card.unplayable { filter: grayscale(0.22); }
+    .maumau-card.unplayable { filter: grayscale(0.22); opacity: 0.58; }
     .maumau-card.placed { animation: mauMauPlace 0.34s ease-out; }
     .maumau-card.drawn { animation: mauMauDraw 0.34s ease-out; }
     .maumau-card-btn:not(:disabled):active .maumau-card { transform: translateY(1px) scale(0.98); }
@@ -1700,8 +1731,10 @@
       .maumau-pile { min-height: 132px; padding: 12px; }
       .maumau-card { width: 66px; min-height: 96px; border-radius: 12px; }
       .maumau-hand .maumau-card { width: 62px; min-height: 92px; }
-      .maumau-card-symbol { font-size: 1.35rem; }
-      .maumau-card-label { font-size: 0.7rem; }
+      .maumau-card-symbol { font-size: 1.25rem; }
+      .maumau-card.number .maumau-card-symbol { font-size: 2.25rem; }
+      .maumau-card.special .maumau-card-symbol { font-size: 1.45rem; }
+      .maumau-card-label { font-size: 0.66rem; }
     }
 
     /* ── Montagsmaler ── */
@@ -2540,7 +2573,7 @@ let kniffelRollTimer=null;
 let drawingToolColor = DRAWING_COLORS.some(c=>c.hex===localStorage.getItem("drawing_color")) ? localStorage.getItem("drawing_color") : "#343a40";
 let drawingToolWidth = DRAWING_WIDTHS.some(w=>w.width===Number(localStorage.getItem("drawing_width"))) ? Number(localStorage.getItem("drawing_width")) : 5;
 let drawingToolMode = "pen";
-let drawingActiveStrokeId=null, drawingActiveStroke=null, drawingSyncTimer=null, drawingTickTimer=null, drawingTimerInterval=null;
+let drawingActiveStrokeId=null, drawingActiveStroke=null, drawingPendingStrokes={}, drawingSyncTimer=null, drawingTickTimer=null, drawingTimerInterval=null;
 let mauMauPendingWildIndex=null, mauMauLastAnimatedTopId=null;
 let syncedPhase=null; // tracks last rendered phase to detect real transitions
 
@@ -3593,9 +3626,9 @@ function mauMauCardLabel(card){
 }
 function mauMauCardSymbol(card){
   if(!card)return"?";
-  if(card.value==="wild")return"🌈";
-  if(card.value==="skip")return"⛔";
-  if(card.value==="reverse")return"↻";
+  if(card.value==="wild")return"🎨";
+  if(card.value==="skip")return"🚫";
+  if(card.value==="reverse")return"🔄";
   if(card.value==="draw2")return"+2";
   return String(card.value||"?");
 }
@@ -3621,12 +3654,16 @@ function mauMauSortedHandEntries(hand){
 }
 function mauMauCardHtml(card,{back=false,className=""}={}){
   if(back){
-    return `<div class="maumau-card back ${escHtml(className)}"><div class="maumau-card-symbol">🃏</div><div class="maumau-card-label">Karte</div></div>`;
+    return `<div class="maumau-card back ${escHtml(className)}"><div class="maumau-card-symbol">🃏</div><div class="maumau-card-label">Ziehen</div></div>`;
   }
   const color=card?.color||"wild";
-  return `<div class="maumau-card ${escHtml(color)} ${escHtml(className)}">
-    <div class="maumau-card-symbol">${escHtml(MAUMAU_COLOR_DOTS[color]||"")} ${escHtml(mauMauCardSymbol(card))}</div>
-    <div class="maumau-card-label">${escHtml(mauMauCardLabel(card))}</div>
+  const value=String(card?.value||"");
+  const isNumber=/^\d$/.test(value);
+  const symbol=mauMauCardSymbol(card);
+  const label=isNumber?"":mauMauCardLabel(card);
+  return `<div class="maumau-card ${escHtml(color)} ${escHtml(className)} ${isNumber?"number":"special"}">
+    <div class="maumau-card-symbol">${escHtml(symbol)}</div>
+    ${label?`<div class="maumau-card-label">${escHtml(label)}</div>`:""}
   </div>`;
 }
 function mauMauCreateDeck(){
@@ -4075,6 +4112,7 @@ window.handleBackButton=async function(){
     stopDrawingTimer();
     drawingActiveStrokeId=null;
     drawingActiveStroke=null;
+    drawingPendingStrokes={};
     await updateRoomData({
       phase:"lobby",
       drawing:drawingLobbyStateForPlayers(gameState.players||{},gameState.drawing||{})
@@ -4263,6 +4301,7 @@ function resetRoundData(){
   stopDrawingTimer();
   drawingActiveStrokeId=null;
   drawingActiveStroke=null;
+  drawingPendingStrokes={};
   visibleSuggestions=[];
 }
 
@@ -5831,22 +5870,31 @@ function renderMauMauPlaying(){
         <div class="maumau-title">${isMyTurn?"Du bist dran":`${escHtml(turnName)} ist dran`}</div>
         <div class="maumau-sub">Runde ${safeNum(m.round)||1} · Richtung ${safeNum(m.direction)===-1?"gegen den Uhrzeigersinn":"im Uhrzeigersinn"}</div>
       </div>
-      <div class="maumau-active-color ${escHtml(activeColor)}">
-        <span class="label">Aktive Farbe</span>
-        <span class="value">${MAUMAU_COLOR_DOTS[activeColor]||""} ${escHtml(MAUMAU_COLOR_LABELS[activeColor]||"—")}</span>
-      </div>
       ${drawStack>0?`<div class="maumau-action-banner">+2-Stapel: ${drawStack} Karten · Lege +2 oder ziehe.</div>`:""}
       <div class="maumau-table">
         <div class="maumau-pile">
           <div class="maumau-pile-label">Ablage</div>
           ${mauMauCardHtml(topCard,{className:animateTop?"placed":""})}
-          <div class="maumau-sub">Aktiv: ${MAUMAU_COLOR_DOTS[activeColor]||""} ${escHtml(MAUMAU_COLOR_LABELS[activeColor]||"—")}</div>
         </div>
         <div class="maumau-pile">
           <div class="maumau-pile-label">Ziehstapel</div>
-          ${mauMauCardHtml(null,{back:true})}
-          <div class="maumau-sub">${(m.drawPile||[]).length} Karten</div>
+          ${canDraw?`<button type="button" class="maumau-pile-draw active" onclick="window.drawMauMauCard()" aria-label="Karte ziehen">${mauMauCardHtml(null,{back:true})}</button>`:mauMauCardHtml(null,{back:true})}
         </div>
+      </div>
+      ${myHand.length===1?`<div class="maumau-action-banner">${m.mauCalled?.[myId]?"Mau gerufen!":"Du hast nur noch eine Karte."}</div>`:""}
+      <div class="maumau-panel">
+        <div class="maumau-title">Deine Karten</div>
+        <div class="maumau-hand">
+          ${mauMauSortedHandEntries(myHand).map(({card,index})=>mauMauHandCardHtml(card,index,mauMauCanPlay(card,m)&&(!pendingDraw||pendingDraw.cardId===card.id),isMyTurn,pendingDraw?.cardId===card.id?"drawn":"")).join("")||`<div class="maumau-sub">Keine Karten.</div>`}
+        </div>
+        ${pendingWild?`<div class="maumau-color-choice">
+          <div class="maumau-title">Farbe wählen</div>
+          <div class="maumau-color-row">
+            ${MAUMAU_COLORS.map(color=>`<button type="button" class="maumau-color-btn ${color}" onclick="window.playMauMauCard(${mauMauPendingWildIndex},'${color}')">${MAUMAU_COLOR_DOTS[color]} ${MAUMAU_COLOR_LABELS[color]}</button>`).join("")}
+          </div>
+        </div>`:""}
+        ${myHand.length===1&&!m.mauCalled?.[myId]?`<div class="maumau-actions"><button type="button" class="btn" onclick="window.callMauMau()">Mau rufen</button></div>`:""}
+        ${isMyTurn&&pendingDraw?`<div class="maumau-actions"><button type="button" class="btn btn-outline" onclick="window.passMauMauAfterDraw()">Passen</button></div>`:""}
       </div>
       <div class="maumau-panel">
         <div class="maumau-title">Spieler</div>
@@ -5861,31 +5909,23 @@ function renderMauMauPlaying(){
           }).join("")}
         </div>
       </div>
-      ${myHand.length===1?`<div class="maumau-action-banner">${m.mauCalled?.[myId]?"Mau gerufen!":"Du hast nur noch eine Karte."}</div>`:""}
-      <div class="maumau-panel">
-        <div class="maumau-title">Deine Karten</div>
-        <div class="maumau-sub">${drawStack>0&&isMyTurn?`Lege +2 oder ziehe ${drawStack} Karten.`:(pendingDraw?"Du kannst die gezogene Karte legen oder passen.":(isMyTurn?"Lege eine passende Karte oder ziehe.":"Warte, bis du dran bist."))}</div>
-        <div class="maumau-hand">
-          ${mauMauSortedHandEntries(myHand).map(({card,index})=>mauMauHandCardHtml(card,index,mauMauCanPlay(card,m)&&(!pendingDraw||pendingDraw.cardId===card.id),isMyTurn,pendingDraw?.cardId===card.id?"drawn":"")).join("")||`<div class="maumau-sub">Keine Karten.</div>`}
-        </div>
-        ${pendingWild?`<div class="maumau-color-choice">
-          <div class="maumau-title">Farbe wählen</div>
-          <div class="maumau-color-row">
-            ${MAUMAU_COLORS.map(color=>`<button type="button" class="maumau-color-btn ${color}" onclick="window.playMauMauCard(${mauMauPendingWildIndex},'${color}')">${MAUMAU_COLOR_DOTS[color]} ${MAUMAU_COLOR_LABELS[color]}</button>`).join("")}
-          </div>
-        </div>`:""}
-        ${myHand.length===1&&!m.mauCalled?.[myId]?`<div class="maumau-actions"><button type="button" class="btn" onclick="window.callMauMau()">Mau rufen</button></div>`:""}
-        ${isMyTurn?`<div class="maumau-actions">${pendingDraw?`<button type="button" class="btn btn-outline" onclick="window.passMauMauAfterDraw()">Passen</button><div class="hint">Gezogene Karte legen oder passen.</div>`:`<button type="button" class="btn btn-outline" ${canDraw?`onclick="window.drawMauMauCard()"`:"disabled"}>${drawStack>0?`${drawStack} Karten ziehen`:"Karte ziehen"}</button>${!canDraw?`<div class="hint">${drawStack>0?"Du kannst +2 legen.":"Du hast eine passende Karte."}</div>`:""}`}</div>`:""}
-      </div>
-      ${m.lastAction?`<div class="maumau-action-banner">${escHtml(m.lastAction)}</div>`:""}
     </div>`;
   if(topCardKey) mauMauLastAnimatedTopId=topCardKey;
 }
+function drawingHasStrokeId(strokes,id){
+  if(!id||!strokes)return false;
+  if(Array.isArray(strokes))return !!strokes[Number(id)];
+  return typeof strokes==="object"&&!!strokes[id];
+}
 function drawingStrokesArray(strokes){
-  if(!strokes)return[];
-  if(Array.isArray(strokes))return strokes.filter(Boolean);
-  if(typeof strokes==="object")return Object.values(strokes).filter(Boolean).sort((a,b)=>safeNum(a.ts)-safeNum(b.ts));
-  return[];
+  let arr=[];
+  if(Array.isArray(strokes)) arr=strokes.filter(Boolean);
+  else if(strokes&&typeof strokes==="object") arr=Object.values(strokes).filter(Boolean);
+  Object.keys(drawingPendingStrokes||{}).forEach(id=>{
+    if(drawingHasStrokeId(strokes,id)) delete drawingPendingStrokes[id];
+    else if(drawingPendingStrokes[id]) arr.push(drawingPendingStrokes[id]);
+  });
+  return arr.sort((a,b)=>safeNum(a.ts)-safeNum(b.ts));
 }
 function drawingPointFromEvent(canvas,e){
   const rect=canvas.getBoundingClientRect();
@@ -5919,9 +5959,12 @@ function drawingBrushWidth(){
 function drawingDrawStroke(ctx,stroke,width,height){
   const pts=(stroke?.points||[]).filter(p=>p&&Number.isFinite(Number(p.x))&&Number.isFinite(Number(p.y)));
   if(!pts.length)return;
+  const isEraser=stroke.tool==="eraser"||(String(stroke.color||"").toLowerCase()==="#ffffff"&&safeNum(stroke.width)>=DRAWING_ERASER_WIDTH);
+  ctx.save();
+  ctx.globalCompositeOperation=isEraser?"destination-out":"source-over";
   ctx.lineCap="round";
   ctx.lineJoin="round";
-  ctx.strokeStyle=stroke.color||"#343a40";
+  ctx.strokeStyle=isEraser?"rgba(0,0,0,1)":(stroke.color||"#343a40");
   ctx.lineWidth=Math.max(1,Number(stroke.width)||4);
   ctx.beginPath();
   pts.forEach((p,i)=>{
@@ -5937,6 +5980,7 @@ function drawingDrawStroke(ctx,stroke,width,height){
     ctx.lineTo(x+0.1,y+0.1);
   }
   ctx.stroke();
+  ctx.restore();
 }
 function drawingDrawCanvas(canvas,strokes){
   if(!canvas)return;
@@ -5989,11 +6033,13 @@ function scheduleDrawingStrokeSync(){
 }
 async function syncDrawingActiveStroke(final=false){
   if(!drawingActiveStrokeId||!drawingActiveStroke||!myRoom)return;
+  const id=drawingActiveStrokeId;
   const stroke={...drawingActiveStroke,points:(drawingActiveStroke.points||[]).slice(0,260)};
+  if(final) drawingPendingStrokes[id]=stroke;
   try{
-    await update(roomRef(),{[`drawing/strokes/${drawingActiveStrokeId}`]:stroke});
+    await update(roomRef(),{[`drawing/strokes/${id}`]:stroke});
   }catch(e){ setConnStatus("err"); }
-  if(final){
+  if(final&&drawingActiveStrokeId===id){
     drawingActiveStrokeId=null;
     drawingActiveStroke=null;
   }
@@ -6034,12 +6080,40 @@ function setupDrawingCanvas(d,isDrawer){
   canvas.onpointercancel=end;
   canvas.onpointerleave=e=>{ if(e.buttons===0&&drawingActiveStroke) end(e); };
 }
+function updateDrawingTimerDom(remaining,timerPct){
+  const timeEl=document.getElementById("drawing-time-left");
+  const fillEl=document.getElementById("drawing-timer-fill");
+  if(timeEl) timeEl.textContent=`${remaining}s`;
+  if(fillEl){
+    fillEl.style.width=`${timerPct}%`;
+    fillEl.classList.toggle("urgent",remaining<=10);
+  }
+}
+function restoreDrawingGuessFocus(value,selectionStart=null,selectionEnd=null){
+  const input=document.getElementById("drawing-guess-input");
+  if(!input)return;
+  input.value=value||"";
+  input.focus({preventScroll:true});
+  try{
+    const posStart=selectionStart==null?input.value.length:selectionStart;
+    const posEnd=selectionEnd==null?posStart:selectionEnd;
+    input.setSelectionRange(posStart,posEnd);
+  }catch(e){}
+}
 function scheduleDrawingTick(remaining){
   if(drawingTickTimer)clearTimeout(drawingTickTimer);
   if(remaining>0&&gameState?.gameType==="drawing"&&gameState.phase==="playing"){
     drawingTickTimer=setTimeout(()=>{
       drawingTickTimer=null;
-      if(gameState?.gameType==="drawing"&&gameState.phase==="playing") renderPlaying();
+      if(!gameState||gameState.gameType!=="drawing"||gameState.phase!=="playing")return;
+      const d=gameState.drawing||{};
+      const elapsed=Math.max(0,Math.floor((Date.now()-(d.roundStartTs||Date.now()))/1000));
+      const duration=Math.max(1,safeNum(d.roundDuration||DRAWING_DEFAULT_DURATION));
+      const nextRemaining=Math.max(0,duration-elapsed);
+      const timerPct=Math.max(0,Math.min(100,(nextRemaining/duration)*100));
+      updateDrawingTimerDom(nextRemaining,timerPct);
+      if(nextRemaining<=0&&isHost) window.endDrawingRoundTimeout();
+      else scheduleDrawingTick(nextRemaining);
     },1000);
   }
 }
@@ -6049,6 +6123,7 @@ window.clearDrawingCanvas=async function(){
   if(d.drawer!==myId)return;
   drawingActiveStrokeId=null;
   drawingActiveStroke=null;
+  drawingPendingStrokes={};
   if(drawingSyncTimer){clearTimeout(drawingSyncTimer);drawingSyncTimer=null;}
   try{await update(roomRef(),{"drawing/strokes":null});}catch(e){setConnStatus("err");}
 };
@@ -6057,6 +6132,7 @@ window.undoDrawingStroke=async function(){
   const d=gameState.drawing||{};
   if(d.drawer!==myId)return;
   if(drawingActiveStroke){
+    if(drawingActiveStrokeId) delete drawingPendingStrokes[drawingActiveStrokeId];
     drawingActiveStrokeId=null;
     drawingActiveStroke=null;
     if(drawingSyncTimer){clearTimeout(drawingSyncTimer);drawingSyncTimer=null;}
@@ -6168,8 +6244,19 @@ function renderDrawingPlaying(){
     window.endDrawingRoundTimeout();
   }
   const guessed=!!d.guessed?.[myId];
+  const wasGuessFocused=document.activeElement?.id==="drawing-guess-input";
+  const guessInputBefore=wasGuessFocused?document.getElementById("drawing-guess-input"):null;
+  const guessValueBefore=guessInputBefore?.value||"";
+  const guessSelectionStart=guessInputBefore?.selectionStart??null;
+  const guessSelectionEnd=guessInputBefore?.selectionEnd??null;
   const existingCanvas=document.getElementById("drawing-canvas");
-  if(drawingActiveStroke&&existingCanvas){
+  if(wasGuessFocused&&existingCanvas&&!isDrawer&&!guessed){
+    drawingDrawCanvas(existingCanvas,d.strokes||{});
+    updateDrawingTimerDom(remaining,timerPct);
+    scheduleDrawingTick(remaining);
+    return;
+  }
+  if(drawingActiveStroke&&existingCanvas){ 
     drawingDrawCanvas(existingCanvas,d.strokes||{});
     scheduleDrawingTick(remaining);
     return;
@@ -6185,8 +6272,8 @@ function renderDrawingPlaying(){
           ${guessed?`<span class="drawing-pill">Richtig geraten ✓</span>`:""}
         </div>
         <div class="drawing-timer">
-          <div class="drawing-timer-head"><span>Zeit</span><span>${remaining}s</span></div>
-          <div class="drawing-timer-track"><div class="drawing-timer-fill ${remaining<=10?"urgent":""}" style="width:${timerPct}%"></div></div>
+          <div class="drawing-timer-head"><span>Zeit</span><span id="drawing-time-left">${remaining}s</span></div>
+          <div class="drawing-timer-track"><div id="drawing-timer-fill" class="drawing-timer-fill ${remaining<=10?"urgent":""}" style="width:${timerPct}%"></div></div>
         </div>
       </div>
       <div class="drawing-word-card">
@@ -6211,6 +6298,9 @@ function renderDrawingPlaying(){
     </div>`;
   setupDrawingCanvas(d,isDrawer);
   scheduleDrawingTick(remaining);
+  if(wasGuessFocused&&!isDrawer&&!guessed){
+    restoreDrawingGuessFocus(guessValueBefore,guessSelectionStart,guessSelectionEnd);
+  }
 }
 function kniffelDiceSum(dice){
   return (dice||[]).reduce((sum,n)=>sum+safeNum(n),0);
@@ -7705,5 +7795,5 @@ function escHtml(s){
     .replace(/'/g,"&#039;");
 }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a187354b1fc1225d',t:'MTc4MzU5ODg0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
