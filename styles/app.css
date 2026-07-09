@@ -83,4 +83,5 @@ body {
   font-size: 20px;
 }
 .leave-btn { display: none; }
+.join-back-btn { display: none !important; }
 .error-msg { color: var(--red); font-size: 14px; margin-top: 12px; font-weight: 700; text-align: center; }
