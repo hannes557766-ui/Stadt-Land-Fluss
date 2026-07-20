@@ -61,7 +61,7 @@ const PLAYER_AVATAR_COLORS = [
 ];
 const VALIDATION_MODES = ["host","vote","ai"];
 const GEMINI_API_KEY = "AQ.Ab8RN6J5NE4QbqJfDrKLCjwkv0LHLJsNW4yBGkDAlWL1SZaGjA";
-const GEMINI_MODEL = "gemini-1.5-flash";
+const GEMINI_MODEL = "gemini-2.5-flash";
 function validGameId(gameId){
   return (gameId&&GAMES[gameId]?.enabled)?gameId:"slf";
 }
