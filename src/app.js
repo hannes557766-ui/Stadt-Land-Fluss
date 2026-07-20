@@ -54,6 +54,11 @@ const GAMES = {
 let selectedGame="slf";
 let currentScreen="home";
 const SELECTED_GAME_SESSION_KEY="slf_game";
+const PLAYER_AVATAR_COLORS = [
+  "#2563eb", "#dc2626", "#059669", "#7c3aed",
+  "#ea580c", "#0891b2", "#be123c", "#4f46e5",
+  "#0f766e", "#9333ea", "#b45309", "#64748b"
+];
 function validGameId(gameId){
   return (gameId&&GAMES[gameId]?.enabled)?gameId:"slf";
 }
@@ -71,6 +76,7 @@ const CAT_SUGGESTIONS = [
 ];
 
 const ALL_LETTERS = "ABCDEFGHIKLMNOPRSTW".split("");
+const LETTER_REVEAL_MS = 3000;
 const BATTLESHIP_SHIPS = [5,4,3,3,2];
 const KNIFFEL_CATEGORIES = [
   {id:"ones", name:"Einser", section:"Oben"},
@@ -183,6 +189,7 @@ let battleshipLocalRound=null, battleshipPlacedShips=[], battleshipOrientation="
 let battleshipDragging=false, battleshipDragCell=null, battleshipDragShipId=null, battleshipDragOffset=0, battleshipDragMoved=false, battleshipSuppressClickUntil=0, battleshipSuppressClickShipId=null;
 let heartbeatInterval=null, roomListener=null;
 let roundTimerInterval=null, roundTimerSecondsLeft=0;
+let letterRevealTimer=null;
 let collectingTimerInterval=null, stoppingTimerInterval=null;
 let typingTimeout=null;
 let prevBuzzerValue=null;
@@ -606,11 +613,60 @@ function showError(msg){
   if(!el)return;
   el.textContent=msg; el.style.display=msg?"block":"none";
 }
+function stableHash(s){
+  let h=0;
+  String(s||"").split("").forEach(ch=>{ h=((h<<5)-h)+ch.charCodeAt(0); h|=0; });
+  return Math.abs(h);
+}
+function validPlayerColor(color){
+  return /^#[0-9a-f]{6}$/i.test(String(color||""));
+}
+function sanitizePlayerColor(color,id=""){
+  const c=String(color||"").trim();
+  if(validPlayerColor(c))return c;
+  return PLAYER_AVATAR_COLORS[stableHash(id)%PLAYER_AVATAR_COLORS.length];
+}
+function preferredPlayerColor(id,players={}){
+  const used=new Set(Object.entries(players||{}).filter(([pid])=>pid!==id).map(([pid,p])=>sanitizePlayerColor(p?.color,pid)));
+  const start=stableHash(id)%PLAYER_AVATAR_COLORS.length;
+  for(let offset=0;offset<PLAYER_AVATAR_COLORS.length;offset++){
+    const color=PLAYER_AVATAR_COLORS[(start+offset)%PLAYER_AVATAR_COLORS.length];
+    if(!used.has(color))return color;
+  }
+  return PLAYER_AVATAR_COLORS[start];
+}
+function playerInitial(name){
+  const clean=String(name||"?").trim();
+  const first=Array.from(clean)[0]||"?";
+  return first.toLocaleUpperCase("de-DE");
+}
+function playerAvatarHtml(id,p={},extraClass=""){
+  const color=sanitizePlayerColor(p?.color,id);
+  return `<span class="player-avatar ${extraClass}" style="--player-color:${color}" aria-hidden="true">${escHtml(playerInitial(p?.name))}</span>`;
+}
+function playerRoomData(existingPlayer=null,allPlayers={}){
+  const existing=existingPlayer||{};
+  return {
+    name:myName,
+    score:Number(existing.score)||0,
+    hb:Date.now(),
+    color:validPlayerColor(existing.color)?String(existing.color).trim():preferredPlayerColor(myId,allPlayers)
+  };
+}
+function scoreNameHtml(id,p={},rank="",extraHtml=""){
+  return `<div class="score-name">
+    ${rank?`<span class="score-rank">${escHtml(rank)}</span>`:""}
+    ${playerAvatarHtml(id,p,"score-avatar")}
+    <span class="score-label">${escHtml(p?.name||"?")}</span>
+    ${extraHtml||""}
+  </div>`;
+}
 function lobbyPlayerChipHtml(id,p,metaText=""){
   const online=Date.now()-(p?.hb||0)<PLAYER_STALE_MS;
   const canKick=!!(isHost&&gameState?.phase==="lobby"&&id!==myId);
   return `<div class="player-chip">
-    <div class="online-dot" style="background:${online?"var(--green)":"transparent"}"></div>
+    ${playerAvatarHtml(id,p)}
+    <div class="online-dot ${online?"online":"offline"}" title="${online?"online":"offline"}"></div>
     <span class="player-chip-name">${escHtml(p?.name||"?")}${id===gameState?.host?" ★":""}</span>
     ${metaText?`<span class="pts">${escHtml(metaText)}</span>`:""}
     ${canKick?`<button type="button" class="player-kick-btn" title="Spieler entfernen" aria-label="${escHtml(p?.name||"Spieler")} entfernen" onclick="window.kickPlayer('${id}')">×</button>`:""}
@@ -647,6 +703,8 @@ window.selectGame=function(gameId){
 window.backToHome=function(){
   selectedGame="slf";
   sessionStorage.removeItem(SELECTED_GAME_SESSION_KEY);
+  clearInviteUrl();
+  setInviteFeedback("");
   showError("");
   updateJoinScreen();
   showScreen("home");
@@ -1519,7 +1577,7 @@ function initialRoomData(){
   return {
     gameType:selectedGame,
     host:myId, hostName:myName,
-    players:{[myId]:{name:myName,score:0,hb:Date.now()}},
+    players:{[myId]:playerRoomData(null,{})},
     cats:catsToObj(DEFAULT_CATS),
     roundDuration:90,
     roundLimit:0,
@@ -1529,7 +1587,8 @@ function initialRoomData(){
     typingStatus:{},
     allowBuzzer:true,
     phase:"lobby", round:0, letter:"",
-    buzzer:null, buzzerTs:null, collectUntil:null,
+    letterRevealStartTs:null, letterRevealUntil:null,
+    buzzer:null, buzzerTs:null, collectUntil:null, stopRequest:null,
     roundAnswers:{}, liveAnswers:{}, finalAnswers:{}, rejections:{}, submittedStatus:{}, roundStartTs:null,
     connect4:selectedGame==="connect4"?initialConnect4State():null,
     battleship:selectedGame==="battleship"?initialBattleshipState():null,
@@ -1553,12 +1612,86 @@ function clearInviteUrl(){
     history.replaceState(null,"",url);
   }catch(e){}
 }
+function getInviteUrl(room=myRoom){
+  const code=normalizeRoomCode(room);
+  try{
+    const url=new URL(location.href);
+    if(code) url.searchParams.set("room",code);
+    else url.searchParams.delete("room");
+    url.hash="";
+    return url.toString();
+  }catch(e){
+    const base=`${location.origin||""}${location.pathname||""}`;
+    return code?`${base}?room=${encodeURIComponent(code)}`:base;
+  }
+}
+let inviteFeedbackTimer=null;
+function setInviteFeedback(msg,type=""){
+  const el=document.getElementById("invite-feedback");
+  if(!el)return;
+  if(inviteFeedbackTimer){clearTimeout(inviteFeedbackTimer);inviteFeedbackTimer=null;}
+  el.textContent=msg||"";
+  el.classList.toggle("good",type==="good");
+  el.classList.toggle("error",type==="error");
+  if(msg){
+    inviteFeedbackTimer=setTimeout(()=>{
+      const cur=document.getElementById("invite-feedback");
+      if(cur){
+        cur.textContent="";
+        cur.classList.remove("good","error");
+      }
+      inviteFeedbackTimer=null;
+    },3500);
+  }
+}
+async function copyTextToClipboard(text){
+  if(navigator.clipboard?.writeText && window.isSecureContext!==false){
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  const ta=document.createElement("textarea");
+  ta.value=text;
+  ta.setAttribute("readonly","");
+  ta.style.position="fixed";
+  ta.style.left="-9999px";
+  ta.style.top="0";
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  const ok=document.execCommand("copy");
+  document.body.removeChild(ta);
+  if(!ok)throw new Error("copy failed");
+}
+window.shareRoomLink=async function(){
+  const code=normalizeRoomCode(myRoom||document.getElementById("display-roomcode")?.textContent||"");
+  if(!code){setInviteFeedback("Noch kein Raum aktiv.","error");return;}
+  const url=getInviteUrl(code);
+  const gameName=GAMES[gameState?.gameType||selectedGame]?.name||"Spiel";
+  const shareTitle=`${gameName} mitspielen`;
+  const shareText=`Komm in meinen Raum ${code}.`;
+  if(navigator.share){
+    try{
+      await navigator.share({title:shareTitle,text:shareText,url});
+      setInviteFeedback("Teilen geöffnet.","good");
+      return;
+    }catch(e){
+      if(e?.name==="AbortError")return;
+    }
+  }
+  try{
+    await copyTextToClipboard(url);
+    setInviteFeedback("Link kopiert.","good");
+  }catch(e){
+    setInviteFeedback(url,"");
+  }
+};
 async function finishRoomConnection(){
   sessionStorage.setItem("slf_name",myName);
   sessionStorage.setItem("slf_room",myRoom);
   sessionStorage.setItem("slf_id",myId);
   sessionStorage.setItem(SELECTED_GAME_SESSION_KEY,selectedGame);
   updateInviteUrl(myRoom);
+  setInviteFeedback("");
   startHeartbeat();
   if(roomListener)roomListener();
   prevBuzzerValue=null;
@@ -1654,7 +1787,7 @@ window.joinExistingRoom=async function(opts={}){
       return;
     }
     isHost=existing.host===myId;
-    const patch={[`players/${myId}`]:{name:myName,score:Number(existing.players?.[myId]?.score)||0,hb:Date.now()}};
+    const patch={[`players/${myId}`]:playerRoomData(existing.players?.[myId]||null,existing.players||{})};
     if(roomGame==="connect4"){
       const seats=existing.connect4?.seats||{};
       if(!seats.red) patch[`connect4/seats/red`]=existing.host||myId;
@@ -1815,7 +1948,8 @@ window.handleBackButton=async function(){
     resetRoundData();
     await updateRoomData({
       phase:"lobby",
-      buzzer:null,buzzerTs:null,collectUntil:null,stopUntil:null,
+      letterRevealStartTs:null,letterRevealUntil:null,
+      buzzer:null,buzzerTs:null,collectUntil:null,stopUntil:null,stopRequest:null,
       roundAnswers:{},liveAnswers:{},finalAnswers:{},rejections:{},validationVotes:{},submittedStatus:{},
       roundStartTs:null,
       typingStatus:{}
@@ -1849,6 +1983,13 @@ async function processStateUpdate(newState){
   }
   gameState=newState;
   isHost=gameState.host===myId;
+  if((gameState.gameType||"slf")==="slf"&&gameState.phase==="playing"){
+    const req=currentStopRequest(gameState);
+    if(req&&(isHost||req.by===myId)){
+      await applyStopRequest(req);
+      return;
+    }
+  }
   if(isHost&&gameState.gameType==="connect4"){
     const seatPatch=reconcileConnect4SeatsPatch(gameState);
     if(seatPatch){
@@ -1935,6 +2076,7 @@ function syncUIWithPhase(){
   const isNewPhase = p !== syncedPhase;
   syncedPhase = p;
   if(p==="lobby"){
+    stopLetterRevealTimer();
     stopDrawingTimer();
     if(isNewPhase) resetRoundData(); // nur bei echtem Phasenwechsel zurücksetzen
     showScreen("lobby");
@@ -1958,6 +2100,7 @@ function syncUIWithPhase(){
     }
     if(isHost&&(gameState.gameType||"slf")==="slf")checkHostRoundEnd();
   } else if(p==="results"){
+    stopLetterRevealTimer();
     stopDrawingTimer();
     stopRoundTimer();
     stopCollectingTimer();
@@ -1969,6 +2112,38 @@ function syncUIWithPhase(){
     const limit=gameState.roundLimit||0;
     if(limit>0&&gameState.round>=limit) setTimeout(playSoundGameOver, 600);
   }
+}
+
+function stopLetterRevealTimer(){
+  if(letterRevealTimer){
+    clearTimeout(letterRevealTimer);
+    letterRevealTimer=null;
+  }
+}
+function letterRevealActive(state=gameState){
+  return !!((state?.gameType||"slf")==="slf"&&state?.phase==="playing"&&safeNum(state?.letterRevealUntil)>Date.now());
+}
+function letterRevealRemainingMs(state=gameState){
+  return Math.max(0,safeNum(state?.letterRevealUntil)-Date.now());
+}
+function scheduleLetterRevealRender(){
+  if(letterRevealTimer||!letterRevealActive())return;
+  const remaining=letterRevealRemainingMs();
+  letterRevealTimer=setTimeout(()=>{
+    letterRevealTimer=null;
+    if((gameState?.gameType||"slf")==="slf"&&gameState?.phase==="playing") renderPlaying();
+  }, Math.max(35,Math.min(85,remaining+20)));
+}
+function renderLetterRevealOverlay(){
+  const remaining=letterRevealRemainingMs();
+  const showFinal=remaining<=420;
+  const letter=showFinal?(gameState?.letter||""):(ALL_LETTERS[Math.floor(Math.random()*ALL_LETTERS.length)]||gameState?.letter||"A");
+  return `<div class="letter-reveal-overlay">
+    <div class="letter-reveal-card">
+      <div class="letter-reveal-label">Buchstabe</div>
+      <div class="letter-reveal-letter ${showFinal?"final":""}">${escHtml(letter)}</div>
+    </div>
+  </div>`;
 }
 
 function resetRoundData(){
@@ -1983,6 +2158,7 @@ function resetRoundData(){
   battleshipLocalRound=null;
   battleshipPlacedShips=[];
   battleshipOrientation="h";
+  stopLetterRevealTimer();
   stopRoundTimer();
   stopCollectingTimer();
   stopStoppingTimer();
@@ -2004,11 +2180,15 @@ function startRoundTimerClient(){
   stopRoundTimer();
   const dur=gameState?.roundDuration||0;
   if(!dur)return;
-  const elapsed=Math.floor((Date.now()-(gameState?.roundStartTs||Date.now()))/1000);
-  roundTimerSecondsLeft=Math.max(0,dur-elapsed);
+  const computeLeft=()=>{
+    const startTs=safeNum(gameState?.roundStartTs)||Date.now();
+    const elapsed=Math.max(0,Math.floor((Date.now()-startTs)/1000));
+    return Math.max(0,dur-elapsed);
+  };
+  roundTimerSecondsLeft=computeLeft();
   renderTimerBar();
   roundTimerInterval=setInterval(async()=>{
-    roundTimerSecondsLeft=Math.max(0,roundTimerSecondsLeft-1);
+    roundTimerSecondsLeft=computeLeft();
     renderTimerBar();
     if(roundTimerSecondsLeft===10) playSoundTimerUrgent();
     if(roundTimerSecondsLeft<=0){
@@ -2103,6 +2283,7 @@ function startCollectingTimerClient(){
 }
 function renderTimerBar(){ 
   const a=document.getElementById("timer-bar-area");if(!a)return;
+  if(letterRevealActive()){a.innerHTML="";return;}
   const dur=gameState?.roundDuration||0;if(!dur){a.innerHTML="";return;}
   const pct=Math.min(100,Math.max(0,(roundTimerSecondsLeft/dur)*100));
   const urgent=roundTimerSecondsLeft<=10;
@@ -2121,7 +2302,100 @@ function renderTimerBar(){
 }
 
 // ─── LOBBY ───────────────────────────────────────────────────────
+function formatLobbyDuration(seconds){
+  const dur=safeNum(seconds);
+  if(!dur)return "Kein Timer";
+  if(dur<60)return `${dur}s`;
+  return `${Math.floor(dur/60)}:${String(dur%60).padStart(2,"0")} min`;
+}
+function lobbySeatCount(seats={},roles=[]){
+  return roles.filter(role=>{
+    const id=seats?.[role];
+    return !!(id&&gameState?.players?.[id]);
+  }).length;
+}
+function lobbyOverviewData(state=gameState){
+  const type=state?.gameType||"slf";
+  const players=state?.players||{};
+  const count=Object.keys(players).length;
+  const game=GAMES[type]||GAMES.slf;
+  let status={text:`${count} Spieler`,ready:count>0};
+  let pills=[];
+
+  if(type==="slf"){
+    const cats=objToCats(state.cats);
+    const dur=state.roundDuration??90;
+    const roundLimit=state.roundLimit??0;
+    const validationMode=state.validationMode||"vote";
+    const used=(state.usedLetters||[]).length;
+    status={text:`${count} Spieler`,ready:count>0};
+    pills=[
+      `${cats.length} Kategorien`,
+      formatLobbyDuration(dur),
+      roundLimit===0?"∞ Runden":`${roundLimit} Runden`,
+      validationMode==="vote"?"Auswertung: Abstimmung":"Auswertung: Host",
+      `${used}/${ALL_LETTERS.length} Buchstaben gespielt`
+    ];
+  }else if(type==="connect4"){
+    const seats=state.connect4?.seats||{};
+    const filled=lobbySeatCount(seats,["red","yellow"]);
+    status={text:`${filled}/2 Plätze`,ready:filled>=2};
+    pills=["2 Spieler", "4 in einer Reihe", "Start: zuerst zufällig", "Verlierer startet nächste Runde"];
+  }else if(type==="battleship"){
+    const seats=state.battleship?.seats||{};
+    const filled=lobbySeatCount(seats,["p1","p2"]);
+    const ships=state.battleship?.ships||BATTLESHIP_SHIPS;
+    status={text:`${filled}/2 Flotten`,ready:filled>=2};
+    pills=["2 Spieler", `${ships.length} Schiffe`, `Flotte: ${ships.join("/")}`, "Treffer: nochmal"];
+  }else if(type==="kniffel"){
+    status={text:`${count}/${KNIFFEL_MAX_PLAYERS} Spieler`,ready:count>=1&&count<=KNIFFEL_MAX_PLAYERS};
+    pills=["5 Würfel", "3 Würfe pro Zug", "13 Felder", "Bonus ab 63 oben"];
+  }else if(type==="drawing"){
+    const mode=drawingWordMode(state.drawing?.wordMode||"mixed");
+    const dur=Math.max(30,Math.min(300,safeNum(state.drawing?.roundDuration)||DRAWING_DEFAULT_DURATION));
+    status={text:`${count}/${DRAWING_MAX_PLAYERS} Spieler`,ready:count>=DRAWING_MIN_PLAYERS&&count<=DRAWING_MAX_PLAYERS};
+    pills=[`${dur}s`, `Wörter: ${DRAWING_WORD_MODE_LABELS[mode]||"Gemischt"}`, "Zeichnen", "Raten"];
+  }else if(type==="maumau"){
+    status={text:`${count}/${MAUMAU_MAX_PLAYERS} Spieler`,ready:count>=MAUMAU_MIN_PLAYERS&&count<=MAUMAU_MAX_PLAYERS};
+    pills=["7 Startkarten", "Zahlen 0–9", "Aussetzen", "+2 stapelbar", "Farbwahl"];
+  }
+  return {name:game.name,status,pills};
+}
+function renderLobbyGameOverview(){
+  const el=document.getElementById("lobby-game-overview");
+  if(!el)return;
+  if(!gameState){el.innerHTML="";return;}
+  const data=lobbyOverviewData(gameState);
+  el.innerHTML=`
+    <div class="lobby-game-overview-card">
+      <div class="lobby-game-overview-top">
+        <div>
+          <div class="lobby-eyebrow">Aktuelles Spiel</div>
+          <div class="lobby-game-overview-name">${escHtml(data.name)}</div>
+        </div>
+        <div class="lobby-player-pill ${data.status.ready?"ready":""}">${escHtml(data.status.text)}</div>
+      </div>
+      <div class="lobby-overview-pills">
+        ${data.pills.map(p=>`<span class="lobby-overview-pill">${escHtml(p)}</span>`).join("")}
+      </div>
+    </div>`;
+}
+function lobbyWaitHtml(text="Warte auf den Host"){
+  return `<div class="lobby-wait-card"><span class="pulse-dot"></span><span>${escHtml(text)}</span></div>`;
+}
+function lobbyHostPanelHtml({title="Host-Bereich",subtitle="",actions="",hint=""}={}){
+  return `<div class="lobby-host-panel">
+    <div class="lobby-host-head">
+      <div class="lobby-section-title">Host</div>
+      <div class="lobby-host-title">${escHtml(title)}</div>
+      ${subtitle?`<div class="lobby-host-sub">${escHtml(subtitle)}</div>`:""}
+    </div>
+    <div class="lobby-host-buttons">${actions||""}</div>
+    ${hint?`<div class="lobby-host-hint">${escHtml(hint)}</div>`:""}
+  </div>`;
+}
 function renderLobby(){
+  renderLobbyGameOverview();
   if(gameState?.gameType==="connect4") return renderConnect4Lobby();
   if(gameState?.gameType==="battleship") return renderBattleshipLobby();
   if(gameState?.gameType==="kniffel") return renderKniffelLobby();
@@ -2143,10 +2417,6 @@ function renderSlfLobby(){
   const validationMode=gameState.validationMode||"host";
   const usedLetters=gameState.usedLetters||[];
   const available=ALL_LETTERS.filter(l=>!usedLetters.includes(l));
-  const timerLabel=dur===0?"Kein Timer":dur<60?`${dur}s`:`${Math.floor(dur/60)}:${String(dur%60).padStart(2,"0")} min`;
-  const roundsLabel=roundLimit===0?"∞ Runden":`${roundLimit} Runden`;
-  const validationLabel=validationMode==="vote"?"Abstimmung":"Host entscheidet";
-
   renderLobbyPlayers((id,p)=>`${safeNum(p.score)}P`);
 
   const summary=document.getElementById("lobby-summary-area");
@@ -2155,14 +2425,6 @@ function renderSlfLobby(){
       <div class="lobby-summary-card">
         <div class="lobby-section-title">Kategorien</div>
         <div class="lobby-cats-line">${cats.map(c=>`<div class="cat-tag">${escHtml(c)}</div>`).join("")}</div>
-      </div>
-      <div class="lobby-summary-card">
-        <div class="lobby-section-title">Spiel</div>
-        <div class="lobby-meta-line">
-          <span class="lobby-meta-pill">${timerLabel}</span>
-          <span class="lobby-meta-pill">${roundsLabel}</span>
-          <span class="lobby-meta-pill">${validationLabel}</span>
-        </div>
       </div>`;
   }
 
@@ -2227,16 +2489,22 @@ function renderSlfLobby(){
   }
 
   const leftCount=available.length;
+  const slfHostActions=`
+    <button type="button" class="btn" onclick="window.startRound()" ${leftCount===0?"disabled":""}>
+      Runde starten${gameState.round>0?` · ${gameState.round} gespielt`:""}
+    </button>
+    <button type="button" class="btn btn-outline" onclick="window.toggleLobbyEditor()">
+      ${lobbyEditorOpen?"Einstellungen schließen":"Einstellungen bearbeiten"}
+    </button>
+    ${gameState.round>0?`<button type="button" class="btn btn-outline" onclick="window.resetLetters()">Buchstaben zurücksetzen</button>`:""}`;
   document.getElementById("lobby-host-area").innerHTML=isHost
-    ?`<button type="button" class="btn" onclick="window.startRound()" ${leftCount===0?"disabled":""}>
-        Runde starten${gameState.round>0?` · ${gameState.round} gespielt`:""}
-      </button>
-      <button type="button" class="btn btn-outline" onclick="window.toggleLobbyEditor()">
-        ${lobbyEditorOpen?"Einstellungen schließen":"Einstellungen bearbeiten"}
-      </button>
-      ${leftCount===0?`<p class="hint" style="margin-top:8px">Alle Buchstaben gespielt.</p>`:``}
-      ${gameState.round>0?`<button type="button" class="btn btn-outline" onclick="window.resetLetters()">Buchstaben zurücksetzen</button>`:""}`
-    :`<div style="font-size:16px;color:var(--pencil);font-weight:700;"><span class="pulse-dot"></span>Warte auf den Host</div>`;
+    ?lobbyHostPanelHtml({
+      title:"Runde vorbereiten",
+      subtitle:lobbyEditorOpen?"Einstellungen sind geöffnet.":"Kategorien, Timer und Auswertung kannst du hier ändern.",
+      actions:slfHostActions,
+      hint:leftCount===0?"Alle Buchstaben gespielt. Setze sie zurück, um weiterzuspielen.":""
+    })
+    :lobbyWaitHtml();
 }
 
 window.toggleLobbyEditor=function(){
@@ -2280,24 +2548,23 @@ function renderBattleshipLobby(){
           ${p2Action}
         </div>
       </div>
-      <div class="lobby-summary-card">
-        <div class="lobby-section-title">Flotte</div>
-        <div class="lobby-meta-line">
-          ${(bs.ships||BATTLESHIP_SHIPS).map(size=>`<span class="lobby-meta-pill">${size}er</span>`).join("")}
-          <span class="lobby-meta-pill">Treffer: nochmal</span>
-        </div>
-      </div>
       ${spectatorIds.length?`<div class="connect4-spectators"><div class="lobby-section-title">Zuschauer</div><div class="lobby-cats-line">${spectatorIds.map(id=>`<div class="cat-tag">${escHtml(players[id]?.name||"?")}</div>`).join("")}</div></div>`:""}`;
   }
   const editor=document.getElementById("lobby-editor-area");
   if(editor) editor.innerHTML="";
   const canPrepare=!!p1Id&&!!p2Id&&!!players[p1Id]&&!!players[p2Id];
+  const battleshipHostActions=`
+    <button type="button" class="btn" ${canPrepare?"":"disabled"} onclick="window.startBattleshipPlacement()">
+      ${canPrepare?"Flotte platzieren":"Warte auf zweiten Spieler"}
+    </button>
+    ${canPrepare?`<button type="button" class="btn btn-outline" onclick="window.swapBattleshipSeats()">Flotten tauschen</button>`:""}`;
   document.getElementById("lobby-host-area").innerHTML=isHost
-    ?`<button type="button" class="btn" ${canPrepare?"":"disabled"} onclick="window.startBattleshipPlacement()">
-        ${canPrepare?"Flotte platzieren":"Warte auf zweiten Spieler"}
-      </button>
-      ${canPrepare?`<button type="button" class="btn btn-outline" onclick="window.swapBattleshipSeats()">Flotten tauschen</button>`:""}`
-    :`<div style="font-size:16px;color:var(--pencil);font-weight:700;"><span class="pulse-dot"></span>Warte auf den Host</div>`;
+    ?lobbyHostPanelHtml({
+      title:"Flotten vorbereiten",
+      subtitle:canPrepare?"Beide Flotten sind vergeben.":"Zwei Spieler müssen eine Flotte übernehmen.",
+      actions:battleshipHostActions
+    })
+    :lobbyWaitHtml();
 }
 
 function renderMauMauLobby(){
@@ -2317,26 +2584,21 @@ function renderMauMauLobby(){
   if(summary){
     summary.innerHTML=`
       <div class="lobby-summary-card">
-        <div class="lobby-section-title">Spiel</div>
-        <div class="lobby-meta-line">
-          <span class="lobby-meta-pill">${playerCount}/${MAUMAU_MAX_PLAYERS} Spieler</span>
-          <span class="lobby-meta-pill">7 Karten</span>
-          <span class="lobby-meta-pill">Zahlen 0–9</span>
-          <span class="lobby-meta-pill">Aussetzen</span>
-          <span class="lobby-meta-pill">+2</span>
-          <span class="lobby-meta-pill">Farbwahl</span>
-        </div>
-      </div>
-      <div class="lobby-summary-card">
         <div class="lobby-section-title">Reihenfolge</div>
         <div class="lobby-cats-line">${order.map((id,i)=>`<div class="cat-tag">${i+1}. ${escHtml(players[id]?.name||"?")}</div>`).join("")}</div>
       </div>`;
   }
   const editor=document.getElementById("lobby-editor-area");
   if(editor) editor.innerHTML="";
+  const mauMauStartLabel=playerCount<MAUMAU_MIN_PLAYERS?`Warte auf ${MAUMAU_MIN_PLAYERS}. Spieler`:(playerCount>MAUMAU_MAX_PLAYERS?"Zu viele Spieler":"Spiel starten");
+  const mauMauHostActions=`<button type="button" class="btn" ${canStart?`onclick="window.startMauMauGame()"`:"disabled"}>${mauMauStartLabel}</button>`;
   document.getElementById("lobby-host-area").innerHTML=isHost
-    ?`<button type="button" class="btn" ${canStart?`onclick="window.startMauMauGame()"`:"disabled"}>${playerCount<MAUMAU_MIN_PLAYERS?`Warte auf ${MAUMAU_MIN_PLAYERS}. Spieler`:(playerCount>MAUMAU_MAX_PLAYERS?"Zu viele Spieler":"Spiel starten")}</button>`
-    :`<div style="font-size:16px;color:var(--pencil);font-weight:700;"><span class="pulse-dot"></span>Warte auf den Host</div>`;
+    ?lobbyHostPanelHtml({
+      title:"Spiel starten",
+      subtitle:canStart?"Alles bereit.":`Mau Mau braucht ${MAUMAU_MIN_PLAYERS} bis ${MAUMAU_MAX_PLAYERS} Spieler.`,
+      actions:mauMauHostActions
+    })
+    :lobbyWaitHtml();
 }
 window.startMauMauGame=async function(){
   if(!isHost||!gameState||gameState.gameType!=="maumau")return;
@@ -2375,16 +2637,6 @@ function renderDrawingLobby(){
   if(summary){
     summary.innerHTML=`
       <div class="lobby-summary-card">
-        <div class="lobby-section-title">Spiel</div>
-        <div class="lobby-meta-line">
-          <span class="lobby-meta-pill">${playerCount}/${DRAWING_MAX_PLAYERS} Spieler</span>
-          <span class="lobby-meta-pill">${drawingDuration}s</span>
-          <span class="lobby-meta-pill">Wörter: ${escHtml(DRAWING_WORD_MODE_LABELS[wordMode]||"Gemischt")}</span>
-          <span class="lobby-meta-pill">Zeichnen</span>
-          <span class="lobby-meta-pill">Raten</span>
-        </div>
-      </div>
-      <div class="lobby-summary-card">
         <div class="lobby-section-title">Zeichner-Reihenfolge</div>
         <div class="lobby-cats-line">${order.map((id,i)=>`<div class="cat-tag">${i+1}. ${escHtml(players[id]?.name||"?")}</div>`).join("")}</div>
       </div>`;
@@ -2407,9 +2659,15 @@ function renderDrawingLobby(){
         </div>
       </div>`:"";
   }
+  const drawingStartLabel=playerCount<DRAWING_MIN_PLAYERS?`Warte auf ${DRAWING_MIN_PLAYERS}. Spieler`:(playerCount>DRAWING_MAX_PLAYERS?"Zu viele Spieler":"Spiel starten");
+  const drawingHostActions=`<button type="button" class="btn" ${canStart?`onclick="window.startDrawingGame()"`:"disabled"}>${drawingStartLabel}</button>`;
   document.getElementById("lobby-host-area").innerHTML=isHost
-    ?`<button type="button" class="btn" ${canStart?`onclick="window.startDrawingGame()"`:"disabled"}>${playerCount<DRAWING_MIN_PLAYERS?`Warte auf ${DRAWING_MIN_PLAYERS}. Spieler`:(playerCount>DRAWING_MAX_PLAYERS?"Zu viele Spieler":"Spiel starten")}</button>`
-    :`<div style="font-size:16px;color:var(--pencil);font-weight:700;"><span class="pulse-dot"></span>Warte auf den Host</div>`;
+    ?lobbyHostPanelHtml({
+      title:"Runde vorbereiten",
+      subtitle:canStart?"Wörterpaket und Zeit können oben geändert werden.":`Montagsmaler braucht ${DRAWING_MIN_PLAYERS} bis ${DRAWING_MAX_PLAYERS} Spieler.`,
+      actions:drawingHostActions
+    })
+    :lobbyWaitHtml();
 }
 window.setDrawingWordMode=async function(mode){
   if(!isHost||!gameState||gameState.gameType!=="drawing"||gameState.phase!=="lobby")return;
@@ -2471,26 +2729,21 @@ function renderKniffelLobby(){
   if(summary){
     summary.innerHTML=`
       <div class="lobby-summary-card">
-        <div class="lobby-section-title">Spiel</div>
-        <div class="lobby-meta-line">
-          <span class="lobby-meta-pill">${playerCount}/${KNIFFEL_MAX_PLAYERS} Spieler</span>
-          <span class="lobby-meta-pill">5 Würfel</span>
-          <span class="lobby-meta-pill">3 Würfe</span>
-          <span class="lobby-meta-pill">13 Felder</span>
-          <span class="lobby-meta-pill">Bonus ab 63</span>
-        </div>
-      </div>
-      <div class="lobby-summary-card">
         <div class="lobby-section-title">Reihenfolge</div>
         <div class="lobby-cats-line">${order.map((id,i)=>`<div class="cat-tag">${i+1}. ${escHtml(players[id]?.name||"?")}</div>`).join("")}</div>
       </div>`;
   }
   const editor=document.getElementById("lobby-editor-area");
   if(editor) editor.innerHTML="";
+  const kniffelHostActions=`<button type="button" class="btn" ${canStart?"":"disabled"} onclick="window.startKniffelGame()">${playerCount>KNIFFEL_MAX_PLAYERS?"Zu viele Spieler":"Spiel starten"}</button>`;
   document.getElementById("lobby-host-area").innerHTML=isHost
-    ?`<button type="button" class="btn" ${canStart?"":"disabled"} onclick="window.startKniffelGame()">${playerCount>KNIFFEL_MAX_PLAYERS?"Zu viele Spieler":"Spiel starten"}</button>
-      ${playerCount>KNIFFEL_MAX_PLAYERS?`<p class="hint" style="margin-top:8px">Kniffel geht bis ${KNIFFEL_MAX_PLAYERS} Spieler.</p>`:""}`
-    :`<div style="font-size:16px;color:var(--pencil);font-weight:700;"><span class="pulse-dot"></span>Warte auf den Host</div>`;
+    ?lobbyHostPanelHtml({
+      title:"Spiel starten",
+      subtitle:canStart?"Alle Spieler kommen in die Reihenfolge.":"Es sind zu viele Spieler im Raum.",
+      actions:kniffelHostActions,
+      hint:playerCount>KNIFFEL_MAX_PLAYERS?`Kniffel geht bis ${KNIFFEL_MAX_PLAYERS} Spieler.`:""
+    })
+    :lobbyWaitHtml();
 }
 
 window.startKniffelGame=async function(){
@@ -2621,12 +2874,18 @@ function renderConnect4Lobby(){
   const editor=document.getElementById("lobby-editor-area");
   if(editor) editor.innerHTML="";
   const canStart=!!redId&&!!yellowId&&!!players[redId]&&!!players[yellowId];
+  const connect4HostActions=`
+    <button type="button" class="btn" ${canStart?"":"disabled"} onclick="window.startConnect4Game()">
+      ${canStart?"Spiel starten":"Warte auf zweiten Spieler"}
+    </button>
+    ${canStart?`<button type="button" class="btn btn-outline" onclick="window.swapConnect4Seats()">Farben tauschen</button>`:""}`;
   document.getElementById("lobby-host-area").innerHTML=isHost
-    ?`<button type="button" class="btn" ${canStart?"":"disabled"} onclick="window.startConnect4Game()">
-        ${canStart?"Spiel starten":"Warte auf zweiten Spieler"}
-      </button>
-      ${canStart?`<button type="button" class="btn btn-outline" onclick="window.swapConnect4Seats()">Farben tauschen</button>`:""}`
-    :`<div style="font-size:16px;color:var(--pencil);font-weight:700;"><span class="pulse-dot"></span>Warte auf den Host</div>`;
+    ?lobbyHostPanelHtml({
+      title:"Spiel starten",
+      subtitle:canStart?"Rot und Gelb sind vergeben.":"Es werden zwei Spieler gebraucht.",
+      actions:connect4HostActions
+    })
+    :lobbyWaitHtml();
 }
 window.swapConnect4Seats=async function(){
   if(!isHost||!gameState||gameState.gameType!=="connect4"||gameState.phase!=="lobby")return;
@@ -2766,21 +3025,26 @@ window.startRound=async function(){
   if(available.length===0)return;
   const letter=available[Math.floor(Math.random()*available.length)];
   const newUsed=[...usedLetters,letter];
+  const now=Date.now();
+  const revealUntil=now+LETTER_REVEAL_MS;
   await updateRoomData({
     phase:"playing",
     round:(gameState.round||0)+1,
     letter,
     usedLetters:newUsed,
+    letterRevealStartTs:now,
+    letterRevealUntil:revealUntil,
     buzzer:null,
     buzzerTs:null,
     collectUntil:null,
+    stopRequest:null,
     roundAnswers:{},
     liveAnswers:{},
     finalAnswers:{},
     rejections:{},
     validationVotes:{},
     submittedStatus:{},
-    roundStartTs:Date.now(),
+    roundStartTs:revealUntil,
     typingStatus:{}
   });
 };
@@ -4513,6 +4777,19 @@ function renderSlfPlaying(){
   const bEl=document.getElementById("buzzer-container");
   const cEl=document.getElementById("playing-content");
 
+  if(letterRevealActive()){
+    if(letterStage) letterStage.style.display="none";
+    if(tiEl) tiEl.innerHTML="";
+    const timerArea=document.getElementById("timer-bar-area");
+    if(timerArea) timerArea.innerHTML="";
+    if(bEl) bEl.innerHTML="";
+    if(cEl) cEl.innerHTML=renderLetterRevealOverlay();
+    scheduleLetterRevealRender();
+    return;
+  }
+  if(letterStage) letterStage.style.display="";
+  renderTimerBar();
+
   if(gameState.phase==="collecting"){
     const msg=gameState.buzzer
       ?`🔔 ${escHtml(gameState.buzzer)} hat STOPP gerufen — Einsammeln!`
@@ -4531,8 +4808,10 @@ function renderSlfPlaying(){
   }
 
   if(gameState.phase==="playing"){ 
-    if(gameState.buzzer){
-      bEl.innerHTML=`<div class="buzzer-fired" id="buzzer-ticker">🔔 ${escHtml(gameState.buzzer)} hat STOPP gerufen!</div>`;
+    const pendingStop=currentStopRequest(gameState);
+    if(gameState.buzzer||pendingStop){
+      const stopName=gameState.buzzer||pendingStop?.name||"Jemand";
+      bEl.innerHTML=`<div class="buzzer-fired" id="buzzer-ticker">🔔 ${escHtml(stopName)} hat STOPP gerufen!</div>`;
     }else if(!submitted){
       bEl.innerHTML=`<div class="buzzer-wrap"><button type="button" class="buzzer-btn" onclick="window.triggerBuzzer()">STOPP!</button></div>`;
     }else{
@@ -4596,6 +4875,23 @@ function collectCurrentAnswers(){
   return ans;
 }
 function roundKey(state=gameState){return String(state?.round||0);}
+function currentStopRequest(state=gameState){
+  const req=state?.stopRequest;
+  if(!req||String(req.round)!==String(state?.round||0))return null;
+  return req;
+}
+async function applyStopRequest(req){
+  if(!req||!myRoom)return;
+  const now=Date.now();
+  await updateRoomData({
+    phase:"stopping",
+    buzzer:req.name||"STOPP",
+    buzzerTs:safeNum(req.ts)||now,
+    stopUntil:now+STOPPING_MS,
+    collectUntil:null,
+    typingStatus:{}
+  });
+}
 async function saveLiveAnswersNow(){
   if(!myRoom||!myId||!gameState||gameState.phase!=="playing")return;
   const rk=roundKey();
@@ -4645,35 +4941,38 @@ async function flushFinalAnswersNow(){
   return finalFlushPromise;
 }
 window.triggerBuzzer=async function(){
-  if(!gameState||gameState.buzzer||gameState.phase!=="playing")return;
+  if(!gameState||gameState.phase!=="playing")return;
   const now=Date.now();
   const ownAnswers=collectCurrentAnswers();
   const rk=roundKey();
+  const request={round:safeNum(gameState.round)||0,by:myId,name:myName||"STOPP",ts:now};
   setConnStatus("sync");
   try{
-    await runTransaction(roomRef(),cur=>{
-      if(!cur||cur.phase!=="playing"||cur.buzzer)return;
-      const curRound=String(cur.round||rk);
-      if(!cur.liveAnswers)cur.liveAnswers={};
-      if(!cur.liveAnswers[curRound])cur.liveAnswers[curRound]={};
-      cur.liveAnswers[curRound][myId]=ownAnswers;
-      if(!cur.finalAnswers)cur.finalAnswers={};
-      if(!cur.finalAnswers[curRound])cur.finalAnswers[curRound]={};
-      cur.finalAnswers[curRound][myId]=ownAnswers;
-      if(!cur.submittedStatus)cur.submittedStatus={};
-      cur.submittedStatus[myId]=true;
-      cur.buzzer=myName;
-      cur.buzzerTs=now;
-      cur.phase="stopping";
-      cur.stopUntil=now+STOPPING_MS;
-      cur.collectUntil=null;
-      cur.typingStatus={};
-      return cur;
+    const tx=await runTransaction(ref(db,`rooms/${myRoom}/stopRequest`),cur=>{
+      if(cur&&String(cur.round)===String(gameState.round||0))return cur;
+      return request;
+    });
+    const req=(tx?.snapshot?.val?.()&&String(tx.snapshot.val().round)===String(gameState.round||0))?tx.snapshot.val():request;
+    await update(roomRef(),{
+      [`liveAnswers/${rk}/${myId}`]:ownAnswers,
+      [`finalAnswers/${rk}/${myId}`]:ownAnswers,
+      [`submittedStatus/${myId}`]:true,
+      phase:"stopping",
+      buzzer:req.name||request.name,
+      buzzerTs:safeNum(req.ts)||now,
+      stopUntil:Date.now()+STOPPING_MS,
+      collectUntil:null,
+      stopRequest:req,
+      typingStatus:{}
     });
     finalFlushed=true;
     submitted=true;
+    sessionStorage.removeItem("slf_local_answers");
     setConnStatus("ok");
   }catch(e){
+    // Falls nur die Phasen-Aktualisierung scheitert, hilft der kleine stopRequest-Knoten
+    // dem Host/Requester beim nächsten Sync trotzdem, die Runde zu stoppen.
+    try{await update(roomRef(),{stopRequest:request});}catch(_e){}
     setConnStatus("err");
   }
 };
@@ -4900,7 +5199,7 @@ function renderMauMauResults(){
   document.getElementById("validation-banner-area").innerHTML=m.lastAction?`<div class="round-ended-note">${escHtml(m.lastAction)}</div>`:"";
   document.getElementById("scoreboard").innerHTML=Object.entries(players).sort((a,b)=>safeNum(b[1].score)-safeNum(a[1].score)).map(([id,p],i)=>`
     <div class="score-row ${id===winner?"gold":""}">
-      <div class="score-name">${["①","②","③"][i]||"  "} ${escHtml(p.name)}</div>
+      ${scoreNameHtml(id,p,["①","②","③"][i]||"")}
       <div class="score-pts">${safeNum(p.score)} Siege</div>
     </div>`).join("");
   const order=mauMauOrder(gameState);
@@ -4924,7 +5223,7 @@ function renderDrawingResults(){
   document.getElementById("validation-banner-area").innerHTML=`<div class="round-ended-note">Wort: <strong>${escHtml(word)}</strong></div>`;
   document.getElementById("scoreboard").innerHTML=Object.entries(gameState.players||{}).sort((a,b)=>safeNum(b[1].score)-safeNum(a[1].score)).map(([id,p],i)=>`
     <div class="score-row ${i===0?"gold":""}">
-      <div class="score-name">${["①","②","③"][i]||"  "} ${escHtml(p.name)}</div>
+      ${scoreNameHtml(id,p,["①","②","③"][i]||"")}
       <div class="score-pts">${safeNum(p.score)} Punkte</div>
     </div>`).join("");
   document.getElementById("results-container").innerHTML=`
@@ -4965,7 +5264,7 @@ function renderKniffelResults(){
   if(banner) banner.innerHTML="";
   document.getElementById("scoreboard").innerHTML=ranked.map((id,i)=>`
     <div class="score-row ${id===winner?"gold":""}">
-      <div class="score-name">${["①","②","③"][i]||"  "} ${escHtml(players[id]?.name||"?")}</div>
+      ${scoreNameHtml(id,players[id]||{},["①","②","③"][i]||"")}
       <div class="score-pts">${kniffelTotal(kniffelScoresForPlayer(resultState,id))} Punkte</div>
     </div>`).join("");
   document.getElementById("results-container").innerHTML=`
@@ -5015,7 +5314,7 @@ function renderConnect4Results(){
     [seats.red,redName,"Rot"],[seats.yellow,yellowName,"Gelb"]
   ].filter(([id])=>id).map(([id,name,role],i)=>`
     <div class="score-row ${c4.winner!=="draw"&&id===seats[c4.winner]?"gold":""}">
-      <div class="score-name">${role==="Rot"?"🔴":"🟡"} ${escHtml(name)}</div>
+      ${scoreNameHtml(id,players[id]||{name},role==="Rot"?"🔴":"🟡")}
       <div class="score-pts">${safeNum(players[id]?.score)} Siege</div>
     </div>`).join("");
   document.getElementById("results-container").innerHTML="";
@@ -5049,7 +5348,7 @@ function renderBattleshipResults(){
     [seats.p1,p1Name,"Flotte 1"],[seats.p2,p2Name,"Flotte 2"]
   ].filter(([id])=>id).map(([id,name,role])=>`
     <div class="score-row ${id===seats[bs.winner]?"gold":""}">
-      <div class="score-name">🚢 ${escHtml(name)} <span style="color:var(--pencil);font-size:12px">${role}</span></div>
+      ${scoreNameHtml(id,players[id]||{name},"🚢",`<span class="score-role">${escHtml(role)}</span>`)}
       <div class="score-pts">${safeNum(players[id]?.score)} Siege</div>
     </div>`).join("");
   const p1Board=bs.boards?.[seats.p1]||{ships:[],shotsReceived:{}};
@@ -5091,15 +5390,16 @@ function renderSlfResults(){
 
   const banner=document.getElementById("validation-banner-area");
   if(banner){
-    banner.innerHTML=gameState.buzzer
-      ?`<div class="round-ended-note">🔔 ${escHtml(gameState.buzzer)} hat STOPP gedrückt</div>`
+    const stopName=gameState.buzzer||currentStopRequest(gameState)?.name;
+    banner.innerHTML=stopName
+      ?`<div class="round-ended-note">🔔 ${escHtml(stopName)} hat STOPP gedrückt</div>`
       :"";
   }
 
   const sorted=Object.entries(players).sort((a,b)=>safeNum(b[1].score)-safeNum(a[1].score));
   document.getElementById("scoreboard").innerHTML=sorted.map(([id,p],i)=>`
     <div class="score-row ${i===0?"gold":""}">
-      <div class="score-name">${["①","②","③"][i]||"  "} ${escHtml(p.name)}</div>
+      ${scoreNameHtml(id,p,["①","②","③"][i]||"")}
       <div class="score-pts">${safeNum(p.score)} Punkte</div>
     </div>`).join("");
 
@@ -5306,7 +5606,8 @@ window.nextRound=async function(){
   resetRoundData();
   await updateRoomData({
     phase:"lobby",
-    buzzer:null,buzzerTs:null,collectUntil:null,
+    letterRevealStartTs:null,letterRevealUntil:null,
+    buzzer:null,buzzerTs:null,collectUntil:null,stopRequest:null,
     roundAnswers:{},liveAnswers:{},finalAnswers:{},rejections:{},validationVotes:{},submittedStatus:{},
     roundStartTs:null,
     preRoundScores,
@@ -5324,7 +5625,8 @@ window.newGame=async function(){
     ...playerReset,
     phase:"lobby",
     round:0,
-    buzzer:null,buzzerTs:null,collectUntil:null,
+    letterRevealStartTs:null,letterRevealUntil:null,
+    buzzer:null,buzzerTs:null,collectUntil:null,stopRequest:null,
     roundAnswers:{},liveAnswers:{},finalAnswers:{},rejections:{},validationVotes:{},submittedStatus:{},
     roundStartTs:null,
     usedLetters:[],
