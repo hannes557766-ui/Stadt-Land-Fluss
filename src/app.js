@@ -5142,8 +5142,7 @@ async function callGeminiForValidation(state){
     throw new Error(`Gemini HTTP ${res.status}${detail?`: ${detail}`:""}`);
   }
   const data=await res.json();
-  const text=(data?.candidates?.[0]?.content?.parts||[]).map(p=>p.text||"").join("
-").trim();
+  const text=(data?.candidates?.[0]?.content?.parts||[]).map(p=>p.text||"").join(String.fromCharCode(10)).trim();
   if(!text)throw new Error("Gemini hat keine JSON-Antwort geliefert.");
   const parsed=parseGeminiJson(text);
   return normalizeAiJudgements(state,parsed,entries);
