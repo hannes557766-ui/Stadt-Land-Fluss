@@ -946,6 +946,14 @@ button.battleship-ship-pill { cursor: pointer; }
   gap: 10px;
 }
 .connect4-actions .btn { margin-top: 0; }
+.connect4-ai-level-box {
+  display: grid;
+  gap: 4px;
+  padding: 2px 0 0;
+}
+.connect4-ai-level-box .lobby-section-title { margin-bottom: 0; }
+.connect4-ai-levels { margin-top: 4px; }
+.connect4-ai-levels .validation-preset { flex: 1 1 84px; }
 .connect4-result-stage {
   width: 100%;
   max-width: 480px;
@@ -1078,17 +1086,22 @@ button.battleship-ship-pill { cursor: pointer; }
 }
 .letter-reveal-letter.final {
   color: var(--primary-accent);
-  animation: letterRevealFinal 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: letterRevealFinalBlink 0.9s ease-in-out 1 forwards;
   text-shadow: 0 8px 0 color-mix(in srgb, var(--ink) 10%, transparent);
 }
 @keyframes letterRevealTick {
   from { transform: scale(0.88) rotate(-4deg); opacity: 0.35; }
   to { transform: scale(1) rotate(0); opacity: 1; }
 }
-@keyframes letterRevealFinal {
-  0% { transform: scale(0.72) rotate(-8deg); opacity: 0.35; }
-  70% { transform: scale(1.08) rotate(1deg); opacity: 1; }
-  100% { transform: scale(1) rotate(0); opacity: 1; }
+@keyframes letterRevealFinalBlink {
+  0%   { transform: scale(0.82); opacity: 0.55; filter: brightness(1); }
+  12%  { transform: scale(1.08); opacity: 1; filter: brightness(1.35); }
+  24%  { transform: scale(1); opacity: 0.82; filter: brightness(0.95); }
+  38%  { transform: scale(1.08); opacity: 1; filter: brightness(1.35); }
+  50%  { transform: scale(1); opacity: 0.82; filter: brightness(0.95); }
+  64%  { transform: scale(1.08); opacity: 1; filter: brightness(1.35); }
+  76%  { transform: scale(1); opacity: 0.9; filter: brightness(1); }
+  100% { transform: scale(1); opacity: 1; filter: brightness(1); }
 }
 #playing-content { width: 100%; max-width: 560px; }
 #playing-content > * { margin-left: auto; margin-right: auto; }
