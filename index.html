@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Stadt Land Fluss</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="./styles/app.css"/>
+  <link rel="stylesheet" href="./styles/app.css?v=drawingguessfocus2"/>
 </head>
 <body>
 
@@ -134,8 +134,7 @@
 </div>
 
 <div id="screen-playing" class="screen hidden" hidden>
-  <div id="timer-bar-area" style="position: fixed; top: 15px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; z-index: 200; padding: 0 15px; pointer-events: none;"></div>
-  <div class="letter-stage" style="margin-top: 80px;">
+  <div class="letter-stage">
     <span class="round-tag" id="round-badge">Runde 1</span>
     <div class="big-letter" id="big-letter">A</div>
     <div class="used-letters" id="used-letters-display"></div>
@@ -143,6 +142,7 @@
   </div>
   <div id="typing-indicators-area"></div>
   <div id="playing-content"></div>
+  <div id="timer-bar-area"></div>
   <div id="buzzer-container"></div>
 </div>
 
@@ -160,7 +160,6 @@
   <div id="results-container" style="width:100%;max-width:480px"></div>
   <div style="width:100%;max-width:480px;margin-top:24px" id="results-actions"></div>
 </div>
-
-<script type="module" src="./src/app.js"></script>
-</body>
+<script type="module" src="./src/app.js?v=drawingguessfocus2"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1e1b60d2fe5df6d',t:'MTc4NDU0NzgzNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
