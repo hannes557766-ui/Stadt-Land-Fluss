@@ -680,24 +680,25 @@ function scoreNameHtml(id,p={},rank="",extraHtml=""){
     ${extraHtml||""}
   </div>`;
 }
-function lobbyPlayerChipHtml(id,p,metaText=""){
+function lobbyPlayerChipHtml(id,p,metaText="",opts={}){
   const online=!!p?.ai||Date.now()-(p?.hb||0)<PLAYER_STALE_MS;
   const canKick=!!(isHost&&gameState?.phase==="lobby"&&id!==myId&&!p?.ai);
+  const showHostMark=opts.showHostMark!==false;
   return `<div class="player-chip">
     ${playerAvatarHtml(id,p)}
     <div class="online-dot ${online?"online":"offline"}" title="${online?"online":"offline"}"></div>
-    <span class="player-chip-name">${escHtml(p?.name||"?")}${id===gameState?.host?" ★":""}</span>
+    <span class="player-chip-name">${escHtml(p?.name||"?")}${showHostMark&&id===gameState?.host?" ★":""}</span>
     ${metaText?`<span class="pts">${escHtml(metaText)}</span>`:""}
     ${canKick?`<button type="button" class="player-kick-btn" title="Spieler entfernen" aria-label="${escHtml(p?.name||"Spieler")} entfernen" onclick="window.kickPlayer('${id}')">×</button>`:""}
   </div>`;
 }
-function renderLobbyPlayers(metaFn=null){
+function renderLobbyPlayers(metaFn=null,opts={}){
   const el=document.getElementById("players-list");
   if(!el||!gameState)return;
   const players=gameState.players||{};
   el.innerHTML=Object.entries(players).map(([id,p])=>{
     const meta=typeof metaFn==="function"?metaFn(id,p):`${safeNum(p?.score)}P`;
-    return lobbyPlayerChipHtml(id,p,meta);
+    return lobbyPlayerChipHtml(id,p,meta,opts);
   }).join("");
 }
 function updateJoinScreen(){
@@ -2471,6 +2472,10 @@ function renderLobbyGameOverview(){
   const el=document.getElementById("lobby-game-overview");
   if(!el)return;
   if(!gameState){el.innerHTML="";return;}
+  if(["slf","connect4","battleship","kniffel","drawing","maumau"].includes(gameState.gameType||"slf")){
+    el.innerHTML="";
+    return;
+  }
   const data=lobbyOverviewData(gameState);
   el.innerHTML=`
     <div class="lobby-game-overview-card">
@@ -2489,13 +2494,13 @@ function renderLobbyGameOverview(){
 function lobbyWaitHtml(text="Warte auf den Host"){
   return `<div class="lobby-wait-card"><span class="pulse-dot"></span><span>${escHtml(text)}</span></div>`;
 }
-function lobbyHostPanelHtml({title="Host-Bereich",subtitle="",actions="",hint=""}={}){
+function lobbyHostPanelHtml({title="Host-Bereich",subtitle="",actions="",hint="",showHead=true}={}){
   return `<div class="lobby-host-panel">
-    <div class="lobby-host-head">
+    ${showHead?`<div class="lobby-host-head">
       <div class="lobby-section-title">Host</div>
       <div class="lobby-host-title">${escHtml(title)}</div>
       ${subtitle?`<div class="lobby-host-sub">${escHtml(subtitle)}</div>`:""}
-    </div>
+    </div>`:""}
     <div class="lobby-host-buttons">${actions||""}</div>
     ${hint?`<div class="lobby-host-hint">${escHtml(hint)}</div>`:""}
   </div>`;
@@ -2523,7 +2528,7 @@ function renderSlfLobby(){
   const validationMode=normalizeValidationMode(gameState.validationMode||"ai");
   const usedLetters=gameState.usedLetters||[];
   const available=ALL_LETTERS.filter(l=>!usedLetters.includes(l));
-  renderLobbyPlayers((id,p)=>`${safeNum(p.score)}P`);
+  renderLobbyPlayers(()=>"");
 
   const summary=document.getElementById("lobby-summary-area");
   if(summary){
@@ -2609,7 +2614,8 @@ function renderSlfLobby(){
       title:"Runde vorbereiten",
       subtitle:lobbyEditorOpen?"Einstellungen sind geöffnet.":(validationMode==="ai"?"KI-Auswertung ist aktiv. Du kannst auch Host oder Abstimmung wählen.":"Kategorien, Timer und Auswertung kannst du hier ändern."),
       actions:slfHostActions,
-      hint:leftCount===0?"Alle Buchstaben gespielt. Setze sie zurück, um weiterzuspielen.":""
+      hint:leftCount===0?"Alle Buchstaben gespielt. Setze sie zurück, um weiterzuspielen.":"",
+      showHead:false
     })
     :lobbyWaitHtml();
 }
@@ -2637,10 +2643,10 @@ function renderBattleshipLobby(){
   const hitStreak=true;
   const myRole=battleshipRoleFor(gameState,myId);
   const spectatorIds=Object.keys(players).filter(id=>id!==p1Id&&id!==p2Id);
-  const p1Action=(!p1Id&&myRole!=="p2")?`<button type="button" class="seat-action" onclick="window.takeBattleshipSeat('p1')">Übernehmen</button>`:`<span class="connect4-seat-role">Flotte 1</span>`;
-  const p2Action=(!p2Id&&myRole!=="p1")?`<button type="button" class="seat-action" onclick="window.takeBattleshipSeat('p2')">Übernehmen</button>`:`<span class="connect4-seat-role">Flotte 2</span>`;
+  const p1Action=(!p1Id&&myRole!=="p2")?`<button type="button" class="seat-action" onclick="window.takeBattleshipSeat('p1')">Übernehmen</button>`:"";
+  const p2Action=(!p2Id&&myRole!=="p1")?`<button type="button" class="seat-action" onclick="window.takeBattleshipSeat('p2')">Übernehmen</button>`:"";
 
-  renderLobbyPlayers((id,p)=>id===p1Id?"Flotte 1":id===p2Id?"Flotte 2":"Zuschauer");
+  renderLobbyPlayers(()=>"");
 
   const summary=document.getElementById("lobby-summary-area");
   if(summary){
@@ -2669,7 +2675,8 @@ function renderBattleshipLobby(){
     ?lobbyHostPanelHtml({
       title:"Flotten vorbereiten",
       subtitle:canPrepare?"Beide Flotten sind vergeben.":"Zwei Spieler müssen eine Flotte übernehmen.",
-      actions:battleshipHostActions
+      actions:battleshipHostActions,
+      showHead:false
     })
     :lobbyWaitHtml();
 }
@@ -2681,29 +2688,21 @@ function renderMauMauLobby(){
   if(hb)hb.style.display=isHost?"block":"none";
   const now=Date.now();
   const players=gameState.players||{};
-  const order=mauMauOrder(gameState);
   const playerCount=Object.keys(players).length;
   const canStart=playerCount>=MAUMAU_MIN_PLAYERS&&playerCount<=MAUMAU_MAX_PLAYERS;
 
-  renderLobbyPlayers((id,p)=>`${safeNum(p.score)} Siege`);
+  renderLobbyPlayers(()=>"");
 
   const summary=document.getElementById("lobby-summary-area");
-  if(summary){
-    summary.innerHTML=`
-      <div class="lobby-summary-card">
-        <div class="lobby-section-title">Reihenfolge</div>
-        <div class="lobby-cats-line">${order.map((id,i)=>`<div class="cat-tag">${i+1}. ${escHtml(players[id]?.name||"?")}</div>`).join("")}</div>
-      </div>`;
-  }
+  if(summary) summary.innerHTML="";
   const editor=document.getElementById("lobby-editor-area");
   if(editor) editor.innerHTML="";
   const mauMauStartLabel=playerCount<MAUMAU_MIN_PLAYERS?`Warte auf ${MAUMAU_MIN_PLAYERS}. Spieler`:(playerCount>MAUMAU_MAX_PLAYERS?"Zu viele Spieler":"Spiel starten");
   const mauMauHostActions=`<button type="button" class="btn" ${canStart?`onclick="window.startMauMauGame()"`:"disabled"}>${mauMauStartLabel}</button>`;
   document.getElementById("lobby-host-area").innerHTML=isHost
     ?lobbyHostPanelHtml({
-      title:"Spiel starten",
-      subtitle:canStart?"Alles bereit.":`Mau Mau braucht ${MAUMAU_MIN_PLAYERS} bis ${MAUMAU_MAX_PLAYERS} Spieler.`,
-      actions:mauMauHostActions
+      actions:mauMauHostActions,
+      showHead:false
     })
     :lobbyWaitHtml();
 }
@@ -2732,22 +2731,15 @@ function renderDrawingLobby(){
   if(hb)hb.style.display=isHost?"block":"none";
   const now=Date.now();
   const players=gameState.players||{};
-  const order=drawingOrder(gameState);
   const playerCount=Object.keys(players).length;
   const canStart=playerCount>=DRAWING_MIN_PLAYERS&&playerCount<=DRAWING_MAX_PLAYERS;
   const wordMode=drawingWordMode(gameState.drawing?.wordMode||"mixed");
   const drawingDuration=Math.max(30,Math.min(300,safeNum(gameState.drawing?.roundDuration)||DRAWING_DEFAULT_DURATION));
 
-  renderLobbyPlayers((id,p)=>`${safeNum(p.score)}P`);
+  renderLobbyPlayers(()=>"");
 
   const summary=document.getElementById("lobby-summary-area");
-  if(summary){
-    summary.innerHTML=`
-      <div class="lobby-summary-card">
-        <div class="lobby-section-title">Zeichner-Reihenfolge</div>
-        <div class="lobby-cats-line">${order.map((id,i)=>`<div class="cat-tag">${i+1}. ${escHtml(players[id]?.name||"?")}</div>`).join("")}</div>
-      </div>`;
-  }
+  if(summary) summary.innerHTML="";
   const editor=document.getElementById("lobby-editor-area");
   if(editor){
     editor.innerHTML=isHost?`
@@ -2770,9 +2762,8 @@ function renderDrawingLobby(){
   const drawingHostActions=`<button type="button" class="btn" ${canStart?`onclick="window.startDrawingGame()"`:"disabled"}>${drawingStartLabel}</button>`;
   document.getElementById("lobby-host-area").innerHTML=isHost
     ?lobbyHostPanelHtml({
-      title:"Runde vorbereiten",
-      subtitle:canStart?"Wörterpaket und Zeit können oben geändert werden.":`Montagsmaler braucht ${DRAWING_MIN_PLAYERS} bis ${DRAWING_MAX_PLAYERS} Spieler.`,
-      actions:drawingHostActions
+      actions:drawingHostActions,
+      showHead:false
     })
     :lobbyWaitHtml();
 }
@@ -2824,31 +2815,22 @@ function renderKniffelLobby(){
   document.getElementById("display-roomcode").textContent=myRoom;
   const hb=document.getElementById("host-badge");
   if(hb)hb.style.display=isHost?"block":"none";
-  const now=Date.now();
   const players=gameState.players||{};
-  const order=kniffelOrder(gameState);
   const playerCount=Object.keys(players).length;
   const canStart=playerCount>=1&&playerCount<=KNIFFEL_MAX_PLAYERS;
 
-  renderLobbyPlayers((id,p)=>`${safeNum(p.score)} Siege`);
+  renderLobbyPlayers(()=>"");
 
   const summary=document.getElementById("lobby-summary-area");
-  if(summary){
-    summary.innerHTML=`
-      <div class="lobby-summary-card">
-        <div class="lobby-section-title">Reihenfolge</div>
-        <div class="lobby-cats-line">${order.map((id,i)=>`<div class="cat-tag">${i+1}. ${escHtml(players[id]?.name||"?")}</div>`).join("")}</div>
-      </div>`;
-  }
+  if(summary) summary.innerHTML="";
   const editor=document.getElementById("lobby-editor-area");
   if(editor) editor.innerHTML="";
   const kniffelHostActions=`<button type="button" class="btn" ${canStart?"":"disabled"} onclick="window.startKniffelGame()">${playerCount>KNIFFEL_MAX_PLAYERS?"Zu viele Spieler":"Spiel starten"}</button>`;
   document.getElementById("lobby-host-area").innerHTML=isHost
     ?lobbyHostPanelHtml({
-      title:"Spiel starten",
-      subtitle:canStart?"Alle Spieler kommen in die Reihenfolge.":"Es sind zu viele Spieler im Raum.",
       actions:kniffelHostActions,
-      hint:playerCount>KNIFFEL_MAX_PLAYERS?`Kniffel geht bis ${KNIFFEL_MAX_PLAYERS} Spieler.`:""
+      hint:playerCount>KNIFFEL_MAX_PLAYERS?`Kniffel geht bis ${KNIFFEL_MAX_PLAYERS} Spieler.`:"",
+      showHead:false
     })
     :lobbyWaitHtml();
 }
@@ -2964,7 +2946,7 @@ function renderConnect4Lobby(){
   const aiLevel=normalizeConnect4AiLevel(c4.aiLevel||CONNECT4_AI_DEFAULT_LEVEL);
   const spectatorIds=Object.keys(players).filter(id=>id!==CONNECT4_AI_ID&&id!==redId&&id!==yellowId);
 
-  renderLobbyPlayers((id,p)=>id===redId?"Rot":id===yellowId?(p?.ai?"KI · Gelb":"Gelb"):"Zuschauer");
+  renderLobbyPlayers(()=>"",{showHostMark:false});
 
   const summary=document.getElementById("lobby-summary-area");
   if(summary){
@@ -2972,11 +2954,9 @@ function renderConnect4Lobby(){
       <div class="connect4-seats">
         <div class="connect4-seat">
           <span class="connect4-seat-left"><span class="connect4-disc red"></span><span class="connect4-seat-name">${escHtml(connect4PlayerName(redId))}</span></span>
-          <span class="connect4-seat-role">Rot</span>
         </div>
         <div class="connect4-seat">
           <span class="connect4-seat-left"><span class="connect4-disc yellow"></span><span class="connect4-seat-name">${escHtml(connect4PlayerName(yellowId))}</span></span>
-          <span class="connect4-seat-role">Gelb</span>
         </div>
       </div>
       ${spectatorIds.length?`<div class="connect4-spectators"><div class="lobby-section-title">Zuschauer</div><div class="lobby-cats-line">${spectatorIds.map(id=>`<div class="cat-tag">${escHtml(players[id]?.name||"?")}</div>`).join("")}</div></div>`:""}`;
@@ -3002,7 +2982,8 @@ function renderConnect4Lobby(){
     ?lobbyHostPanelHtml({
       title:aiActive?"Gegen Computer":"Spiel starten",
       subtitle:canStart?(aiActive?`Computergegner ist bereit · Level: ${connect4AiLevelLabel(aiLevel)}`:"Rot und Gelb sind vergeben."):(aiActive?"Computer wird vorbereitet.":"Es werden zwei Spieler gebraucht."),
-      actions:connect4HostActions
+      actions:connect4HostActions,
+      showHead:false
     })
     :lobbyWaitHtml();
 }
@@ -4583,38 +4564,79 @@ function kniffelEntryChoicesHtml(state,k){
     <div class="kniffel-entry-groups">${sections}</div>
   </div>`;
 }
+function kniffelRuleHtml(catId){
+  const diceRules={
+    ones:["⚀ ⚀ ⚀","nur Einser zählen"],
+    twos:["⚁ ⚁ ⚁","nur Zweier zählen"],
+    threes:["⚂ ⚂ ⚂","nur Dreier zählen"],
+    fours:["⚃ ⚃ ⚃","nur Vierer zählen"],
+    fives:["⚄ ⚄ ⚄","nur Fünfer zählen"],
+    sixes:["⚅ ⚅ ⚅","nur Sechser zählen"]
+  };
+  if(diceRules[catId]){
+    const [dice,label]=diceRules[catId];
+    return `<div class="kniffel-rule"><span class="kniffel-rule-dice">${dice}</span><span>${label}</span></div>`;
+  }
+  const rules={
+    threeKind:"alle Augen zählen",
+    fourKind:"alle Augen zählen",
+    fullHouse:"25 Punkte",
+    smallStraight:"30 Punkte",
+    largeStraight:"40 Punkte",
+    kniffel:"50 Punkte",
+    chance:"alle Augen zählen"
+  };
+  return `<div class="kniffel-rule"><span>${escHtml(rules[catId]||"")}</span></div>`;
+}
+function kniffelScoreCellHtml(state,k,pid,cat,interactive){
+  const scores=kniffelScoresForPlayer(state,pid);
+  const val=scores[cat.id];
+  const canPick=interactive&&!kniffelIsRolling(k)&&pid===myId&&k.turn===myId&&k.rolls>0&&val==null;
+  if(canPick){
+    const preview=kniffelScoreFor(cat.id,k.dice||[]);
+    return `<td class="kniffel-player-cell kniffel-current-player"><button type="button" class="kniffel-score-btn" onclick="window.pickKniffelCategory('${cat.id}')">${preview}</button></td>`;
+  }
+  return `<td class="kniffel-player-cell ${pid===k.turn?"kniffel-current-player":""}">${val!=null?safeNum(val):`<span class="kniffel-empty">—</span>`}</td>`;
+}
+function kniffelTotalCellHtml(value,pid,k,extraClass=""){
+  return `<td class="kniffel-player-cell ${extraClass} ${pid===k.turn?"kniffel-current-player":""}">${safeNum(value)}</td>`;
+}
 function kniffelScoreSheetHtml(state,{interactive=false}={}){
   const k=normalizeKniffelState(state.kniffel,state.players||{});
   const order=kniffelOrder({...state,kniffel:k});
-  let lastSection="";
+  const playerHeads=order.map(pid=>`<th class="kniffel-player-head ${pid===k.turn?"kniffel-current-player":""}">${escHtml(state.players?.[pid]?.name||"?")}</th>`).join("");
+  const upperCats=KNIFFEL_CATEGORIES.filter(cat=>cat.section==="Oben");
+  const lowerCats=KNIFFEL_CATEGORIES.filter(cat=>cat.section==="Unten");
+  const sectionRow=(label)=>`<tr class="kniffel-section-row"><td colspan="${order.length+2}">${escHtml(label)}</td></tr>`;
+  const categoryRow=(cat)=>`<tr class="kniffel-category-row">
+    <td class="kniffel-field-cell">${escHtml(cat.name)}</td>
+    <td class="kniffel-rule-cell">${kniffelRuleHtml(cat.id)}</td>
+    ${order.map(pid=>kniffelScoreCellHtml(state,k,pid,cat,interactive)).join("")}
+  </tr>`;
+  const totalRow=(label,rule,values,className="kniffel-total-row")=>`<tr class="${className}">
+    <td class="kniffel-field-cell">${escHtml(label)}</td>
+    <td class="kniffel-rule-cell">${rule?escHtml(rule):"➜"}</td>
+    ${order.map(pid=>kniffelTotalCellHtml(values(pid),pid,k)).join("")}
+  </tr>`;
+
   const rows=[];
-  KNIFFEL_CATEGORIES.forEach(cat=>{
-    if(cat.section!==lastSection){
-      lastSection=cat.section;
-      rows.push(`<tr class="kniffel-section-row"><td colspan="${order.length+1}">${escHtml(lastSection)}</td></tr>`);
-    }
-    rows.push(`<tr>
-      <td>${escHtml(cat.name)}</td>
-      ${order.map(pid=>{
-        const scores=kniffelScoresForPlayer(state,pid);
-        const val=scores[cat.id];
-        const canPick=interactive&&!kniffelIsRolling(k)&&pid===myId&&k.turn===myId&&k.rolls>0&&val==null;
-        if(canPick){
-          const preview=kniffelScoreFor(cat.id,k.dice||[]);
-          return `<td class="kniffel-current-player"><button type="button" class="kniffel-score-btn" onclick="window.pickKniffelCategory('${cat.id}')">${preview}</button></td>`;
-        }
-        return `<td class="${pid===k.turn?"kniffel-current-player":""}">${val!=null?safeNum(val):`<span class="kniffel-empty">—</span>`}</td>`;
-      }).join("")}
-    </tr>`);
-  });
-  rows.push(`<tr class="kniffel-total-row"><td>Oben</td>${order.map(pid=>`<td>${kniffelUpperTotal(kniffelScoresForPlayer(state,pid))}</td>`).join("")}</tr>`);
-  rows.push(`<tr class="kniffel-total-row"><td>Bonus</td>${order.map(pid=>`<td>${kniffelBonus(kniffelScoresForPlayer(state,pid))}</td>`).join("")}</tr>`);
-  rows.push(`<tr class="kniffel-total-row"><td>Gesamt</td>${order.map(pid=>`<td>${kniffelTotal(kniffelScoresForPlayer(state,pid))}</td>`).join("")}</tr>`);
-  return `<div class="kniffel-score-wrap"><table class="kniffel-sheet">
-    <thead><tr><th>Feld</th>${order.map(pid=>`<th class="${pid===k.turn?"kniffel-current-player":""}">${escHtml(state.players?.[pid]?.name||"?")}</th>`).join("")}</tr></thead>
+  rows.push(sectionRow("Oberer Teil"));
+  upperCats.forEach(cat=>rows.push(categoryRow(cat)));
+  rows.push(totalRow("Gesamt", "oberer Teil", pid=>kniffelUpperTotal(kniffelScoresForPlayer(state,pid)), "kniffel-total-row kniffel-subtotal-row"));
+  rows.push(totalRow("Bonus bei 63 oder mehr", "plus 35", pid=>kniffelBonus(kniffelScoresForPlayer(state,pid)), "kniffel-total-row kniffel-bonus-row"));
+  rows.push(totalRow("Gesamt oberer Teil", "➜", pid=>kniffelUpperTotal(kniffelScoresForPlayer(state,pid))+kniffelBonus(kniffelScoresForPlayer(state,pid)), "kniffel-total-row kniffel-part-total-row"));
+  rows.push(sectionRow("Unterer Teil"));
+  lowerCats.forEach(cat=>rows.push(categoryRow(cat)));
+  rows.push(totalRow("Gesamt unterer Teil", "➜", pid=>kniffelLowerTotal(kniffelScoresForPlayer(state,pid)), "kniffel-total-row kniffel-subtotal-row"));
+  rows.push(totalRow("Gesamt oberer Teil", "➜", pid=>kniffelUpperTotal(kniffelScoresForPlayer(state,pid))+kniffelBonus(kniffelScoresForPlayer(state,pid)), "kniffel-total-row kniffel-subtotal-row"));
+  rows.push(totalRow("Endsumme", "➜", pid=>kniffelTotal(kniffelScoresForPlayer(state,pid)), "kniffel-total-row kniffel-grand-total-row"));
+
+  return `<div class="kniffel-score-wrap"><table class="kniffel-sheet kniffel-paper-sheet">
+    <thead><tr><th class="kniffel-field-head">Feld</th><th class="kniffel-rule-head">Zählt</th>${playerHeads}</tr></thead>
     <tbody>${rows.join("")}</tbody>
   </table></div>`;
 }
+
 function renderKniffelPlaying(){
   if(!gameState)return;
   stopRoundTimer();
@@ -4652,13 +4674,9 @@ function renderKniffelPlaying(){
         </div>
         ${isMyTurn?`<div class="kniffel-actions">
           <button type="button" class="btn" ${canRoll?`onclick="window.rollKniffelDice()"`:"disabled"}>${escHtml(rollLabel)}</button>
-          ${!rolling&&k.rolls===0?`<div class="hint">Nach dem ersten Wurf kannst du Würfel behalten und unten ein Feld eintragen.</div>`:""}
-          ${!rolling&&k.rolls>0?`<div class="hint">Zum Eintragen unten einen Vorschauwert antippen.</div>`:""}
         </div>`:""}
       </div>
-      ${k.lastScore?`<div class="round-ended-note">${escHtml(gameState.players?.[k.lastScore.player]?.name||"?")} hat ${safeNum(k.lastScore.score)} Punkte bei ${escHtml(KNIFFEL_CATEGORIES.find(c=>c.id===k.lastScore.category)?.name||k.lastScore.category)} eingetragen.</div>`:""}
-      ${kniffelEntryChoicesHtml(gameState,k)}
-      ${kniffelScoreSheetHtml({...gameState,kniffel:k},{interactive:false})}
+      ${kniffelScoreSheetHtml({...gameState,kniffel:k},{interactive:true})}
     </div>`;
 }
 window.toggleKniffelHold=async function(index){
@@ -5010,7 +5028,7 @@ function renderConnect4Playing(){
       <div class="connect4-board" aria-label="Vier gewinnt Spielbrett">
         ${board.map((cell,i)=>{
           const col=i%7;
-          const playable=isMyTurn&&!connect4ColumnFull(board,col);
+          const playable=!cell&&isMyTurn&&!connect4ColumnFull(board,col);
           const win=(c4.winCells||[]).includes(i)?"win":"";
           const last=(animateMove&&c4.lastMove===i)?"last":"";
           const dropStyle=last?` style="--drop-y:${-(Math.floor(i/7)+1)*44}px"`:"";
@@ -5022,8 +5040,18 @@ function renderConnect4Playing(){
         }).join("")}
       </div>
     </div>`;
+  const setColumnHover=(col,on)=>{
+    cEl.querySelectorAll(`.connect4-cell[data-col="${col}"]`).forEach(cell=>{
+      cell.classList.toggle("column-hover",on);
+    });
+  };
   cEl.querySelectorAll(".connect4-cell.playable").forEach(btn=>{
-    btn.addEventListener("click",()=>window.makeConnect4Move(Number(btn.dataset.col)));
+    const col=Number(btn.dataset.col);
+    btn.addEventListener("click",()=>window.makeConnect4Move(col));
+    btn.addEventListener("mouseenter",()=>setColumnHover(col,true));
+    btn.addEventListener("mouseleave",()=>setColumnHover(col,false));
+    btn.addEventListener("focus",()=>setColumnHover(col,true));
+    btn.addEventListener("blur",()=>setColumnHover(col,false));
   });
   if(animateMove) connect4LastAnimatedMoveKey=moveKey;
 }
