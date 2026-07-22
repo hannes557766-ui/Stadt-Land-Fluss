@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Stadt Land Fluss</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="./styles/app.css?v=connect4emptyhover1"/>
+  <link rel="stylesheet" href="./styles/app.css?v=tictactoe6"/>
 </head>
 <body>
 
@@ -60,6 +60,11 @@
     <button type="button" class="game-card-btn" onclick="window.selectGame('connect4')">
       <span class="game-card-icon">🔴</span>
       <span class="game-card-title">Vier gewinnt</span>
+      <span class="game-card-status">2 Spieler</span>
+    </button>
+    <button type="button" class="game-card-btn" onclick="window.selectGame('tictactoe')">
+      <span class="game-card-icon">✕○</span>
+      <span class="game-card-title">Tic Tac Toe</span>
       <span class="game-card-status">2 Spieler</span>
     </button>
     <button type="button" class="game-card-btn" onclick="window.selectGame('battleship')">
@@ -165,6 +170,6 @@
   <div id="results-container" style="width:100%;max-width:480px"></div>
   <div style="width:100%;max-width:480px;margin-top:24px" id="results-actions"></div>
 </div>
-<script type="module" src="./src/app.js?v=connect4emptyhover1"></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1eab6fc3f6d8755',t:'MTc4NDY0MjI0Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script type="module" src="./src/app.js?v=tictactoe6"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1f339934822a264',t:'MTc4NDczMTQ4Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
