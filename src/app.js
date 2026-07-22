@@ -60,6 +60,8 @@ const GAMES = {
 let selectedGame="slf";
 let currentScreen="home";
 const SELECTED_GAME_SESSION_KEY="slf_game";
+const SAVED_NAME_KEY = "slf_saved_name";
+const SAVED_NAME_KEY = "slf_saved_name";
 const PLAYER_AVATAR_COLORS = [
   "#2563eb", "#dc2626", "#059669", "#7c3aed",
   "#ea580c", "#0891b2", "#be123c", "#4f46e5",
