@@ -60,6 +60,8 @@ const GAMES = {
 let selectedGame="slf";
 let currentScreen="home";
 const SELECTED_GAME_SESSION_KEY="slf_game";
+const SAVED_NAME_KEY = "slf_saved_name";
+const SAVED_NAME_KEY = "slf_saved_name";
 const PLAYER_AVATAR_COLORS = [
   "#2563eb", "#dc2626", "#059669", "#7c3aed",
   "#ea580c", "#0891b2", "#be123c", "#4f46e5",
@@ -6571,9 +6573,14 @@ function renderConnect4Results(){
     ${board.map((cell,i)=>`<div class="connect4-cell ${cell||""} ${(c4.winCells||[]).includes(i)?"win":""}"></div>`).join("")}
     ${connect4WinLineHtml(c4.winCells||[])}
   </div>`;
+
+  const primaryAction = isHost
+    ? `<button type="button" class="btn" style="margin-top:16px" onclick="window.resetConnect4Game()">Nochmal spielen →</button>`
+    : `<button type="button" class="btn btn-outline" style="margin-top:16px" disabled>Warte auf den Host…</button>`;
+
   const goArea=document.getElementById("gameover-area");
   if(goArea){
-    goArea.innerHTML=`<div class="connect4-result-stage">${boardHtml}</div>`;
+    goArea.innerHTML=`<div class="connect4-result-stage">${boardHtml}${primaryAction}</div>`;
   }
   const banner=document.getElementById("validation-banner-area"); if(banner) banner.innerHTML="";
   document.getElementById("scoreboard").innerHTML=[
