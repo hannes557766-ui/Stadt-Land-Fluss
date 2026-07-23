@@ -60,8 +60,6 @@ const GAMES = {
 let selectedGame="slf";
 let currentScreen="home";
 const SELECTED_GAME_SESSION_KEY="slf_game";
-const SAVED_NAME_KEY = "slf_saved_name";
-const SAVED_NAME_KEY = "slf_saved_name";
 const PLAYER_AVATAR_COLORS = [
   "#2563eb", "#dc2626", "#059669", "#7c3aed",
   "#ea580c", "#0891b2", "#be123c", "#4f46e5",
@@ -169,19 +167,72 @@ const DRAWING_COLORS = [
   {name:"Gelb", hex:"#facc15"},
   {name:"Lila", hex:"#8b5cf6"}
 ];
-const DRAWING_WIDTHS = [
-  {label:"Dünn", width:3},
-  {label:"Mittel", width:5},
-  {label:"Dick", width:9}
-];
-const DRAWING_ERASER_WIDTH = 18;
+const DRAWING_MIN_WIDTH = 2;
+const DRAWING_MAX_WIDTH = 24;
+const DRAWING_DEFAULT_WIDTH = 5;
+function normalizeDrawingColor(hex){
+  const value=String(hex||"").trim();
+  return /^#[0-9a-f]{6}$/i.test(value)?value.toLowerCase():null;
+}
+function normalizeDrawingWidth(width){
+  const raw=String(width??"").trim();
+  if(!raw)return DRAWING_DEFAULT_WIDTH;
+  const n=Math.round(Number(raw));
+  return Number.isFinite(n)?Math.max(DRAWING_MIN_WIDTH,Math.min(DRAWING_MAX_WIDTH,n)):DRAWING_DEFAULT_WIDTH;
+}
+function normalizeDrawingEraserWidth(width){
+  const raw=String(width??"").trim();
+  if(!raw)return DRAWING_DEFAULT_ERASER_WIDTH;
+  const n=Math.round(Number(raw));
+  return Number.isFinite(n)?Math.max(DRAWING_MIN_ERASER_WIDTH,Math.min(DRAWING_MAX_ERASER_WIDTH,n)):DRAWING_DEFAULT_ERASER_WIDTH;
+}
+const DRAWING_MIN_ERASER_WIDTH = 6;
+const DRAWING_MAX_ERASER_WIDTH = 48;
+const DRAWING_DEFAULT_ERASER_WIDTH = 18;
+const DRAWING_ERASER_WIDTH = DRAWING_DEFAULT_ERASER_WIDTH;
+const DRAWING_MIN_ZOOM = 1;
+const DRAWING_MAX_ZOOM = 4;
+const DRAWING_ZOOM_STEP = 1.35;
+const DRAWING_GUESS_VISIBLE_MS = 11000;
+const DRAWING_GUESS_FADE_MS = 2500;
+const DRAWING_GUESS_TOTAL_MS = DRAWING_GUESS_VISIBLE_MS + DRAWING_GUESS_FADE_MS;
+const DRAWING_POINT_MIN_DISTANCE = 2.4;
+const DRAWING_MAX_POINTS_PER_STROKE = 520;
+const DRAWING_REVEAL_START_RATIO = 0.33;
+const DRAWING_REVEAL_MIN_START_MS = 15000;
+const DRAWING_REVEAL_MAX_START_MS = 45000;
+const DRAWING_REVEAL_STEP_MS = 15000;
 const DRAWING_WORD_PACKS = {
   easy: [
     "Haus","Baum","Katze","Hund","Auto","Sonne","Mond","Stern","Pizza","Schiff",
     "Blume","Ball","Tasse","Buch","Stuhl","Tisch","Apfel","Banane","Bett","Tür",
     "Schuh","Fisch","Vogel","Herz","Kerze","Uhr","Lampe","Brille","Krone","Schlüssel",
     "Maus","Käse","Wolke","Regen","Schnee","Eis","Mütze","Hut","Jacke","Hose",
-    "Löffel","Gabel","Topf","Kuchen","Brot","Milch","Ei","Biene","Schaf","Pferd"
+    "Löffel","Gabel","Topf","Kuchen","Brot","Milch","Ei","Biene","Schaf","Pferd",
+    "Bus","Zug","Fahrrad","Roller","Flugzeug","Rakete","Traktor","Feuerwehr","Polizei","Krankenwagen",
+    "Straße","Brücke","Ampel","Schild","Zaun","Tor","Fenster","Dach","Kamin","Garage",
+    "Garten","Wiese","Wald","Berg","See","Meer","Strand","Insel","Fluss","Teich",
+    "Regenbogen","Blitz","Donner","Wind","Tropfen","Pfütze","Schirm","Schneemann","Eiszapfen","Löwe",
+    "Tiger","Elefant","Giraffe","Affe","Bär","Fuchs","Wolf","Hase","Igel","Kuh",
+    "Schwein","Huhn","Ente","Gans","Ziege","Hundehütte","Frosch","Schlange","Schildkröte","Krokodil",
+    "Pinguin","Wal","Delfin","Hai","Krabbe","Muschel","Schnecke","Spinne","Ameise","Marienkäfer",
+    "Schmetterling","Eule","Adler","Papagei","Kaktus","Pilz","Gras","Blatt","Ast","Orange",
+    "Zitrone","Erdbeere","Kirsche","Birne","Traube","Melone","Karotte","Tomate","Gurke","Kartoffel",
+    "Mais","Salat","Burger","Pommes","Nudeln","Suppe","Wurst","Messer","Teller","Schüssel",
+    "Glas","Flasche","Dose","Korb","Eimer","Besen","Seife","Zahnbürste","Zahnpasta","Handtuch",
+    "Badewanne","Dusche","Toilette","Spiegel","Kamm","Bürste","Föhn","Hand","Fuß","Auge",
+    "Nase","Mund","Ohr","Zahn","Kopf","Bauch","Bein","Arm","Finger","Baby",
+    "Kind","Mann","Frau","Opa","Oma","Lehrer","Arzt","Koch","Bäcker","Maler",
+    "Clown","König","Prinzessin","Ritter","Pirat","Hexe","Geist","Monster","Drache","Roboter",
+    "Alien","Fee","Engel","Teufel","Superheld","Zauberstab","Schwert","Helm","Krankenhaus","Schule",
+    "Hausaufgabe","Stift","Bleistift","Radiergummi","Lineal","Schere","Kleber","Papier","Brief","Paket",
+    "Rucksack","Koffer","Tasche","Geld","Münze","Kranz","Geschenk","Ballon","Torte","Musik",
+    "Trommel","Gitarre","Klavier","Mikrofon","Kopfhörer","Fernseher","Computer","Handy","Kamera","Radio",
+    "Batterie","Stecker","Glühbirne","Wecker","Fernbedienung","Spielzeug","Puppe","Teddy","Würfel","Karte",
+    "Puzzle","Lego","Seil","Schaukel","Rutsche","Sandkasten","Burg","Zelt","Lagerfeuer","Grill",
+    "Hammer","Nagel","Säge","Bohrer","Schraube","Pinsel","Farbe","Leiter","Sofa","Schrank",
+    "Regal","Kissen","Decke","Teppich","Waschmaschine","Kühlschrank","Ofen","Herd","Pfanne","Staubsauger",
+    "Mülltonne","Briefkasten","Blumentopf","Gießkanne"
   ],
   mixed: [
     "Fahrrad","Schule","Rakete","Regenschirm","Schneemann","Roboter","Drache","Fußball","Gitarre","Kamera",
@@ -199,6 +250,7 @@ const DRAWING_WORD_PACKS = {
   ]
 };
 const DRAWING_WORD_MODE_LABELS = { easy:"Einfach", mixed:"Gemischt", hard:"Schwer" };
+const DRAWING_DEFAULT_WORD_MODE = "easy";
 const DRAWING_WORDS = [...new Set(Object.values(DRAWING_WORD_PACKS).flat())];
 const MAUMAU_MIN_PLAYERS = 2;
 const MAUMAU_MAX_PLAYERS = 8;
@@ -231,10 +283,16 @@ let collectingTimerInterval=null, stoppingTimerInterval=null;
 let typingTimeout=null;
 let prevBuzzerValue=null;
 let kniffelRollTimer=null;
-let drawingToolColor = DRAWING_COLORS.some(c=>c.hex===localStorage.getItem("drawing_color")) ? localStorage.getItem("drawing_color") : "#343a40";
-let drawingToolWidth = DRAWING_WIDTHS.some(w=>w.width===Number(localStorage.getItem("drawing_width"))) ? Number(localStorage.getItem("drawing_width")) : 5;
+let drawingToolColor = normalizeDrawingColor(localStorage.getItem("drawing_color")) || "#343a40";
+let drawingToolWidth = normalizeDrawingWidth(localStorage.getItem("drawing_width"));
+let drawingEraserWidth = normalizeDrawingEraserWidth(localStorage.getItem("drawing_eraser_width"));
 let drawingToolMode = "pen";
-let drawingActiveStrokeId=null, drawingActiveStroke=null, drawingPendingStrokes={}, drawingSyncTimer=null, drawingTickTimer=null, drawingTimerInterval=null;
+let drawingViewMode = false;
+let drawingView = {zoom:1,x:0,y:0};
+let drawingPointers = new Map();
+let drawingGesture = null;
+let drawingActivePointerId = null;
+let drawingActiveStrokeId=null, drawingActiveStroke=null, drawingPendingStrokes={}, drawingSyncTimer=null, drawingTickTimer=null, drawingGuessFadeTimer=null, drawingTimerInterval=null;
 let mauMauPendingWildIndex=null, mauMauLastAnimatedTopId=null;
 let syncedPhase=null; // tracks last rendered phase to detect real transitions
 let aiValidationRunningKey=null;
@@ -1384,7 +1442,8 @@ function initialDrawingState(order=[]){
     drawer:null,
     word:"",
     wordIndex:0,
-    wordMode:"mixed",
+    wordMode:DRAWING_DEFAULT_WORD_MODE,
+    revealLetters:false,
     usedWords:[],
     roundDuration:DRAWING_DEFAULT_DURATION,
     roundStartTs:null,
@@ -1397,7 +1456,8 @@ function initialDrawingState(order=[]){
 }
 function drawingLobbyStateForPlayers(players={},previous={}){
   const state=initialDrawingState(Object.keys(players||{}));
-  state.wordMode=drawingWordMode(previous?.wordMode||"mixed");
+  state.wordMode=drawingWordMode(previous?.wordMode||DRAWING_DEFAULT_WORD_MODE);
+  state.revealLetters=!!previous?.revealLetters;
   state.usedWords=Array.isArray(previous?.usedWords)?previous.usedWords.slice(-drawingWordPool(state.wordMode).length):[];
   state.roundDuration=Math.max(30,Math.min(300,safeNum(previous?.roundDuration)||DRAWING_DEFAULT_DURATION));
   return state;
@@ -1424,12 +1484,50 @@ function drawingNextDrawer(order,currentDrawer){
   return clean[(idx>=0?idx+1:0)%clean.length];
 }
 function drawingWordMode(mode){
-  return DRAWING_WORD_PACKS[mode]?mode:"mixed";
+  return DRAWING_WORD_PACKS[mode]?mode:DRAWING_DEFAULT_WORD_MODE;
 }
+function drawingRevealableChar(ch){
+  return !(ch==="-"||ch==="–"||ch==="—"||/\s/.test(ch));
+}
+function drawingRevealOrder(word,d={}){
+  return Array.from(String(word||""))
+    .map((ch,i)=>({ch,i}))
+    .filter(item=>drawingRevealableChar(item.ch))
+    .sort((a,b)=>stableHash(`${word}|${safeNum(d?.round)}|${a.i}`)-stableHash(`${word}|${safeNum(d?.round)}|${b.i}`))
+    .map(item=>item.i);
+}
+function drawingRevealCount(word,d={}){
+  if(!d?.revealLetters)return 0;
+  const indices=drawingRevealOrder(word,d);
+  if(indices.length<=1)return 0;
+  const durationMs=Math.max(1,safeNum(d?.roundDuration||DRAWING_DEFAULT_DURATION))*1000;
+  const startDelay=Math.max(DRAWING_REVEAL_MIN_START_MS,Math.min(DRAWING_REVEAL_MAX_START_MS,Math.round(durationMs*DRAWING_REVEAL_START_RATIO)));
+  const elapsed=Math.max(0,Date.now()-safeNum(d?.roundStartTs));
+  if(elapsed<startDelay)return 0;
+  const maxReveal=Math.max(1,indices.length-1);
+  return Math.min(maxReveal,1+Math.floor((elapsed-startDelay)/DRAWING_REVEAL_STEP_MS));
+}
+function drawingSecretPlaceholderHtml(word,d={}){
+  const chars=Array.from(String(word||""));
+  if(!chars.length)return `<span class="drawing-secret-word"><span class="drawing-secret-letter">?</span></span>`;
+  const revealSet=new Set(drawingRevealOrder(word,d).slice(0,drawingRevealCount(word,d)));
+  return `<span class="drawing-secret-word">${chars.map((ch,i)=>{
+    if(/\s/.test(ch))return `<span class="drawing-secret-space" aria-hidden="true"></span>`;
+    if(ch==="-"||ch==="–"||ch==="—")return `<span class="drawing-secret-separator">-</span>`;
+    if(revealSet.has(i))return `<span class="drawing-secret-letter revealed">${escHtml(ch)}</span>`;
+    return `<span class="drawing-secret-letter">•</span>`;
+  }).join("")}</span>`;
+}
+function updateDrawingSecretWordDom(){
+  const el=document.getElementById("drawing-secret-word-display");
+  const d=gameState?.drawing;
+  if(el&&d)el.innerHTML=drawingSecretPlaceholderHtml(d.word||"",d);
+}
+
 function drawingWordPool(mode){
-  return DRAWING_WORD_PACKS[drawingWordMode(mode)]||DRAWING_WORD_PACKS.mixed;
+  return DRAWING_WORD_PACKS[drawingWordMode(mode)]||DRAWING_WORD_PACKS[DRAWING_DEFAULT_WORD_MODE];
 }
-function drawingPickWord(usedWords=[],mode="mixed"){
+function drawingPickWord(usedWords=[],mode=DRAWING_DEFAULT_WORD_MODE){
   const pool=drawingWordPool(mode);
   const used=new Set((usedWords||[]).map(String));
   let available=pool.filter(w=>!used.has(w));
@@ -1443,7 +1541,7 @@ function drawingPickWord(usedWords=[],mode="mixed"){
 function drawingRoundState(order,round,drawer=null,previous={}){
   const clean=[...new Set((order||[]).filter(Boolean))];
   const chosenDrawer=drawer&&clean.includes(drawer)?drawer:(drawingFirstDrawer(clean));
-  const wordMode=drawingWordMode(previous?.wordMode||"mixed");
+  const wordMode=drawingWordMode(previous?.wordMode||DRAWING_DEFAULT_WORD_MODE);
   const picked=drawingPickWord(previous?.usedWords||[],wordMode);
   const duration=Math.max(30,Math.min(300,safeNum(previous?.roundDuration)||DRAWING_DEFAULT_DURATION));
   return {
@@ -1455,6 +1553,7 @@ function drawingRoundState(order,round,drawer=null,previous={}){
     word:picked.word,
     wordIndex:Math.max(0,DRAWING_WORDS.indexOf(picked.word)),
     wordMode,
+    revealLetters:!!previous?.revealLetters,
     usedWords:picked.usedWords,
     roundDuration:duration,
     roundStartTs:Date.now(),
@@ -1465,14 +1564,35 @@ function drawingRoundState(order,round,drawer=null,previous={}){
     winner:null
   };
 }
-function drawingRecentGuessesHtml(d){
-  const guesses=drawingGuessesArray(d?.guesses).slice(-8).reverse();
+function drawingRecentGuessesHtml(d,{transient=false}={}){
+  const now=Date.now();
+  let guesses=drawingGuessesArray(d?.guesses);
+  if(transient){
+    guesses=guesses.filter(g=>Math.max(0,now-safeNum(g.ts))<DRAWING_GUESS_TOTAL_MS);
+  }
+  guesses=guesses.slice(-8).reverse();
   if(!guesses.length)return`<div class="drawing-sub" style="margin-top:12px">Noch keine Rateversuche.</div>`;
-  return `<div class="drawing-guesses">${guesses.map(g=>`
-    <div class="drawing-guess-chip ${g.correct?"correct":""}">
+  return `<div class="drawing-guesses">${guesses.map(g=>{
+    const age=transient?Math.max(0,now-safeNum(g.ts)):0;
+    const style=transient?` style="--guess-life:${DRAWING_GUESS_TOTAL_MS}ms;animation-delay:-${Math.min(age,DRAWING_GUESS_TOTAL_MS-1)}ms"`:"";
+    return `<div class="drawing-guess-chip ${g.correct?"correct":""} ${transient?"transient":""}"${style}>
       <span class="drawing-guess-name">${escHtml(g.name||"?")}</span>
       <span class="drawing-guess-word">${escHtml(g.guess||"")}${g.correct?" ✓":""}</span>
-    </div>`).join("")}</div>`;
+    </div>`;
+  }).join("")}</div>`;
+}
+function scheduleDrawingGuessFadeRender(d){
+  stopDrawingGuessFadeTimer();
+  if(!gameState||gameState.gameType!=="drawing"||gameState.phase!=="playing")return;
+  const now=Date.now();
+  const remaining=drawingGuessesArray(d?.guesses)
+    .map(g=>DRAWING_GUESS_TOTAL_MS-(now-safeNum(g.ts)))
+    .filter(ms=>ms>0);
+  if(!remaining.length)return;
+  drawingGuessFadeTimer=setTimeout(()=>{
+    drawingGuessFadeTimer=null;
+    if(gameState?.gameType==="drawing"&&gameState.phase==="playing") renderPlaying();
+  },Math.max(250,Math.min(...remaining)+80));
 }
 function drawingEndTime(d){
   return safeNum(d?.roundStartTs)+safeNum(d?.roundDuration||DRAWING_DEFAULT_DURATION)*1000;
@@ -1481,6 +1601,12 @@ function stopDrawingTimer(){
   if(drawingTimerInterval){
     clearInterval(drawingTimerInterval);
     drawingTimerInterval=null;
+  }
+}
+function stopDrawingGuessFadeTimer(){
+  if(drawingGuessFadeTimer){
+    clearTimeout(drawingGuessFadeTimer);
+    drawingGuessFadeTimer=null;
   }
 }
 function startDrawingTimerClient(){
@@ -1509,7 +1635,7 @@ function reconcileDrawingStatePatch(state){
     const rawOrder=Array.isArray(d.order)?d.order.filter(id=>players[id]):[];
     if(d.phase!=="lobby") patch["drawing/phase"]="lobby";
     if(JSON.stringify(rawOrder)!==JSON.stringify(desiredOrder)) patch["drawing/order"]=desiredOrder;
-    if(!DRAWING_WORD_PACKS[d.wordMode||""]) patch["drawing/wordMode"]="mixed";
+    if(!DRAWING_WORD_PACKS[d.wordMode||""]) patch["drawing/wordMode"]=DRAWING_DEFAULT_WORD_MODE;
     if(d.drawer!=null) patch["drawing/drawer"]=null;
     if(d.word) patch["drawing/word"]="";
     if(d.roundStartTs!=null) patch["drawing/roundStartTs"]=null;
@@ -1538,7 +1664,7 @@ function reconcileDrawingStatePatch(state){
     }
     if(d.phase!=="playing") patch["drawing/phase"]="playing";
     if(!d.word){
-      const mode=drawingWordMode(d.wordMode||"mixed");
+      const mode=drawingWordMode(d.wordMode||DRAWING_DEFAULT_WORD_MODE);
       const picked=drawingPickWord(d.usedWords||[],mode);
       patch["drawing/word"]=picked.word;
       patch["drawing/wordIndex"]=Math.max(0,DRAWING_WORDS.indexOf(picked.word));
@@ -2139,9 +2265,15 @@ function cleanupLocalRoomAfterRemoval(){
   if(kniffelRollTimer){clearTimeout(kniffelRollTimer);kniffelRollTimer=null;}
   if(drawingSyncTimer){clearTimeout(drawingSyncTimer);drawingSyncTimer=null;}
   if(drawingTickTimer){clearTimeout(drawingTickTimer);drawingTickTimer=null;}
+  if(drawingGuessFadeTimer){clearTimeout(drawingGuessFadeTimer);drawingGuessFadeTimer=null;}
   drawingActiveStrokeId=null;
+  drawingActivePointerId=null;
   drawingActiveStroke=null;
   drawingPendingStrokes={};
+  drawingPointers.clear();
+  drawingGesture=null;
+  drawingViewMode=false;
+  drawingView={zoom:1,x:0,y:0};
   mauMauPendingWildIndex=null;
   if(heartbeatInterval){clearInterval(heartbeatInterval);heartbeatInterval=null;}
   if(roomListener){const off=roomListener;roomListener=null;try{off();}catch(e){}}
@@ -2259,11 +2391,6 @@ window.handleBackButton=async function(){
     await updateRoomData({
       phase:"lobby",
       drawing:drawingLobbyStateForPlayers(gameState.players||{},gameState.drawing||{})
-    });
-  }else if(type==="maumau"){
-    await updateRoomData({
-      phase:"lobby",
-      maumau:mauMauLobbyStateForPlayers(gameState.players||{},gameState.maumau||{})
     });
   }else{
     resetRoundData();
@@ -2507,7 +2634,9 @@ function resetRoundData(){
   if(kniffelRollTimer){clearTimeout(kniffelRollTimer);kniffelRollTimer=null;}
   if(drawingSyncTimer){clearTimeout(drawingSyncTimer);drawingSyncTimer=null;}
   if(drawingTickTimer){clearTimeout(drawingTickTimer);drawingTickTimer=null;}
-  stopDrawingTimer();
+    if(drawingGuessFadeTimer){clearTimeout(drawingGuessFadeTimer);drawingGuessFadeTimer=null;}
+    stopDrawingTimer();
+  stopDrawingGuessFadeTimer();
   drawingActiveStrokeId=null;
   drawingActiveStroke=null;
   drawingPendingStrokes={};
@@ -2691,10 +2820,10 @@ function lobbyOverviewData(state=gameState){
     status={text:`${count}/${KNIFFEL_MAX_PLAYERS} Spieler`,ready:count>=1&&count<=KNIFFEL_MAX_PLAYERS};
     pills=["5 Würfel", "3 Würfe pro Zug", "13 Felder", "Bonus ab 63 oben"];
   }else if(type==="drawing"){
-    const mode=drawingWordMode(state.drawing?.wordMode||"mixed");
+    const mode=drawingWordMode(state.drawing?.wordMode||DRAWING_DEFAULT_WORD_MODE);
     const dur=Math.max(30,Math.min(300,safeNum(state.drawing?.roundDuration)||DRAWING_DEFAULT_DURATION));
     status={text:`${count}/${DRAWING_MAX_PLAYERS} Spieler`,ready:count>=DRAWING_MIN_PLAYERS&&count<=DRAWING_MAX_PLAYERS};
-    pills=[`${dur}s`, `Wörter: ${DRAWING_WORD_MODE_LABELS[mode]||"Gemischt"}`, "Zeichnen", "Raten"];
+    pills=[`${dur}s`, `Wörter: ${DRAWING_WORD_MODE_LABELS[mode]||DRAWING_WORD_MODE_LABELS[DRAWING_DEFAULT_WORD_MODE]}`, "Zeichnen", "Raten"];
   }else if(type==="maumau"){
     status={text:`${count}/${MAUMAU_MAX_PLAYERS} Spieler`,ready:count>=MAUMAU_MIN_PLAYERS&&count<=MAUMAU_MAX_PLAYERS};
     pills=["7 Startkarten", "Zahlen 0–9", "Aussetzen", "+2 stapelbar", "Farbwahl"];
@@ -3293,7 +3422,8 @@ function renderDrawingLobby(){
   const players=gameState.players||{};
   const playerCount=Object.keys(players).length;
   const canStart=playerCount>=DRAWING_MIN_PLAYERS&&playerCount<=DRAWING_MAX_PLAYERS;
-  const wordMode=drawingWordMode(gameState.drawing?.wordMode||"mixed");
+  const wordMode=drawingWordMode(gameState.drawing?.wordMode||DRAWING_DEFAULT_WORD_MODE);
+  const revealLetters=!!gameState.drawing?.revealLetters;
   const drawingDuration=Math.max(30,Math.min(300,safeNum(gameState.drawing?.roundDuration)||DRAWING_DEFAULT_DURATION));
 
   renderLobbyPlayers(()=>"");
@@ -3314,6 +3444,13 @@ function renderDrawingLobby(){
           <div class="lobby-editor-title">Zeit</div>
           <div class="timer-presets">
             ${DRAWING_TIMER_PRESETS.map(sec=>`<button type="button" class="timer-preset ${drawingDuration===sec?"active":""}" onclick="window.setDrawingDuration(${sec})">${sec}s</button>`).join("")}
+          </div>
+        </div>
+        <div class="lobby-editor-group">
+          <div class="lobby-editor-title">Hinweise</div>
+          <div class="validation-presets">
+            <button type="button" class="validation-preset ${!revealLetters?"active":""}" onclick="window.setDrawingRevealLetters(false)">Aus</button>
+            <button type="button" class="validation-preset ${revealLetters?"active":""}" onclick="window.setDrawingRevealLetters(true)">Buchstaben</button>
           </div>
         </div>
       </div>`:"";
@@ -3340,6 +3477,10 @@ window.setDrawingDuration=async function(seconds){
   seconds=Math.max(30,Math.min(300,Math.floor(safeNum(seconds))));
   if(!DRAWING_TIMER_PRESETS.includes(seconds))return;
   await updateRoomData({"drawing/roundDuration":seconds});
+};
+window.setDrawingRevealLetters=async function(enabled){
+  if(!isHost||!gameState||gameState.gameType!=="drawing"||gameState.phase!=="lobby")return;
+  await updateRoomData({"drawing/revealLetters":!!enabled});
 };
 function drawingRandomWord(){
   return DRAWING_WORDS[Math.floor(Math.random()*DRAWING_WORDS.length)]||"Haus";
@@ -4557,10 +4698,68 @@ function drawingStrokesArray(strokes){
   });
   return arr.sort((a,b)=>safeNum(a.ts)-safeNum(b.ts));
 }
+function drawingClampView(view=drawingView){
+  const zoom=Math.max(DRAWING_MIN_ZOOM,Math.min(DRAWING_MAX_ZOOM,Number(view?.zoom)||1));
+  const maxOffset=Math.max(0,1000-(1000/zoom));
+  return {
+    zoom,
+    x:Math.max(0,Math.min(maxOffset,Number(view?.x)||0)),
+    y:Math.max(0,Math.min(maxOffset,Number(view?.y)||0))
+  };
+}
+function drawingSetView(view,redraw=true){
+  drawingView=drawingClampView(view);
+  if(redraw) redrawCurrentDrawingCanvas();
+}
+function drawingResetView(redraw=true){
+  drawingView={zoom:1,x:0,y:0};
+  if(redraw) redrawCurrentDrawingCanvas();
+}
+function redrawCurrentDrawingCanvas(){
+  const canvas=document.getElementById("drawing-canvas");
+  if(canvas&&gameState?.drawing) drawingDrawCanvas(canvas,gameState.drawing.strokes||{});
+}
+function drawingStrokesToObject(strokes){
+  if(Array.isArray(strokes)){
+    return Object.fromEntries(strokes.map((v,i)=>[String(i),v]).filter(([,v])=>v));
+  }
+  return strokes&&typeof strokes==="object"?{...strokes}:{};
+}
+function setLocalDrawingStrokes(strokes){
+  if(!gameState?.drawing)return;
+  gameState.drawing.strokes=strokes||{};
+}
+function removeLocalDrawingStroke(id){
+  if(!id||!gameState?.drawing)return;
+  const strokes=drawingStrokesToObject(gameState.drawing.strokes||{});
+  delete strokes[String(id)];
+  gameState.drawing.strokes=strokes;
+}
+function latestPendingDrawingStrokeEntry(){
+  return Object.entries(drawingPendingStrokes||{})
+    .filter(([,stroke])=>stroke&&(!stroke.by||stroke.by===myId))
+    .sort((a,b)=>safeNum(a[1]?.ts)-safeNum(b[1]?.ts))
+    .pop()||null;
+}
+function cancelDrawingActiveStroke(){
+  if(drawingActiveStrokeId) delete drawingPendingStrokes[drawingActiveStrokeId];
+  drawingActiveStrokeId=null;
+  drawingActivePointerId=null;
+  drawingActiveStroke=null;
+  if(drawingSyncTimer){clearTimeout(drawingSyncTimer);drawingSyncTimer=null;}
+}
+function drawingZoomView(factor){
+  const current=drawingClampView();
+  const nextZoom=Math.max(DRAWING_MIN_ZOOM,Math.min(DRAWING_MAX_ZOOM,current.zoom*factor));
+  const cx=current.x+(500/current.zoom);
+  const cy=current.y+(500/current.zoom);
+  drawingSetView({zoom:nextZoom,x:cx-(500/nextZoom),y:cy-(500/nextZoom)});
+}
 function drawingPointFromEvent(canvas,e){
   const rect=canvas.getBoundingClientRect();
-  const x=Math.max(0,Math.min(1000,Math.round(((e.clientX-rect.left)/Math.max(1,rect.width))*1000)));
-  const y=Math.max(0,Math.min(1000,Math.round(((e.clientY-rect.top)/Math.max(1,rect.height))*1000)));
+  const view=drawingClampView();
+  const x=Math.max(0,Math.min(1000,Math.round(view.x+(((e.clientX-rect.left)/Math.max(1,rect.width))*1000/view.zoom))));
+  const y=Math.max(0,Math.min(1000,Math.round(view.y+(((e.clientY-rect.top)/Math.max(1,rect.height))*1000/view.zoom))));
   return{x,y};
 }
 function drawingPointDistance(a,b){
@@ -4580,11 +4779,15 @@ function drawingPrepareCanvas(canvas){
   ctx.setTransform(dpr,0,0,dpr,0,0);
   return{ctx,width:rect.width,height:rect.height};
 }
+
 function drawingBrushColor(){
   return drawingToolMode==="eraser"?"#ffffff":drawingToolColor;
 }
 function drawingBrushWidth(){
-  return drawingToolMode==="eraser"?DRAWING_ERASER_WIDTH:drawingToolWidth;
+  return drawingToolMode==="eraser"?drawingEraserWidth:drawingToolWidth;
+}
+function drawingCanvasPoint(p,width,height){
+  return {x:(Number(p.x)/1000)*width,y:(Number(p.y)/1000)*height};
 }
 function drawingDrawStroke(ctx,stroke,width,height){
   const pts=(stroke?.points||[]).filter(p=>p&&Number.isFinite(Number(p.x))&&Number.isFinite(Number(p.y)));
@@ -4597,17 +4800,24 @@ function drawingDrawStroke(ctx,stroke,width,height){
   ctx.strokeStyle=isEraser?"rgba(0,0,0,1)":(stroke.color||"#343a40");
   ctx.lineWidth=Math.max(1,Number(stroke.width)||4);
   ctx.beginPath();
-  pts.forEach((p,i)=>{
-    const x=(Number(p.x)/1000)*width;
-    const y=(Number(p.y)/1000)*height;
-    if(i===0)ctx.moveTo(x,y);
-    else ctx.lineTo(x,y);
-  });
+  const first=drawingCanvasPoint(pts[0],width,height);
+  ctx.moveTo(first.x,first.y);
   if(pts.length===1){
-    const p=pts[0];
-    const x=(Number(p.x)/1000)*width;
-    const y=(Number(p.y)/1000)*height;
-    ctx.lineTo(x+0.1,y+0.1);
+    ctx.lineTo(first.x+0.1,first.y+0.1);
+  }else if(pts.length===2){
+    const second=drawingCanvasPoint(pts[1],width,height);
+    ctx.lineTo(second.x,second.y);
+  }else{
+    for(let i=1;i<pts.length-1;i++){
+      const p=drawingCanvasPoint(pts[i],width,height);
+      const next=drawingCanvasPoint(pts[i+1],width,height);
+      const midX=(p.x+next.x)/2;
+      const midY=(p.y+next.y)/2;
+      if(typeof ctx.quadraticCurveTo==="function") ctx.quadraticCurveTo(p.x,p.y,midX,midY);
+      else ctx.lineTo(midX,midY);
+    }
+    const last=drawingCanvasPoint(pts[pts.length-1],width,height);
+    ctx.lineTo(last.x,last.y);
   }
   ctx.stroke();
   ctx.restore();
@@ -4615,43 +4825,105 @@ function drawingDrawStroke(ctx,stroke,width,height){
 function drawingDrawCanvas(canvas,strokes){
   if(!canvas)return;
   const {ctx,width,height}=drawingPrepareCanvas(canvas);
+  const view=drawingClampView();
+  drawingView=view;
   ctx.clearRect(0,0,width,height);
   ctx.fillStyle="#ffffff";
   ctx.fillRect(0,0,width,height);
+  ctx.save();
+  ctx.translate(-(view.x/1000)*width*view.zoom,-(view.y/1000)*height*view.zoom);
+  ctx.scale(view.zoom,view.zoom);
   drawingStrokesArray(strokes).forEach(stroke=>drawingDrawStroke(ctx,stroke,width,height));
   if(drawingActiveStroke) drawingDrawStroke(ctx,drawingActiveStroke,width,height);
+  ctx.restore();
 }
 function drawingToolsHtml(){
+  const view=drawingClampView();
+  const customColor=normalizeDrawingColor(drawingToolColor)||"#343a40";
+  const activeWidth=drawingToolMode==="eraser"?drawingEraserWidth:drawingToolWidth;
+  const widthMin=drawingToolMode==="eraser"?DRAWING_MIN_ERASER_WIDTH:DRAWING_MIN_WIDTH;
+  const widthMax=drawingToolMode==="eraser"?DRAWING_MAX_ERASER_WIDTH:DRAWING_MAX_WIDTH;
+  const widthLabel=drawingToolMode==="eraser"?"Radierer":"Dicke";
   return `<div class="drawing-tool-panel">
     <div class="drawing-tool-title">Werkzeuge</div>
-    <div class="drawing-tool-row" aria-label="Farben">
-      ${DRAWING_COLORS.map(c=>`<button type="button" class="drawing-color-btn ${drawingToolMode==="pen"&&drawingToolColor===c.hex?"active":""}" style="background:${c.hex}" title="${escHtml(c.name)}" aria-label="${escHtml(c.name)}" onclick="window.pickDrawingColor('${c.hex}')"></button>`).join("")}
+    <div class="drawing-tool-row" aria-label="Farbe">
+      <label class="drawing-custom-color ${!drawingViewMode&&drawingToolMode==="pen"?"active":""}" title="Farbe wählen" aria-label="Farbe wählen">
+        <input type="color" value="${customColor}" onchange="window.pickDrawingColor(this.value)"/>
+        <span class="drawing-custom-color-preview" style="background:${customColor}">🖌️</span>
+      </label>
     </div>
-    <div class="drawing-tool-row" aria-label="Stiftdicke">
-      ${DRAWING_WIDTHS.map(w=>`<button type="button" class="drawing-tool-btn ${drawingToolMode==="pen"&&drawingToolWidth===w.width?"active":""}" onclick="window.pickDrawingWidth(${w.width})">${escHtml(w.label)}</button>`).join("")}
-      <button type="button" class="drawing-tool-btn ${drawingToolMode==="eraser"?"active":""}" onclick="window.toggleDrawingEraser()">Radierer</button>
+    <div class="drawing-tool-row drawing-width-row" aria-label="Stiftdicke">
+      <label class="drawing-width-control ${drawingToolMode==="eraser"?"eraser":""}">
+        <span>${widthLabel}</span>
+        <input type="range" min="${widthMin}" max="${widthMax}" step="1" value="${activeWidth}" oninput="window.pickDrawingActiveWidth(this.value)"/>
+        <strong>${activeWidth}</strong>
+      </label>
+      <button type="button" class="drawing-tool-btn ${!drawingViewMode&&drawingToolMode==="eraser"?"active":""}" onclick="window.toggleDrawingEraser()">Radierer</button>
       <button type="button" class="drawing-tool-btn" onclick="window.undoDrawingStroke()">Rückgängig</button>
       <button type="button" class="drawing-tool-btn" onclick="window.clearDrawingCanvas()">Alles löschen</button>
+    </div>
+    <div class="drawing-tool-title">Ansicht</div>
+    <div class="drawing-tool-row drawing-zoom-row" aria-label="Zoom">
+      <button type="button" class="drawing-tool-btn" onclick="window.zoomDrawingCanvas('out')">−</button>
+      <button type="button" class="drawing-tool-btn" onclick="window.resetDrawingCanvasView()">${Math.round(view.zoom*100)}%</button>
+      <button type="button" class="drawing-tool-btn" onclick="window.zoomDrawingCanvas('in')">+</button>
+      <button type="button" class="drawing-tool-btn ${drawingViewMode?"active":""}" onclick="window.toggleDrawingViewMode()">Ansicht</button>
     </div>
   </div>`;
 }
 window.pickDrawingColor=function(hex){
-  if(!DRAWING_COLORS.some(c=>c.hex===hex))return;
+  hex=normalizeDrawingColor(hex);
+  if(!hex)return;
   drawingToolColor=hex;
   drawingToolMode="pen";
+  drawingViewMode=false;
   localStorage.setItem("drawing_color",hex);
   renderPlaying();
 };
+function updateDrawingWidthControlLabel(value){
+  const label=document.querySelector(".drawing-width-control strong");
+  if(label)label.textContent=String(value);
+}
 window.pickDrawingWidth=function(width){
-  width=Number(width);
-  if(!DRAWING_WIDTHS.some(w=>w.width===width))return;
+  width=normalizeDrawingWidth(width);
   drawingToolWidth=width;
   drawingToolMode="pen";
+  drawingViewMode=false;
   localStorage.setItem("drawing_width",String(width));
-  renderPlaying();
+  redrawCurrentDrawingCanvas();
+  updateDrawingWidthControlLabel(width);
+};
+window.pickDrawingEraserWidth=function(width){
+  width=normalizeDrawingEraserWidth(width);
+  drawingEraserWidth=width;
+  drawingToolMode="eraser";
+  drawingViewMode=false;
+  localStorage.setItem("drawing_eraser_width",String(width));
+  redrawCurrentDrawingCanvas();
+  updateDrawingWidthControlLabel(width);
+};
+window.pickDrawingActiveWidth=function(width){
+  if(drawingToolMode==="eraser") window.pickDrawingEraserWidth(width);
+  else window.pickDrawingWidth(width);
 };
 window.toggleDrawingEraser=function(){
+  drawingViewMode=false;
   drawingToolMode=drawingToolMode==="eraser"?"pen":"eraser";
+  renderPlaying();
+};
+window.toggleDrawingViewMode=function(){
+  drawingViewMode=!drawingViewMode;
+  drawingPointers.clear();
+  drawingGesture=null;
+  drawingActivePointerId=null;
+  renderPlaying();
+};
+window.zoomDrawingCanvas=function(dir){
+  drawingZoomView(dir==="out"?1/DRAWING_ZOOM_STEP:DRAWING_ZOOM_STEP);
+  renderPlaying();
+};
+window.resetDrawingCanvasView=function(){
+  drawingResetView(false);
   renderPlaying();
 };
 function scheduleDrawingStrokeSync(){
@@ -4664,7 +4936,7 @@ function scheduleDrawingStrokeSync(){
 async function syncDrawingActiveStroke(final=false){
   if(!drawingActiveStrokeId||!drawingActiveStroke||!myRoom)return;
   const id=drawingActiveStrokeId;
-  const stroke={...drawingActiveStroke,points:(drawingActiveStroke.points||[]).slice(0,260)};
+  const stroke={...drawingActiveStroke,points:(drawingActiveStroke.points||[]).slice(0,DRAWING_MAX_POINTS_PER_STROKE)};
   if(final) drawingPendingStrokes[id]=stroke;
   try{
     await update(roomRef(),{[`drawing/strokes/${id}`]:stroke});
@@ -4674,41 +4946,136 @@ async function syncDrawingActiveStroke(final=false){
     drawingActiveStroke=null;
   }
 }
+function drawingPointerList(){ return Array.from(drawingPointers.values()); }
+function drawingStartGesture(canvas){
+  const pts=drawingPointerList();
+  const rect=canvas.getBoundingClientRect();
+  const view=drawingClampView();
+  if(pts.length>=2){
+    const [a,b]=pts;
+    const mid={x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+    drawingGesture={type:"pinch",rect,startView:view,a,b,mid,dist:Math.max(1,Math.hypot(a.x-b.x,a.y-b.y))};
+  }else if(pts.length===1){
+    drawingGesture={type:"pan",rect,startView:view,a:pts[0]};
+  }
+}
+function drawingUpdateViewGesture(canvas){
+  if(!drawingViewMode||drawingPointers.size===0)return;
+  if(!drawingGesture)drawingStartGesture(canvas);
+  const pts=drawingPointerList();
+  if(!drawingGesture)return;
+  if(drawingGesture.type==="pinch"&&pts.length>=2){
+    const [a,b]=pts;
+    const rect=canvas.getBoundingClientRect();
+    const dist=Math.max(1,Math.hypot(a.x-b.x,a.y-b.y));
+    const nextZoom=Math.max(DRAWING_MIN_ZOOM,Math.min(DRAWING_MAX_ZOOM,drawingGesture.startView.zoom*(dist/drawingGesture.dist)));
+    const startMid=drawingGesture.mid;
+    const curMid={x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+    const focusX=drawingGesture.startView.x+(((startMid.x-drawingGesture.rect.left)/Math.max(1,drawingGesture.rect.width))*1000/drawingGesture.startView.zoom);
+    const focusY=drawingGesture.startView.y+(((startMid.y-drawingGesture.rect.top)/Math.max(1,drawingGesture.rect.height))*1000/drawingGesture.startView.zoom);
+    const nextX=focusX-(((curMid.x-rect.left)/Math.max(1,rect.width))*1000/nextZoom);
+    const nextY=focusY-(((curMid.y-rect.top)/Math.max(1,rect.height))*1000/nextZoom);
+    drawingSetView({zoom:nextZoom,x:nextX,y:nextY},false);
+    redrawCurrentDrawingCanvas();
+  }else if(drawingGesture.type==="pan"&&pts.length===1){
+    const p=pts[0], rect=canvas.getBoundingClientRect(), view=drawingGesture.startView;
+    const dx=p.x-drawingGesture.a.x, dy=p.y-drawingGesture.a.y;
+    drawingSetView({zoom:view.zoom,x:view.x-(dx*1000/(Math.max(1,rect.width)*view.zoom)),y:view.y-(dy*1000/(Math.max(1,rect.height)*view.zoom))},false);
+    redrawCurrentDrawingCanvas();
+  }else{
+    drawingStartGesture(canvas);
+  }
+}
+function drawingCancelTinyActiveStroke(){
+  if(drawingActiveStroke&&safeNum(drawingActiveStroke.points?.length)<=1){
+    drawingActiveStroke=null;
+    drawingActiveStrokeId=null;
+    drawingActivePointerId=null;
+    redrawCurrentDrawingCanvas();
+  }
+}
+function drawingAddPointToActiveStroke(canvas,e){
+  if(!drawingActiveStroke)return false;
+  const p=drawingPointFromEvent(canvas,e);
+  const pts=drawingActiveStroke.points;
+  if(!pts.length||drawingPointDistance(pts[pts.length-1],p)>=DRAWING_POINT_MIN_DISTANCE){
+    pts.push(p);
+    if(pts.length>DRAWING_MAX_POINTS_PER_STROKE) pts.splice(1,pts.length-DRAWING_MAX_POINTS_PER_STROKE);
+    return true;
+  }
+  return false;
+}
+function drawingPointerEventsForMove(e){
+  try{
+    const events=typeof e.getCoalescedEvents==="function"?e.getCoalescedEvents():null;
+    if(events&&events.length)return events;
+  }catch(_e){}
+  return [e];
+}
 function setupDrawingCanvas(d,isDrawer){
   const canvas=document.getElementById("drawing-canvas");
   if(!canvas)return;
+  canvas.classList.toggle("view-mode",!!drawingViewMode);
   drawingDrawCanvas(canvas,d.strokes||{});
+  drawingPointers.clear();
+  drawingGesture=null;
+  drawingActivePointerId=null;
   if(!isDrawer)return;
   canvas.onpointerdown=e=>{
     e.preventDefault();
+    drawingPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    try{canvas.setPointerCapture?.(e.pointerId);}catch(_e){}
+    if(drawingViewMode){
+      drawingStartGesture(canvas);
+      return;
+    }
+    if(drawingPointers.size>1){
+      drawingCancelTinyActiveStroke();
+      return;
+    }
     const p=drawingPointFromEvent(canvas,e);
+    drawingActivePointerId=e.pointerId;
     drawingActiveStrokeId=`${myId}_${Date.now()}_${Math.floor(Math.random()*10000)}`;
     drawingActiveStroke={by:myId,ts:Date.now(),color:drawingBrushColor(),width:drawingBrushWidth(),tool:drawingToolMode,points:[p]};
-    try{canvas.setPointerCapture?.(e.pointerId);}catch(_e){}
     drawingDrawCanvas(canvas,d.strokes||{});
     scheduleDrawingStrokeSync();
   };
   canvas.onpointermove=e=>{
-    if(!drawingActiveStroke)return;
+    if(drawingPointers.has(e.pointerId))drawingPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(drawingViewMode){
+      e.preventDefault();
+      drawingUpdateViewGesture(canvas);
+      return;
+    }
+    if(!drawingActiveStroke||drawingActivePointerId!==e.pointerId)return;
     e.preventDefault();
-    const p=drawingPointFromEvent(canvas,e);
-    const pts=drawingActiveStroke.points;
-    if(drawingPointDistance(pts[pts.length-1],p)<7)return;
-    pts.push(p);
-    if(pts.length>260) pts.splice(1,pts.length-260);
+    let changed=false;
+    drawingPointerEventsForMove(e).forEach(evt=>{
+      changed=drawingAddPointToActiveStroke(canvas,evt)||changed;
+    });
+    if(!changed)return;
     drawingDrawCanvas(canvas,d.strokes||{});
     scheduleDrawingStrokeSync();
   };
   const end=e=>{
-    if(!drawingActiveStroke)return;
+    const wasActive=drawingActivePointerId===e.pointerId;
+    drawingPointers.delete(e.pointerId);
+    if(drawingViewMode){
+      e.preventDefault();
+      drawingGesture=null;
+      try{canvas.releasePointerCapture?.(e.pointerId);}catch(_e){}
+      return;
+    }
+    if(!drawingActiveStroke||!wasActive)return;
     e.preventDefault();
     try{canvas.releasePointerCapture?.(e.pointerId);}catch(_e){}
     if(drawingSyncTimer){clearTimeout(drawingSyncTimer);drawingSyncTimer=null;}
+    drawingActivePointerId=null;
     syncDrawingActiveStroke(true);
   };
   canvas.onpointerup=end;
   canvas.onpointercancel=end;
-  canvas.onpointerleave=e=>{ if(e.buttons===0&&drawingActiveStroke) end(e); };
+  canvas.onpointerleave=e=>{ if(!drawingViewMode&&e.buttons===0&&drawingActiveStroke&&drawingActivePointerId===e.pointerId) end(e); };
 }
 function updateDrawingTimerDom(remaining,timerPct){
   const timeEl=document.getElementById("drawing-time-left");
@@ -4718,6 +5085,7 @@ function updateDrawingTimerDom(remaining,timerPct){
     fillEl.style.width=`${timerPct}%`;
     fillEl.classList.toggle("urgent",remaining<=10);
   }
+  updateDrawingSecretWordDom();
 }
 function restoreDrawingGuessFocus(value,selectionStart=null,selectionEnd=null){
   const input=document.getElementById("drawing-guess-input");
@@ -4751,39 +5119,54 @@ window.clearDrawingCanvas=async function(){
   if(!gameState||gameState.gameType!=="drawing"||gameState.phase!=="playing")return;
   const d=gameState.drawing||{};
   if(d.drawer!==myId)return;
-  drawingActiveStrokeId=null;
-  drawingActiveStroke=null;
+  setConnStatus("sync");
+  cancelDrawingActiveStroke();
   drawingPendingStrokes={};
-  if(drawingSyncTimer){clearTimeout(drawingSyncTimer);drawingSyncTimer=null;}
-  try{await update(roomRef(),{"drawing/strokes":null});}catch(e){setConnStatus("err");}
+  setLocalDrawingStrokes({});
+  redrawCurrentDrawingCanvas();
+  try{
+    await update(roomRef(),{"drawing/strokes":null});
+    setConnStatus("ok");
+  }catch(e){setConnStatus("err");}
 };
 window.undoDrawingStroke=async function(){
   if(!gameState||gameState.gameType!=="drawing"||gameState.phase!=="playing")return;
   const d=gameState.drawing||{};
   if(d.drawer!==myId)return;
   if(drawingActiveStroke){
-    if(drawingActiveStrokeId) delete drawingPendingStrokes[drawingActiveStrokeId];
-    drawingActiveStrokeId=null;
-    drawingActiveStroke=null;
-    if(drawingSyncTimer){clearTimeout(drawingSyncTimer);drawingSyncTimer=null;}
-    renderPlaying();
+    cancelDrawingActiveStroke();
+    redrawCurrentDrawingCanvas();
     return;
   }
-  const strokes=d.strokes||{};
-  let entries=[];
-  if(Array.isArray(strokes)) entries=strokes.map((v,i)=>[String(i),v]).filter(([,v])=>v);
-  else if(strokes&&typeof strokes==="object") entries=Object.entries(strokes).filter(([,v])=>v);
-  const own=entries
-    .filter(([,stroke])=>!stroke.by||stroke.by===myId)
+  const pending=latestPendingDrawingStrokeEntry();
+  if(pending){
+    const [id]=pending;
+    delete drawingPendingStrokes[id];
+    removeLocalDrawingStroke(id);
+    redrawCurrentDrawingCanvas();
+    setConnStatus("sync");
+    try{
+      await update(roomRef(),{[`drawing/strokes/${id}`]:null});
+      setConnStatus("ok");
+    }catch(e){setConnStatus("err");}
+    return;
+  }
+  const strokes=drawingStrokesToObject(d.strokes||{});
+  const own=Object.entries(strokes)
+    .filter(([,stroke])=>stroke&&(!stroke.by||stroke.by===myId))
     .sort((a,b)=>safeNum(a[1]?.ts)-safeNum(b[1]?.ts));
   const last=own[own.length-1];
   if(!last)return;
+  const [id]=last;
+  removeLocalDrawingStroke(id);
+  redrawCurrentDrawingCanvas();
   setConnStatus("sync");
   try{
-    await update(roomRef(),{[`drawing/strokes/${last[0]}`]:null});
+    await update(roomRef(),{[`drawing/strokes/${id}`]:null});
     setConnStatus("ok");
   }catch(e){setConnStatus("err");}
 };
+
 window.submitDrawingGuess=async function(){
   if(!gameState||gameState.gameType!=="drawing"||gameState.phase!=="playing")return;
   const input=document.getElementById("drawing-guess-input");
@@ -4908,26 +5291,27 @@ function renderDrawingPlaying(){
       </div>
       <div class="drawing-word-card">
         <div class="drawing-sub">${isDrawer?"Dein Wort":"Geheimes Wort"}</div>
-        <div class="drawing-word">${isDrawer?escHtml(word||"?"):"••••••"}</div>
+        <div class="drawing-word" id="${isDrawer?"":"drawing-secret-word-display"}">${isDrawer?escHtml(word||"?"):drawingSecretPlaceholderHtml(word,d)}</div>
       </div>
       <div class="drawing-canvas-wrap">
         <canvas id="drawing-canvas" class="drawing-canvas ${isDrawer?"drawable":""}" aria-label="Montagsmaler Zeichenfläche"></canvas>
-        ${isDrawer?`<div class="drawing-tools"><span class="drawing-sub">Mit Finger oder Maus zeichnen</span></div>${drawingToolsHtml()}`:`<div class="drawing-tools"><span class="drawing-sub">Rate unten das geheime Wort.</span></div>`}
       </div>
+      ${isDrawer?`<div class="drawing-tools"><span class="drawing-sub">Mit Finger oder Maus zeichnen</span></div>${drawingToolsHtml()}`:`<div class="drawing-tools"><span class="drawing-sub">Rate unten das geheime Wort.</span></div>`}
       ${!isDrawer?`<div class="drawing-panel">
         <div class="drawing-title">Raten</div>
         ${guessed?`<div class="drawing-sub">Du hast das Wort richtig geraten.</div>`:`<div class="drawing-guess-row">
           <input type="text" id="drawing-guess-input" placeholder="Dein Tipp…" maxlength="40" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();window.submitDrawingGuess();}"/>
           <button type="button" class="btn btn-sm" onclick="window.submitDrawingGuess()">Raten</button>
         </div>`}
-        ${drawingRecentGuessesHtml(d)}
+        ${drawingRecentGuessesHtml(d,{transient:true})}
       </div>`:`<div class="drawing-panel">
         <div class="drawing-title">Rateversuche</div>
-        ${drawingRecentGuessesHtml(d)}
+        ${drawingRecentGuessesHtml(d,{transient:true})}
       </div>`}
     </div>`;
   setupDrawingCanvas(d,isDrawer);
   scheduleDrawingTick(remaining);
+  scheduleDrawingGuessFadeRender(d);
   if(wasGuessFocused&&!isDrawer&&!guessed){
     restoreDrawingGuessFocus(guessValueBefore,guessSelectionStart,guessSelectionEnd);
   }
@@ -5101,34 +5485,6 @@ function kniffelResetDiceTurn(k,nextTurn){
     rollingNonce:safeNum(k?.rollingNonce),
     rollingMask:emptyKniffelRollingMask()
   };
-}
-function kniffelEntryChoicesHtml(state,k){
-  if(!k||kniffelIsRolling(k)||k.turn!==myId||safeNum(k.rolls)<=0||!kniffelDiceReady(k.dice))return"";
-  const scores=kniffelScoresForPlayer({...state,kniffel:k},myId);
-  const sections=["Oben","Unten"].map(section=>{
-    const cats=KNIFFEL_CATEGORIES.filter(cat=>cat.section===section&&scores[cat.id]==null);
-    if(!cats.length)return"";
-    return `<div class="kniffel-entry-group">
-      <div class="kniffel-entry-group-title">${escHtml(section)}</div>
-      <div class="kniffel-entry-grid">
-        ${cats.map(cat=>{
-          const preview=kniffelScoreFor(cat.id,k.dice||[]);
-          return `<button type="button" class="kniffel-entry-btn" onclick="window.pickKniffelCategory('${cat.id}')">
-            <span class="kniffel-entry-label">${escHtml(cat.name)}</span>
-            <span class="kniffel-entry-score ${preview===0?"zero":""}">${preview}</span>
-          </button>`;
-        }).join("")}
-      </div>
-    </div>`;
-  }).join("");
-  if(!sections.trim())return"";
-  return `<div class="kniffel-entry-panel">
-    <div class="kniffel-entry-head">
-      <div class="kniffel-entry-title">Eintragen</div>
-      <div class="kniffel-entry-sub">Vorschauwerte</div>
-    </div>
-    <div class="kniffel-entry-groups">${sections}</div>
-  </div>`;
 }
 function kniffelCategorySymbolHtml(catId){
   const icons={
@@ -6257,7 +6613,7 @@ function locallyEquivalentAnswers(a,b){
   const av=duplicateVariants(a), bv=duplicateVariants(b);
   for(const x of av){ if(bv.has(x))return true; }
   const minLen=Math.min(a.length,b.length);
-  if(minLen>=7&&a.slice(0,2)===b.slice(0,2)&&damerauLevenshtein(a,b)<=1)return true;
+  if(minLen>=5&&a[0]===b[0]&&damerauLevenshtein(a,b)<=1)return true;
   return false;
 }
 function aiCanonicalForScoring(state,pid,cat){
@@ -6532,8 +6888,12 @@ function renderTicTacToeResults(){
   document.getElementById("results-sub").textContent=`Tic Tac Toe · Runde ${ttt.round||1}`;
   const goArea=document.getElementById("gameover-area");
   if(goArea){
+    const rematchHtml=isHost
+      ?`<button type="button" class="btn" onclick="window.resetTicTacToeGame()">Nochmal spielen →</button>`
+      :`<button type="button" class="btn btn-outline" disabled>Warte auf den Host…</button>`;
     goArea.innerHTML=`<div class="tictactoe-game tictactoe-result-stage">
       <div class="tictactoe-status done">${ttt.winner==="draw"?"Unentschieden":`🏆 ${escHtml(winnerName)} gewinnt!`}</div>
+      <div class="result-rematch">${rematchHtml}</div>
       ${ticTacToeBoardHtml(ttt)}
     </div>`;
   }
@@ -6546,9 +6906,7 @@ function renderTicTacToeResults(){
       <div class="score-pts">${safeNum(players[id]?.score)} Siege</div>
     </div>`).join("");
   document.getElementById("results-container").innerHTML="";
-  document.getElementById("results-actions").innerHTML=isHost
-    ?`<button type="button" class="btn" onclick="window.resetTicTacToeGame()">Nochmal spielen →</button>`
-    :`<button type="button" class="btn btn-outline" disabled>Warte auf den Host…</button>`;
+  document.getElementById("results-actions").innerHTML="";
 }
 function renderConnect4Results(){
   if(!gameState)return;
@@ -6573,14 +6931,12 @@ function renderConnect4Results(){
     ${board.map((cell,i)=>`<div class="connect4-cell ${cell||""} ${(c4.winCells||[]).includes(i)?"win":""}"></div>`).join("")}
     ${connect4WinLineHtml(c4.winCells||[])}
   </div>`;
-
-  const primaryAction = isHost
-    ? `<button type="button" class="btn" style="margin-top:16px" onclick="window.resetConnect4Game()">Nochmal spielen →</button>`
-    : `<button type="button" class="btn btn-outline" style="margin-top:16px" disabled>Warte auf den Host…</button>`;
-
   const goArea=document.getElementById("gameover-area");
   if(goArea){
-    goArea.innerHTML=`<div class="connect4-result-stage">${boardHtml}${primaryAction}</div>`;
+    const rematchHtml=isHost
+      ?`<button type="button" class="btn" onclick="window.resetConnect4Game()">Nochmal spielen →</button>`
+      :`<button type="button" class="btn btn-outline" disabled>Warte auf den Host…</button>`;
+    goArea.innerHTML=`<div class="connect4-result-stage"><div class="result-rematch">${rematchHtml}</div>${boardHtml}</div>`;
   }
   const banner=document.getElementById("validation-banner-area"); if(banner) banner.innerHTML="";
   document.getElementById("scoreboard").innerHTML=[
@@ -6591,9 +6947,7 @@ function renderConnect4Results(){
       <div class="score-pts">${safeNum(players[id]?.score)} Siege</div>
     </div>`).join("");
   document.getElementById("results-container").innerHTML="";
-  document.getElementById("results-actions").innerHTML=isHost
-    ?`<button type="button" class="btn" onclick="window.resetConnect4Game()">Nochmal spielen →</button>`
-    :`<button type="button" class="btn btn-outline" disabled>Warte auf den Host…</button>`;
+  document.getElementById("results-actions").innerHTML="";
 }
 function renderBattleshipResults(){
   if(!gameState)return;
