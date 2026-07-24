@@ -6048,8 +6048,8 @@ function renderConnect4Playing(){
   cEl.innerHTML=`
     <div class="connect4-game">
       <div class="connect4-legend">
-        <div class="connect4-seat ${c4.turn==="red"&&!c4.winner?"active-turn":""}"><span class="connect4-seat-left"><span class="connect4-disc red"></span><span class="connect4-seat-name">${escHtml(redName)}</span></span><span class="connect4-seat-role">Rot</span></div>
-        <div class="connect4-seat ${c4.turn==="yellow"&&!c4.winner?"active-turn":""}"><span class="connect4-seat-left"><span class="connect4-disc yellow"></span><span class="connect4-seat-name">${escHtml(yellowName)}</span></span><span class="connect4-seat-role">Gelb</span></div>
+        <div class="connect4-seat ${c4.turn==="red"&&!c4.winner?"active-turn":""}"><span class="connect4-seat-left"><span class="connect4-disc red"></span><span class="connect4-seat-name">${escHtml(redName)}</span></span></div>
+        <div class="connect4-seat ${c4.turn==="yellow"&&!c4.winner?"active-turn":""}"><span class="connect4-seat-left"><span class="connect4-disc yellow"></span><span class="connect4-seat-name">${escHtml(yellowName)}</span></span></div>
       </div>
       <div class="connect4-board" aria-label="Vier gewinnt Spielbrett">
         ${board.map((cell,i)=>{
