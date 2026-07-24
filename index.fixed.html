@@ -10035,8 +10035,8 @@ function renderTicTacToeResults(){
       :`<button type="button" class="btn btn-outline" disabled>Warte auf den Host…</button>`;
     goArea.innerHTML=`<div class="tictactoe-game tictactoe-result-stage">
       <div class="tictactoe-status done">${ttt.winner==="draw"?"Unentschieden":`🏆 ${escHtml(winnerName)} gewinnt!`}</div>
-      <div class="result-rematch">${rematchHtml}</div>
       ${ticTacToeBoardHtml(ttt)}
+      <div class="result-rematch">${rematchHtml}</div>
     </div>`;
   }
   const banner=document.getElementById("validation-banner-area"); if(banner) banner.innerHTML="";
@@ -10078,7 +10078,7 @@ function renderConnect4Results(){
     const rematchHtml=isHost
       ?`<button type="button" class="btn" onclick="window.resetConnect4Game()">Nochmal spielen →</button>`
       :`<button type="button" class="btn btn-outline" disabled>Warte auf den Host…</button>`;
-    goArea.innerHTML=`<div class="connect4-result-stage"><div class="result-rematch">${rematchHtml}</div>${boardHtml}</div>`;
+    goArea.innerHTML=`<div class="connect4-result-stage">${boardHtml}<div class="result-rematch">${rematchHtml}</div></div>`;
   }
   const banner=document.getElementById("validation-banner-area"); if(banner) banner.innerHTML="";
   document.getElementById("scoreboard").innerHTML=[
