@@ -5403,7 +5403,7 @@ function renderDrawingPlaying(){
         <button type="button" class="drawing-fullscreen-btn" onclick="window.toggleDrawingFullscreen()" title="${drawingFullscreen?"Vollbild beenden":"Vollbild"}" aria-label="Vollbild">${drawingFullscreen?"🗗":"⛶"}</button>
         ${drawingFullscreen&&isDrawer?drawingToolsHtml():""}
       </div>
-      ${!drawingFullscreen?(isDrawer?`<div class="drawing-tools"><span class="drawing-sub">Mit Finger oder Maus zeichnen</span></div>${drawingToolsHtml()}`:`<div class="drawing-tools"><span class="drawing-sub">Rate unten das geheime Wort.</span></div>`):""}
+      ${!drawingFullscreen?(isDrawer?`<div class="drawing-tools"><span class="drawing-sub">Mit Finger oder Maus zeichnen</span></div>${drawingToolsHtml()}`:``):""}
       ${!drawingFullscreen?(!isDrawer?`<div class="drawing-panel">
         <div class="drawing-title">Raten</div>
         ${guessed?`<div class="drawing-sub">Du hast das Wort richtig geraten.</div>`:`<div class="drawing-guess-row">
