@@ -5334,6 +5334,14 @@ function renderDrawingPlaying(){
     scheduleDrawingTick(remaining);
     return;
   }
+  const guessInputFocused = existingCanvas && !isDrawer && document.activeElement?.id === "drawing-guess-input";
+  if(guessInputFocused){
+    drawingDrawCanvas(existingCanvas,d.strokes||{});
+    updateDrawingTimerDom(remaining,timerPct);
+    scheduleDrawingTick(remaining);
+    scheduleDrawingGuessFadeRender(d);
+    return;
+  }
   if(wasGuessFocused&&existingCanvas&&!isDrawer&&!guessed){
     drawingDrawCanvas(existingCanvas,d.strokes||{});
     updateDrawingTimerDom(remaining,timerPct);
