@@ -7758,11 +7758,31 @@ function drawingHasStrokeId(strokes,id){
 }
 function drawingStrokesArray(strokes){
   let arr=[];
-  if(Array.isArray(strokes)) arr=strokes.filter(Boolean);
-  else if(strokes&&typeof strokes==="object") arr=Object.values(strokes).filter(Boolean);
-  Object.keys(drawingPendingStrokes||{}).forEach(id=>{
-    if(drawingHasStrokeId(strokes,id)) delete drawingPendingStrokes[id];
-    else if(drawingPendingStrokes[id]) arr.push(drawingPendingStrokes[id]);
+  const seenIds = new Set();
+  if(Array.isArray(strokes)){
+    strokes.forEach((s,i)=>{
+      if(s){
+        arr.push(s);
+        seenIds.add(String(s.id||i));
+      }
+    });
+  }else if(strokes&&typeof strokes==="object"){
+    Object.entries(strokes).forEach(([id,s])=>{
+      if(s){
+        arr.push(s);
+        seenIds.add(String(id));
+      }
+    });
+  }
+  Object.entries(drawingPendingStrokes||{}).forEach(([id,s])=>{
+    if(s){
+      if(drawingHasStrokeId(strokes,id)){
+        delete drawingPendingStrokes[id];
+      }else if(!seenIds.has(String(id))){
+        arr.push(s);
+        seenIds.add(String(id));
+      }
+    }
   });
   return arr.sort((a,b)=>safeNum(a.ts)-safeNum(b.ts));
 }
