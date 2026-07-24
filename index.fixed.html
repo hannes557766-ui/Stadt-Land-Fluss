@@ -2244,12 +2244,60 @@ input[type=range]::-moz-range-thumb {
   color: var(--pencil);
 }
 .drawing-canvas-wrap {
+  position: relative;
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 18px;
   background: var(--paper-white);
   padding: 8px;
   touch-action: none;
+}
+.drawing-fullscreen-btn {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 15;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--paper-white);
+  color: var(--ink);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: transform 0.15s, background 0.15s;
+  touch-action: manipulation;
+}
+.drawing-fullscreen-btn:hover {
+  background: var(--paper2);
+  transform: scale(1.08);
+}
+.drawing-canvas-wrap.fullscreen {
+  position: fixed !important;
+  inset: 16px !important;
+  z-index: 1000 !important;
+  max-width: none !important;
+  max-height: none !important;
+  width: calc(100vw - 32px) !important;
+  height: calc(100vh - 32px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background: var(--paper-white) !important;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3) !important;
+  padding: 16px !important;
+  border-radius: 24px !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+.drawing-canvas-wrap.fullscreen .drawing-canvas {
+  flex: 1 1 auto !important;
+  aspect-ratio: auto !important;
+  width: 100% !important;
+  min-height: 280px !important;
 }
 .drawing-canvas {
   width: 100%;
@@ -3274,6 +3322,16 @@ let drawingToolWidth = normalizeDrawingWidth(localStorage.getItem("drawing_width
 let drawingEraserWidth = normalizeDrawingEraserWidth(localStorage.getItem("drawing_eraser_width"));
 let drawingToolMode = "pen";
 let drawingViewMode = false;
+let drawingFullscreen = false;
+window.toggleDrawingFullscreen = function(){
+  drawingFullscreen = !drawingFullscreen;
+  renderPlaying();
+};
+let drawingFullscreen = false;
+window.toggleDrawingFullscreen = function(){
+  drawingFullscreen = !drawingFullscreen;
+  renderPlaying();
+};
 let drawingView = {zoom:1,x:0,y:0};
 let drawingPointers = new Map();
 let drawingGesture = null;
@@ -5612,6 +5670,7 @@ function resetRoundData(){
   battleshipLocalRound=null;
   battleshipPlacedShips=[];
   battleshipOrientation="h";
+  drawingFullscreen=false;
   stopLetterRevealTimer();
   stopRoundTimer();
   stopCollectingTimer();
@@ -8341,7 +8400,7 @@ function renderDrawingPlaying(){
   }
   cEl.innerHTML=`
     <div class="drawing-game">
-      <div class="drawing-panel">
+      ${!drawingFullscreen?`<div class="drawing-panel">
         <div class="drawing-title">${isDrawer?"Du malst":`${escHtml(drawerName)} malt`}</div>
         <div class="drawing-sub">Runde ${safeNum(d.round)||1} · ${remaining}s</div>
         <div class="drawing-pill-row" style="margin-top:10px">
@@ -8357,12 +8416,14 @@ function renderDrawingPlaying(){
       <div class="drawing-word-card">
         <div class="drawing-sub">${isDrawer?"Dein Wort":"Geheimes Wort"}</div>
         <div class="drawing-word" id="${isDrawer?"":"drawing-secret-word-display"}">${isDrawer?escHtml(word||"?"):drawingSecretPlaceholderHtml(word,d)}</div>
-      </div>
-      <div class="drawing-canvas-wrap">
+      </div>`:""}
+      <div class="drawing-canvas-wrap ${drawingFullscreen?"fullscreen":""}">
         <canvas id="drawing-canvas" class="drawing-canvas ${isDrawer?"drawable":""}" aria-label="Montagsmaler Zeichenfläche"></canvas>
+        <button type="button" class="drawing-fullscreen-btn" onclick="window.toggleDrawingFullscreen()" title="${drawingFullscreen?"Vollbild beenden":"Vollbild"}" aria-label="Vollbild">${drawingFullscreen?"🗗":"⛶"}</button>
+        ${drawingFullscreen&&isDrawer?drawingToolsHtml():""}
       </div>
-      ${isDrawer?`<div class="drawing-tools"><span class="drawing-sub">Mit Finger oder Maus zeichnen</span></div>${drawingToolsHtml()}`:`<div class="drawing-tools"><span class="drawing-sub">Rate unten das geheime Wort.</span></div>`}
-      ${!isDrawer?`<div class="drawing-panel">
+      ${!drawingFullscreen?(isDrawer?`<div class="drawing-tools"><span class="drawing-sub">Mit Finger oder Maus zeichnen</span></div>${drawingToolsHtml()}`:`<div class="drawing-tools"><span class="drawing-sub">Rate unten das geheime Wort.</span></div>`):""}
+      ${!drawingFullscreen?(!isDrawer?`<div class="drawing-panel">
         <div class="drawing-title">Raten</div>
         ${guessed?`<div class="drawing-sub">Du hast das Wort richtig geraten.</div>`:`<div class="drawing-guess-row">
           <input type="text" id="drawing-guess-input" placeholder="Dein Tipp…" maxlength="40" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();window.submitDrawingGuess();}"/>
@@ -8372,7 +8433,7 @@ function renderDrawingPlaying(){
       </div>`:`<div class="drawing-panel">
         <div class="drawing-title">Rateversuche</div>
         ${drawingRecentGuessesHtml(d,{transient:true})}
-      </div>`}
+      </div>`):""}
     </div>`;
   setupDrawingCanvas(d,isDrawer);
   scheduleDrawingTick(remaining);
