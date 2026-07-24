@@ -5381,17 +5381,13 @@ function renderDrawingPlaying(){
   }
   cEl.innerHTML=`
     <div class="drawing-game">
-      ${!drawingFullscreen?`<div class="drawing-panel">
-        <div class="drawing-title">${isDrawer?"Du malst":`${escHtml(drawerName)} malt`}</div>
-        <div class="drawing-sub">Runde ${safeNum(d.round)||1} · ${remaining}s</div>
-        <div class="drawing-pill-row" style="margin-top:10px">
-          <span class="drawing-pill">${isDrawer?"Zeichner":"Rater"}</span>
-          <span class="drawing-pill">${drawingStrokesArray(d.strokes).length} Striche</span>
-          ${guessed?`<span class="drawing-pill">Richtig geraten ✓</span>`:""}
+      ${!drawingFullscreen?`<div class="drawing-panel" style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <div>
+          <div class="drawing-title" style="font-size:1.1rem;margin-bottom:0">${isDrawer?"Du malst":`${escHtml(drawerName)} malt`}</div>
         </div>
-        <div class="drawing-timer">
-          <div class="drawing-timer-head"><span>Zeit</span><span id="drawing-time-left">${remaining}s</span></div>
-          <div class="drawing-timer-track"><div id="drawing-timer-fill" class="drawing-timer-fill ${remaining<=10?"urgent":""}" style="width:${timerPct}%"></div></div>
+        <div style="text-align:right">
+          <div class="drawing-sub" style="margin-top:0">Zeit</div>
+          <div style="font-size:1.4rem;font-weight:900;color:var(--ink);line-height:1;" id="drawing-time-left">${remaining}s</div>
         </div>
       </div>
       <div class="drawing-word-card">
