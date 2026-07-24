@@ -8309,6 +8309,17 @@ function renderDrawingPlaying(){
   const guessSelectionStart=guessInputBefore?.selectionStart??null;
   const guessSelectionEnd=guessInputBefore?.selectionEnd??null;
   const existingCanvas=document.getElementById("drawing-canvas");
+  const drawingToolFocused = existingCanvas && isDrawer && document.activeElement && (
+    document.querySelector(".drawing-tool-panel")?.contains(document.activeElement) ||
+    document.activeElement.type === "color" ||
+    document.activeElement.type === "range"
+  );
+  if(drawingToolFocused){
+    drawingDrawCanvas(existingCanvas,d.strokes||{});
+    updateDrawingTimerDom(remaining,timerPct);
+    scheduleDrawingTick(remaining);
+    return;
+  }
   if(wasGuessFocused&&existingCanvas&&!isDrawer&&!guessed){
     drawingDrawCanvas(existingCanvas,d.strokes||{});
     updateDrawingTimerDom(remaining,timerPct);
