@@ -1444,6 +1444,7 @@ function initialDrawingState(order=[]){
     wordIndex:0,
     wordMode:DRAWING_DEFAULT_WORD_MODE,
     revealLetters:false,
+    bgColor:"#ffffff",
     usedWords:[],
     roundDuration:DRAWING_DEFAULT_DURATION,
     roundStartTs:null,
@@ -1458,6 +1459,7 @@ function drawingLobbyStateForPlayers(players={},previous={}){
   const state=initialDrawingState(Object.keys(players||{}));
   state.wordMode=drawingWordMode(previous?.wordMode||DRAWING_DEFAULT_WORD_MODE);
   state.revealLetters=!!previous?.revealLetters;
+  state.bgColor=normalizeDrawingColor(previous?.bgColor)||"#ffffff";
   state.usedWords=Array.isArray(previous?.usedWords)?previous.usedWords.slice(-drawingWordPool(state.wordMode).length):[];
   state.roundDuration=Math.max(30,Math.min(300,safeNum(previous?.roundDuration)||DRAWING_DEFAULT_DURATION));
   return state;
@@ -1544,6 +1546,7 @@ function drawingRoundState(order,round,drawer=null,previous={}){
   const wordMode=drawingWordMode(previous?.wordMode||DRAWING_DEFAULT_WORD_MODE);
   const picked=drawingPickWord(previous?.usedWords||[],wordMode);
   const duration=Math.max(30,Math.min(300,safeNum(previous?.roundDuration)||DRAWING_DEFAULT_DURATION));
+  const bgColor=normalizeDrawingColor(previous?.bgColor)||"#ffffff";
   return {
     ...initialDrawingState(clean),
     phase:"playing",
@@ -1554,6 +1557,7 @@ function drawingRoundState(order,round,drawer=null,previous={}){
     wordIndex:Math.max(0,DRAWING_WORDS.indexOf(picked.word)),
     wordMode,
     revealLetters:!!previous?.revealLetters,
+    bgColor,
     usedWords:picked.usedWords,
     roundDuration:duration,
     roundStartTs:Date.now(),
@@ -3425,6 +3429,15 @@ function renderDrawingLobby(){
   const wordMode=drawingWordMode(gameState.drawing?.wordMode||DRAWING_DEFAULT_WORD_MODE);
   const revealLetters=!!gameState.drawing?.revealLetters;
   const drawingDuration=Math.max(30,Math.min(300,safeNum(gameState.drawing?.roundDuration)||DRAWING_DEFAULT_DURATION));
+  const bgColors=[
+    {hex:"#ffffff", label:"Weiß"},
+    {hex:"#1f2937", label:"Schwarz"},
+    {hex:"#dbeafe", label:"Hellblau"},
+    {hex:"#fef3c7", label:"Hellgelb"},
+    {hex:"#dcfce7", label:"Hellgrün"},
+    {hex:"#ffe4e6", label:"Rosa"}
+  ];
+  const drawingBgColor = normalizeDrawingColor(gameState.drawing?.bgColor) || "#ffffff";
 
   renderLobbyPlayers(()=>"");
 
@@ -3451,6 +3464,16 @@ function renderDrawingLobby(){
           <div class="validation-presets">
             <button type="button" class="validation-preset ${!revealLetters?"active":""}" onclick="window.setDrawingRevealLetters(false)">Aus</button>
             <button type="button" class="validation-preset ${revealLetters?"active":""}" onclick="window.setDrawingRevealLetters(true)">Buchstaben</button>
+          </div>
+        </div>
+        <div class="lobby-editor-group">
+          <div class="lobby-editor-title">Hintergrundfarbe</div>
+          <div class="drawing-tool-row" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <label class="drawing-custom-color active" title="Hintergrund-Farbe wählen">
+              <input type="color" value="${drawingBgColor}" onchange="window.setDrawingBgColor(this.value)"/>
+              <span class="drawing-custom-color-preview" style="background:${drawingBgColor}">🖼️</span>
+            </label>
+            ${bgColors.map(c=>`<button type="button" class="drawing-color-btn ${normalizeDrawingColor(drawingBgColor)===normalizeDrawingColor(c.hex)?"active":""}" style="background:${c.hex}; border: 1px solid rgba(0,0,0,0.15);" title="${c.label}" onclick="window.setDrawingBgColor('${c.hex}')"></button>`).join("")}
           </div>
         </div>
       </div>`:"";
@@ -4781,7 +4804,8 @@ function drawingPrepareCanvas(canvas){
 }
 
 function drawingBrushColor(){
-  return drawingToolMode==="eraser"?"#ffffff":drawingToolColor;
+  if(drawingToolMode==="eraser") return normalizeDrawingColor(gameState?.drawing?.bgColor)||"#ffffff";
+  return drawingToolColor;
 }
 function drawingBrushWidth(){
   return drawingToolMode==="eraser"?drawingEraserWidth:drawingToolWidth;
@@ -4792,12 +4816,13 @@ function drawingCanvasPoint(p,width,height){
 function drawingDrawStroke(ctx,stroke,width,height){
   const pts=(stroke?.points||[]).filter(p=>p&&Number.isFinite(Number(p.x))&&Number.isFinite(Number(p.y)));
   if(!pts.length)return;
-  const isEraser=stroke.tool==="eraser"||(String(stroke.color||"").toLowerCase()==="#ffffff"&&safeNum(stroke.width)>=DRAWING_ERASER_WIDTH);
+  const currentBg=normalizeDrawingColor(gameState?.drawing?.bgColor)||"#ffffff";
+  const isEraser=stroke.tool==="eraser"||(String(stroke.color||"").toLowerCase()===currentBg&&safeNum(stroke.width)>=DRAWING_ERASER_WIDTH);
   ctx.save();
-  ctx.globalCompositeOperation=isEraser?"destination-out":"source-over";
+  ctx.globalCompositeOperation="source-over";
   ctx.lineCap="round";
   ctx.lineJoin="round";
-  ctx.strokeStyle=isEraser?"rgba(0,0,0,1)":(stroke.color||"#343a40");
+  ctx.strokeStyle=isEraser?(normalizeDrawingColor(stroke.color)||currentBg):(stroke.color||"#343a40");
   ctx.lineWidth=Math.max(1,Number(stroke.width)||4);
   ctx.beginPath();
   const first=drawingCanvasPoint(pts[0],width,height);
@@ -4828,7 +4853,8 @@ function drawingDrawCanvas(canvas,strokes){
   const view=drawingClampView();
   drawingView=view;
   ctx.clearRect(0,0,width,height);
-  ctx.fillStyle="#ffffff";
+  const bgColor=normalizeDrawingColor(gameState?.drawing?.bgColor)||"#ffffff";
+  ctx.fillStyle=bgColor;
   ctx.fillRect(0,0,width,height);
   ctx.save();
   ctx.translate(-(view.x/1000)*width*view.zoom,-(view.y/1000)*height*view.zoom);
@@ -4840,18 +4866,37 @@ function drawingDrawCanvas(canvas,strokes){
 function drawingToolsHtml(){
   const view=drawingClampView();
   const customColor=normalizeDrawingColor(drawingToolColor)||"#343a40";
+  const bgCustomColor=normalizeDrawingColor(gameState?.drawing?.bgColor)||"#ffffff";
   const activeWidth=drawingToolMode==="eraser"?drawingEraserWidth:drawingToolWidth;
   const widthMin=drawingToolMode==="eraser"?DRAWING_MIN_ERASER_WIDTH:DRAWING_MIN_WIDTH;
   const widthMax=drawingToolMode==="eraser"?DRAWING_MAX_ERASER_WIDTH:DRAWING_MAX_WIDTH;
   const widthLabel=drawingToolMode==="eraser"?"Radierer":"Dicke";
+  const bgColors=[
+    {hex:"#ffffff", label:"Weiß"},
+    {hex:"#1f2937", label:"Schwarz"},
+    {hex:"#dbeafe", label:"Hellblau"},
+    {hex:"#fef3c7", label:"Hellgelb"},
+    {hex:"#dcfce7", label:"Hellgrün"},
+    {hex:"#ffe4e6", label:"Rosa"}
+  ];
   return `<div class="drawing-tool-panel">
-    <div class="drawing-tool-title">Werkzeuge</div>
-    <div class="drawing-tool-row" aria-label="Farbe">
-      <label class="drawing-custom-color ${!drawingViewMode&&drawingToolMode==="pen"?"active":""}" title="Farbe wählen" aria-label="Farbe wählen">
+    <div class="drawing-tool-title">Stift-Farbe</div>
+    <div class="drawing-tool-row" aria-label="Stift-Farbe">
+      <label class="drawing-custom-color ${!drawingViewMode&&drawingToolMode==="pen"?"active":""}" title="Stift-Farbe wählen" aria-label="Stift-Farbe wählen">
         <input type="color" value="${customColor}" onchange="window.pickDrawingColor(this.value)"/>
         <span class="drawing-custom-color-preview" style="background:${customColor}">🖌️</span>
       </label>
+      ${DRAWING_COLORS.map(c=>`<button type="button" class="drawing-color-btn ${!drawingViewMode&&drawingToolMode==="pen"&&normalizeDrawingColor(drawingToolColor)===normalizeDrawingColor(c.hex)?"active":""}" style="background:${c.hex}" title="${c.name}" onclick="window.pickDrawingColor('${c.hex}')"></button>`).join("")}
     </div>
+    <div class="drawing-tool-title">Hintergrundfarbe</div>
+    <div class="drawing-tool-row" aria-label="Hintergrundfarbe">
+      <label class="drawing-custom-color active" title="Hintergrund-Farbe wählen" aria-label="Hintergrund-Farbe wählen">
+        <input type="color" value="${bgCustomColor}" onchange="window.setDrawingBgColor(this.value)"/>
+        <span class="drawing-custom-color-preview" style="background:${bgCustomColor}">🖼️</span>
+      </label>
+      ${bgColors.map(c=>`<button type="button" class="drawing-color-btn ${normalizeDrawingColor(bgCustomColor)===normalizeDrawingColor(c.hex)?"active":""}" style="background:${c.hex}; border: 1px solid rgba(0,0,0,0.15);" title="${c.label}" onclick="window.setDrawingBgColor('${c.hex}')"></button>`).join("")}
+    </div>
+    <div class="drawing-tool-title">Werkzeuge</div>
     <div class="drawing-tool-row drawing-width-row" aria-label="Stiftdicke">
       <label class="drawing-width-control ${drawingToolMode==="eraser"?"eraser":""}">
         <span>${widthLabel}</span>
@@ -4871,6 +4916,21 @@ function drawingToolsHtml(){
     </div>
   </div>`;
 }
+window.setDrawingBgColor = async function(hex){
+  hex = normalizeDrawingColor(hex);
+  if(!hex) return;
+  if(!gameState || gameState.gameType!=="drawing") return;
+  const d = gameState.drawing || {};
+  if(isHost || d.drawer===myId){
+    setConnStatus("sync");
+    try {
+      await update(roomRef(),{"drawing/bgColor": hex});
+      setConnStatus("ok");
+    } catch(e) {
+      setConnStatus("err");
+    }
+  }
+};
 window.pickDrawingColor=function(hex){
   hex=normalizeDrawingColor(hex);
   if(!hex)return;
