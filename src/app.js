@@ -168,7 +168,7 @@ const DRAWING_COLORS = [
   {name:"Lila", hex:"#8b5cf6"}
 ];
 const DRAWING_MIN_WIDTH = 2;
-const DRAWING_MAX_WIDTH = 24;
+const DRAWING_MAX_WIDTH = 80;
 const DRAWING_DEFAULT_WIDTH = 5;
 function normalizeDrawingColor(hex){
   const value=String(hex||"").trim();
@@ -187,7 +187,7 @@ function normalizeDrawingEraserWidth(width){
   return Number.isFinite(n)?Math.max(DRAWING_MIN_ERASER_WIDTH,Math.min(DRAWING_MAX_ERASER_WIDTH,n)):DRAWING_DEFAULT_ERASER_WIDTH;
 }
 const DRAWING_MIN_ERASER_WIDTH = 6;
-const DRAWING_MAX_ERASER_WIDTH = 48;
+const DRAWING_MAX_ERASER_WIDTH = 160;
 const DRAWING_DEFAULT_ERASER_WIDTH = 18;
 const DRAWING_ERASER_WIDTH = DRAWING_DEFAULT_ERASER_WIDTH;
 const DRAWING_MIN_ZOOM = 1;
