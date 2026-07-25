@@ -1806,6 +1806,25 @@ body[data-theme="night"] .lobby-editor {
   transition: background 0.2s;
 }
 .settings-close:hover { background: var(--paper); }
+
+.settings-back-btn {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper-white);
+  color: var(--ink);
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 18px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.settings-back-btn:hover { background: var(--paper2); }
 .settings-section { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 11px;
   letter-spacing: 1.5px; text-transform: uppercase; color: var(--pencil);
   margin: 20px 0 10px; }
@@ -2160,6 +2179,7 @@ input[type=range]::-moz-range-thumb {
   max-width: 560px;
   display: grid;
   gap: 16px;
+  overflow-anchor: none;
 }
 .drawing-panel {
   border: 1px solid var(--line);
@@ -2244,60 +2264,13 @@ input[type=range]::-moz-range-thumb {
   color: var(--pencil);
 }
 .drawing-canvas-wrap {
-  position: relative;
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 18px;
   background: var(--paper-white);
   padding: 8px;
   touch-action: none;
-}
-.drawing-fullscreen-btn {
-  position: absolute;
-  right: 14px;
-  bottom: 14px;
-  z-index: 15;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 1px solid var(--line);
-  background: var(--paper-white);
-  color: var(--ink);
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  transition: transform 0.15s, background 0.15s;
-  touch-action: manipulation;
-}
-.drawing-fullscreen-btn:hover {
-  background: var(--paper2);
-  transform: scale(1.08);
-}
-.drawing-canvas-wrap.fullscreen {
-  position: fixed !important;
-  inset: 16px !important;
-  z-index: 1000 !important;
-  max-width: none !important;
-  max-height: none !important;
-  width: calc(100vw - 32px) !important;
-  height: calc(100vh - 32px) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  background: var(--paper-white) !important;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.3) !important;
-  padding: 16px !important;
-  border-radius: 24px !important;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch;
-}
-.drawing-canvas-wrap.fullscreen .drawing-canvas {
-  flex: 1 1 auto !important;
-  aspect-ratio: auto !important;
-  width: 100% !important;
-  min-height: 280px !important;
+  overflow-anchor: none;
 }
 .drawing-canvas {
   width: 100%;
@@ -2308,9 +2281,60 @@ input[type=range]::-moz-range-thumb {
   touch-action: none;
   cursor: default;
 }
+.drawing-canvas-wrap.scrollable,
+.drawing-canvas.scrollable {
+  touch-action: pan-y;
+}
+.drawing-canvas.scrollable {
+  cursor: default;
+}
 .drawing-canvas.drawable { cursor: crosshair; }
 .drawing-canvas.view-mode { cursor: grab; }
 .drawing-canvas.view-mode:active { cursor: grabbing; }
+body.drawing-canvas-fullscreen-active {
+  overflow: hidden;
+}
+.drawing-game.drawing-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  width: auto;
+  max-width: none;
+  min-height: 100dvh;
+  max-height: 100dvh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  background: var(--paper);
+  align-content: start;
+}
+.drawing-game.drawing-fullscreen .drawing-canvas-wrap {
+  border-radius: 20px;
+  padding: 8px;
+}
+.drawing-game.drawing-fullscreen .drawing-canvas {
+  aspect-ratio: auto;
+  height: min(68dvh, calc(100dvh - 250px));
+  min-height: 330px;
+}
+.drawing-fullscreen-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+.drawing-fullscreen-icon path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.15;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.drawing-fullscreen-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 46px;
+}
 .drawing-tools {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -2427,6 +2451,24 @@ input[type=range]::-moz-range-thumb {
   font-size: 14px;
   line-height: 1;
 }
+.drawing-background-color-preview {
+  color: var(--ink);
+  box-shadow: inset 0 0 0 2px rgba(52,58,64,0.18);
+  font-size: 16px;
+  font-weight: 900;
+}
+.drawing-bg-bucket-icon {
+  width: 19px;
+  height: 19px;
+  display: block;
+}
+.drawing-bg-bucket-icon path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .drawing-tool-btn {
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -2457,6 +2499,12 @@ input[type=range]::-moz-range-thumb {
   margin-top: 0;
   height: 48px;
   padding: 0 16px;
+  flex: 0 0 auto;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.drawing-guess-row .btn:hover,
+.drawing-guess-row .btn:active {
+  transform: none;
 }
 .drawing-guesses {
   display: grid;
@@ -2508,6 +2556,10 @@ input[type=range]::-moz-range-thumb {
 @media (max-width: 430px) {
   .drawing-panel, .drawing-word-card { padding: 14px; }
   .drawing-canvas-wrap { padding: 6px; border-radius: 16px; }
+  .drawing-game.drawing-fullscreen .drawing-canvas {
+    height: min(62dvh, calc(100dvh - 235px));
+    min-height: 270px;
+  }
   .drawing-tools { grid-template-columns: 1fr; }
   .drawing-tool-panel {
     max-height: min(42vh, 360px);
@@ -2866,11 +2918,154 @@ input[type=range]::-moz-range-thumb {
   .kniffel-sheet th, .kniffel-sheet td { padding: 8px 9px; }
 }
 
+/* Einheitliche Buttons: keine Leucht-/Glow-Effekte */
+.btn,
+.buzzer-btn,
+.timer-preset,
+.round-preset,
+.validation-preset,
+.vote-btn,
+.gear-btn,
+.game-card-btn,
+.settings-back-btn,
+.leave-btn,
+.theme-chip,
+.color-swatch,
+.drawing-color-btn,
+.drawing-custom-color,
+.drawing-tool-btn,
+.drawing-fullscreen-btn,
+.kniffel-score-btn,
+.maumau-card-btn,
+.maumau-color-btn,
+.player-kick-btn {
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+}
+.btn:hover,
+.btn:active,
+.btn:focus,
+.btn:focus-visible,
+.buzzer-btn:hover,
+.buzzer-btn:active,
+.buzzer-btn:focus,
+.buzzer-btn:focus-visible,
+.timer-preset:hover,
+.timer-preset:active,
+.timer-preset:focus,
+.timer-preset:focus-visible,
+.round-preset:hover,
+.round-preset:active,
+.round-preset:focus,
+.round-preset:focus-visible,
+.validation-preset:hover,
+.validation-preset:active,
+.validation-preset:focus,
+.validation-preset:focus-visible,
+.vote-btn:hover,
+.vote-btn:active,
+.vote-btn:focus,
+.vote-btn:focus-visible,
+.gear-btn:hover,
+.gear-btn:active,
+.gear-btn:focus,
+.gear-btn:focus-visible,
+.game-card-btn:hover,
+.game-card-btn:active,
+.game-card-btn:focus,
+.game-card-btn:focus-visible,
+.settings-back-btn:hover,
+.settings-back-btn:active,
+.settings-back-btn:focus,
+.settings-back-btn:focus-visible,
+.leave-btn:hover,
+.leave-btn:active,
+.leave-btn:focus,
+.leave-btn:focus-visible,
+.theme-chip:hover,
+.theme-chip:active,
+.theme-chip:focus,
+.theme-chip:focus-visible,
+.color-swatch:hover,
+.color-swatch:active,
+.color-swatch:focus,
+.color-swatch:focus-visible,
+.drawing-color-btn:hover,
+.drawing-color-btn:active,
+.drawing-color-btn:focus,
+.drawing-color-btn:focus-visible,
+.drawing-custom-color:hover,
+.drawing-custom-color:active,
+.drawing-custom-color:focus,
+.drawing-custom-color:focus-visible,
+.drawing-tool-btn:hover,
+.drawing-tool-btn:active,
+.drawing-tool-btn:focus,
+.drawing-tool-btn:focus-visible,
+.drawing-fullscreen-btn:hover,
+.drawing-fullscreen-btn:active,
+.drawing-fullscreen-btn:focus,
+.drawing-fullscreen-btn:focus-visible,
+.kniffel-score-btn:hover,
+.kniffel-score-btn:active,
+.kniffel-score-btn:focus,
+.kniffel-score-btn:focus-visible,
+.maumau-card-btn:hover,
+.maumau-card-btn:active,
+.maumau-card-btn:focus,
+.maumau-card-btn:focus-visible,
+.maumau-color-btn:hover,
+.maumau-color-btn:active,
+.maumau-color-btn:focus,
+.maumau-color-btn:focus-visible,
+.player-kick-btn:hover,
+.player-kick-btn:active,
+.player-kick-btn:focus,
+.player-kick-btn:focus-visible {
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+  outline: none;
+}
+.btn:focus-visible,
+.buzzer-btn:focus-visible,
+.timer-preset:focus-visible,
+.round-preset:focus-visible,
+.validation-preset:focus-visible,
+.vote-btn:focus-visible,
+.gear-btn:focus-visible,
+.game-card-btn:focus-visible,
+.settings-back-btn:focus-visible,
+.leave-btn:focus-visible,
+.theme-chip:focus-visible,
+.color-swatch:focus-visible,
+.drawing-color-btn:focus-visible,
+.drawing-custom-color:focus-visible,
+.drawing-tool-btn:focus-visible,
+.drawing-fullscreen-btn:focus-visible,
+.kniffel-score-btn:focus-visible,
+.maumau-card-btn:focus-visible,
+.maumau-color-btn:focus-visible,
+.player-kick-btn:focus-visible {
+  outline: 2px solid var(--line);
+  outline-offset: 2px;
+}
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus {
+  outline: none;
+}
+button:focus-visible {
+  outline: 2px solid var(--line);
+  outline-offset: 2px;
+}
+
   </style>
 </head>
 <body>
 
-<button id="btn-leave" class="leave-btn" onclick="window.handleBackButton()">← Zurück</button>
 <button class="gear-btn" onclick="window.openSettings()" title="Einstellungen">⚙️</button>
 
 <!-- Settings Modal -->
@@ -2880,6 +3075,7 @@ input[type=range]::-moz-range-thumb {
       Einstellungen
       <button class="settings-close" onclick="window.closeSettings()">✕</button>
     </div>
+    <button id="btn-leave" type="button" class="settings-back-btn" onclick="window.closeSettings();window.handleBackButton()">← Zurück</button>
     <div class="settings-section">Verbindung</div>
     <div class="conn-status-row">
       <div class="conn-dot sync" id="conn-dot"></div>
@@ -3202,11 +3398,15 @@ const DRAWING_COLORS = [
   {name:"Lila", hex:"#8b5cf6"}
 ];
 const DRAWING_MIN_WIDTH = 2;
-const DRAWING_MAX_WIDTH = 80;
+const DRAWING_MAX_WIDTH = 24;
 const DRAWING_DEFAULT_WIDTH = 5;
 function normalizeDrawingColor(hex){
   const value=String(hex||"").trim();
   return /^#[0-9a-f]{6}$/i.test(value)?value.toLowerCase():null;
+}
+const DRAWING_DEFAULT_BACKGROUND = "#ffffff";
+function normalizeDrawingBackground(hex){
+  return normalizeDrawingColor(hex)||DRAWING_DEFAULT_BACKGROUND;
 }
 function normalizeDrawingWidth(width){
   const raw=String(width??"").trim();
@@ -3221,7 +3421,7 @@ function normalizeDrawingEraserWidth(width){
   return Number.isFinite(n)?Math.max(DRAWING_MIN_ERASER_WIDTH,Math.min(DRAWING_MAX_ERASER_WIDTH,n)):DRAWING_DEFAULT_ERASER_WIDTH;
 }
 const DRAWING_MIN_ERASER_WIDTH = 6;
-const DRAWING_MAX_ERASER_WIDTH = 160;
+const DRAWING_MAX_ERASER_WIDTH = 48;
 const DRAWING_DEFAULT_ERASER_WIDTH = 18;
 const DRAWING_ERASER_WIDTH = DRAWING_DEFAULT_ERASER_WIDTH;
 const DRAWING_MIN_ZOOM = 1;
@@ -3231,7 +3431,7 @@ const DRAWING_GUESS_VISIBLE_MS = 11000;
 const DRAWING_GUESS_FADE_MS = 2500;
 const DRAWING_GUESS_TOTAL_MS = DRAWING_GUESS_VISIBLE_MS + DRAWING_GUESS_FADE_MS;
 const DRAWING_POINT_MIN_DISTANCE = 2.4;
-const DRAWING_MAX_POINTS_PER_STROKE = 5000;
+const DRAWING_MAX_POINTS_PER_STROKE = 10000;
 const DRAWING_REVEAL_START_RATIO = 0.33;
 const DRAWING_REVEAL_MIN_START_MS = 15000;
 const DRAWING_REVEAL_MAX_START_MS = 45000;
@@ -3322,21 +3522,18 @@ let drawingToolWidth = normalizeDrawingWidth(localStorage.getItem("drawing_width
 let drawingEraserWidth = normalizeDrawingEraserWidth(localStorage.getItem("drawing_eraser_width"));
 let drawingToolMode = "pen";
 let drawingViewMode = false;
-let drawingFullscreen = false;
-window.toggleDrawingFullscreen = function(){
-  drawingFullscreen = !drawingFullscreen;
-  renderPlaying();
-};
-let drawingFullscreen = false;
-window.toggleDrawingFullscreen = function(){
-  drawingFullscreen = !drawingFullscreen;
-  renderPlaying();
-};
+let drawingCanvasFullscreen = false;
 let drawingView = {zoom:1,x:0,y:0};
 let drawingPointers = new Map();
 let drawingGesture = null;
 let drawingActivePointerId = null;
+let drawingColorPickerActiveUntil = 0;
+let drawingUserScrollTs = 0;
 let drawingActiveStrokeId=null, drawingActiveStroke=null, drawingPendingStrokes={}, drawingSyncTimer=null, drawingTickTimer=null, drawingGuessFadeTimer=null, drawingTimerInterval=null;
+let drawingGuessFocusUntil=0, drawingGuessDraft="", drawingGuessSelectionStart=null, drawingGuessSelectionEnd=null;
+function markDrawingUserScrollIntent(){drawingUserScrollTs=Date.now();}
+window.addEventListener("touchmove",markDrawingUserScrollIntent,{passive:true});
+window.addEventListener("wheel",markDrawingUserScrollIntent,{passive:true});
 let mauMauPendingWildIndex=null, mauMauLastAnimatedTopId=null;
 let syncedPhase=null; // tracks last rendered phase to detect real transitions
 let aiValidationRunningKey=null;
@@ -4488,7 +4685,7 @@ function initialDrawingState(order=[]){
     wordIndex:0,
     wordMode:DRAWING_DEFAULT_WORD_MODE,
     revealLetters:false,
-    bgColor:"#ffffff",
+    backgroundColor:DRAWING_DEFAULT_BACKGROUND,
     usedWords:[],
     roundDuration:DRAWING_DEFAULT_DURATION,
     roundStartTs:null,
@@ -4503,7 +4700,7 @@ function drawingLobbyStateForPlayers(players={},previous={}){
   const state=initialDrawingState(Object.keys(players||{}));
   state.wordMode=drawingWordMode(previous?.wordMode||DRAWING_DEFAULT_WORD_MODE);
   state.revealLetters=!!previous?.revealLetters;
-  state.bgColor=normalizeDrawingColor(previous?.bgColor)||"#ffffff";
+  state.backgroundColor=DRAWING_DEFAULT_BACKGROUND;
   state.usedWords=Array.isArray(previous?.usedWords)?previous.usedWords.slice(-drawingWordPool(state.wordMode).length):[];
   state.roundDuration=Math.max(30,Math.min(300,safeNum(previous?.roundDuration)||DRAWING_DEFAULT_DURATION));
   return state;
@@ -4590,7 +4787,6 @@ function drawingRoundState(order,round,drawer=null,previous={}){
   const wordMode=drawingWordMode(previous?.wordMode||DRAWING_DEFAULT_WORD_MODE);
   const picked=drawingPickWord(previous?.usedWords||[],wordMode);
   const duration=Math.max(30,Math.min(300,safeNum(previous?.roundDuration)||DRAWING_DEFAULT_DURATION));
-  const bgColor=normalizeDrawingColor(previous?.bgColor)||"#ffffff";
   return {
     ...initialDrawingState(clean),
     phase:"playing",
@@ -4601,7 +4797,7 @@ function drawingRoundState(order,round,drawer=null,previous={}){
     wordIndex:Math.max(0,DRAWING_WORDS.indexOf(picked.word)),
     wordMode,
     revealLetters:!!previous?.revealLetters,
-    bgColor,
+    backgroundColor:DRAWING_DEFAULT_BACKGROUND,
     usedWords:picked.usedWords,
     roundDuration:duration,
     roundStartTs:Date.now(),
@@ -4641,6 +4837,54 @@ function scheduleDrawingGuessFadeRender(d){
     drawingGuessFadeTimer=null;
     if(gameState?.gameType==="drawing"&&gameState.phase==="playing") renderPlaying();
   },Math.max(250,Math.min(...remaining)+80));
+}
+function drawingVisibleGuessesKey(d){
+  const now=Date.now();
+  const guesses=drawingGuessesArray(d?.guesses)
+    .filter(g=>Math.max(0,now-safeNum(g.ts))<DRAWING_GUESS_TOTAL_MS)
+    .slice(-8);
+  if(!guesses.length)return"empty";
+  return guesses.map(g=>[
+    safeNum(g.ts),
+    g.player||"",
+    g.correct?1:0,
+    String(g.guess||"")
+  ].join("~")).join("|");
+}
+function drawingPlayingStructureKey(d,drawer,isDrawer,guessed,word){
+  return [
+    safeNum(d?.round)||1,
+    safeNum(d?.roundStartTs)||0,
+    safeNum(d?.roundDuration||DRAWING_DEFAULT_DURATION),
+    drawer||"",
+    isDrawer?"drawer":"rater",
+    guessed?"guessed":"open",
+    d?.revealLetters?"reveal":"plain",
+    word||""
+  ].join("|");
+}
+function drawingPlayingRenderKey(d,drawer,isDrawer,guessed,word){
+  const base=`${drawingPlayingStructureKey(d,drawer,isDrawer,guessed,word)}|fs:${drawingCanvasFullscreen?1:0}`;
+  if(!isDrawer)return base;
+  const view=drawingClampView();
+  return `${base}|tool:${drawingToolMode}|view:${drawingViewMode?1:0}|zoom:${Math.round(view.zoom*100)}|pen:${drawingToolWidth}|eraser:${drawingEraserWidth}|color:${normalizeDrawingColor(drawingToolColor)||""}|bg:${normalizeDrawingBackground(d?.backgroundColor)}`;
+}
+function updateDrawingPlayingDynamicDom(d,remaining,timerPct){
+  const canvas=document.getElementById("drawing-canvas");
+  if(canvas) drawingDrawCanvas(canvas,d?.strokes||{});
+  updateDrawingTimerDom(remaining,timerPct);
+  const roundEl=document.getElementById("drawing-round-status");
+  if(roundEl) roundEl.textContent=`Runde ${safeNum(d?.round)||1} · ${remaining}s`;
+  const strokesEl=document.getElementById("drawing-strokes-pill");
+  if(strokesEl) strokesEl.textContent=`${drawingStrokesArray(d?.strokes).length} Striche`;
+  const guessesEl=document.getElementById("drawing-guesses-area");
+  if(guessesEl){
+    const key=drawingVisibleGuessesKey(d);
+    if(guessesEl.dataset.drawingGuessesKey!==key){
+      guessesEl.innerHTML=drawingRecentGuessesHtml(d,{transient:true});
+      guessesEl.dataset.drawingGuessesKey=key;
+    }
+  }
 }
 function drawingEndTime(d){
   return safeNum(d?.roundStartTs)+safeNum(d?.roundDuration||DRAWING_DEFAULT_DURATION)*1000;
@@ -4687,6 +4931,7 @@ function reconcileDrawingStatePatch(state){
     if(d.drawer!=null) patch["drawing/drawer"]=null;
     if(d.word) patch["drawing/word"]="";
     if(d.roundStartTs!=null) patch["drawing/roundStartTs"]=null;
+    if(normalizeDrawingBackground(d.backgroundColor)!==DRAWING_DEFAULT_BACKGROUND) patch["drawing/backgroundColor"]=DRAWING_DEFAULT_BACKGROUND;
     if(d.strokes) patch["drawing/strokes"]=null;
     if(d.guesses) patch["drawing/guesses"]=null;
     if(d.guessed) patch["drawing/guessed"]=null;
@@ -5321,6 +5566,7 @@ function cleanupLocalRoomAfterRemoval(){
   drawingPointers.clear();
   drawingGesture=null;
   drawingViewMode=false;
+  setDrawingCanvasFullscreen(false);
   drawingView={zoom:1,x:0,y:0};
   mauMauPendingWildIndex=null;
   if(heartbeatInterval){clearInterval(heartbeatInterval);heartbeatInterval=null;}
@@ -5563,6 +5809,9 @@ async function processStateUpdate(newState){
     stopCollectingTimer();
     stopStoppingTimer();
   }
+  if(!((gameState.gameType||"slf")==="drawing"&&gameState.phase==="playing")){
+    setDrawingCanvasFullscreen(false);
+  }
   if(gameState.buzzer && gameState.buzzer!==prevBuzzer){
     prevBuzzerValue=gameState.buzzer;
     playSoundBuzzer();
@@ -5666,11 +5915,15 @@ function resetRoundData(){
   liveSaveQueued=false;
   liveSaveRunning=false;
   localAnswers={};
+  drawingGuessFocusUntil=0;
+  drawingGuessDraft="";
+  drawingGuessSelectionStart=null;
+  drawingGuessSelectionEnd=null;
+  setDrawingCanvasFullscreen(false);
   lobbyEditorOpen=false;
   battleshipLocalRound=null;
   battleshipPlacedShips=[];
   battleshipOrientation="h";
-  drawingFullscreen=false;
   stopLetterRevealTimer();
   stopRoundTimer();
   stopCollectingTimer();
@@ -6474,15 +6727,6 @@ function renderDrawingLobby(){
   const wordMode=drawingWordMode(gameState.drawing?.wordMode||DRAWING_DEFAULT_WORD_MODE);
   const revealLetters=!!gameState.drawing?.revealLetters;
   const drawingDuration=Math.max(30,Math.min(300,safeNum(gameState.drawing?.roundDuration)||DRAWING_DEFAULT_DURATION));
-  const bgColors=[
-    {hex:"#ffffff", label:"Weiß"},
-    {hex:"#1f2937", label:"Schwarz"},
-    {hex:"#dbeafe", label:"Hellblau"},
-    {hex:"#fef3c7", label:"Hellgelb"},
-    {hex:"#dcfce7", label:"Hellgrün"},
-    {hex:"#ffe4e6", label:"Rosa"}
-  ];
-  const drawingBgColor = normalizeDrawingColor(gameState.drawing?.bgColor) || "#ffffff";
 
   renderLobbyPlayers(()=>"");
 
@@ -6509,16 +6753,6 @@ function renderDrawingLobby(){
           <div class="validation-presets">
             <button type="button" class="validation-preset ${!revealLetters?"active":""}" onclick="window.setDrawingRevealLetters(false)">Aus</button>
             <button type="button" class="validation-preset ${revealLetters?"active":""}" onclick="window.setDrawingRevealLetters(true)">Buchstaben</button>
-          </div>
-        </div>
-        <div class="lobby-editor-group">
-          <div class="lobby-editor-title">Hintergrundfarbe</div>
-          <div class="drawing-tool-row" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <label class="drawing-custom-color active" title="Hintergrund-Farbe wählen">
-              <input type="color" value="${drawingBgColor}" onchange="window.setDrawingBgColor(this.value)"/>
-              <span class="drawing-custom-color-preview" style="background:${drawingBgColor}">🖼️</span>
-            </label>
-            ${bgColors.map(c=>`<button type="button" class="drawing-color-btn ${normalizeDrawingColor(drawingBgColor)===normalizeDrawingColor(c.hex)?"active":""}" style="background:${c.hex}; border: 1px solid rgba(0,0,0,0.15);" title="${c.label}" onclick="window.setDrawingBgColor('${c.hex}')"></button>`).join("")}
           </div>
         </div>
       </div>`:"";
@@ -7758,31 +7992,11 @@ function drawingHasStrokeId(strokes,id){
 }
 function drawingStrokesArray(strokes){
   let arr=[];
-  const seenIds = new Set();
-  if(Array.isArray(strokes)){
-    strokes.forEach((s,i)=>{
-      if(s){
-        arr.push(s);
-        seenIds.add(String(s.id||i));
-      }
-    });
-  }else if(strokes&&typeof strokes==="object"){
-    Object.entries(strokes).forEach(([id,s])=>{
-      if(s){
-        arr.push(s);
-        seenIds.add(String(id));
-      }
-    });
-  }
-  Object.entries(drawingPendingStrokes||{}).forEach(([id,s])=>{
-    if(s){
-      if(drawingHasStrokeId(strokes,id)){
-        delete drawingPendingStrokes[id];
-      }else if(!seenIds.has(String(id))){
-        arr.push(s);
-        seenIds.add(String(id));
-      }
-    }
+  if(Array.isArray(strokes)) arr=strokes.filter(Boolean);
+  else if(strokes&&typeof strokes==="object") arr=Object.values(strokes).filter(Boolean);
+  Object.keys(drawingPendingStrokes||{}).forEach(id=>{
+    if(drawingHasStrokeId(strokes,id)) delete drawingPendingStrokes[id];
+    else if(drawingPendingStrokes[id]) arr.push(drawingPendingStrokes[id]);
   });
   return arr.sort((a,b)=>safeNum(a.ts)-safeNum(b.ts));
 }
@@ -7803,9 +8017,73 @@ function drawingResetView(redraw=true){
   drawingView={zoom:1,x:0,y:0};
   if(redraw) redrawCurrentDrawingCanvas();
 }
+function drawingScrollSnapshot(){
+  const full=document.querySelector(".drawing-game.drawing-fullscreen");
+  const doc=document.scrollingElement||document.documentElement;
+  return {
+    x:window.scrollX||doc?.scrollLeft||0,
+    y:window.scrollY||doc?.scrollTop||0,
+    fullTop:full?full.scrollTop:null,
+    fullLeft:full?full.scrollLeft:null
+  };
+}
+function instantWindowScrollTo(x,y){
+  const html=document.documentElement;
+  const doc=document.scrollingElement||html;
+  const prev=html?.style?.scrollBehavior||"";
+  if(html)html.style.scrollBehavior="auto";
+  if(typeof window.scrollTo==="function"){
+    try{window.scrollTo({left:x,top:y,behavior:"auto"});}
+    catch(e){try{window.scrollTo(x,y);}catch(_e){}}
+  }
+  if(doc){doc.scrollLeft=x;doc.scrollTop=y;}
+  if(html)html.style.scrollBehavior=prev;
+}
+function restoreDrawingScrollSnapshot(snapshot){
+  if(!snapshot)return;
+  const restore=()=>{
+    if(!gameState||gameState.gameType!=="drawing"||gameState.phase!=="playing")return;
+    if(Date.now()-drawingUserScrollTs<140)return;
+    const full=document.querySelector(".drawing-game.drawing-fullscreen");
+    if(full&&snapshot.fullTop!=null){
+      if(full.scrollTop<snapshot.fullTop-2) full.scrollTop=snapshot.fullTop;
+      if(Math.abs((full.scrollLeft||0)-(snapshot.fullLeft||0))>2) full.scrollLeft=snapshot.fullLeft||0;
+      return;
+    }
+    const currentY=window.scrollY||document.documentElement?.scrollTop||0;
+    const currentX=window.scrollX||document.documentElement?.scrollLeft||0;
+    if(currentY<snapshot.y-2||Math.abs(currentX-snapshot.x)>2){
+      instantWindowScrollTo(snapshot.x,snapshot.y);
+    }
+  };
+  restore();
+  if(typeof requestAnimationFrame==="function") requestAnimationFrame(restore);
+  else setTimeout(restore,0);
+  setTimeout(restore,80);
+}
 function redrawCurrentDrawingCanvas(){
   const canvas=document.getElementById("drawing-canvas");
   if(canvas&&gameState?.drawing) drawingDrawCanvas(canvas,gameState.drawing.strokes||{});
+}
+function markDrawingColorPickerActive(ms=60000){
+  drawingColorPickerActiveUntil=Date.now()+ms;
+}
+function clearDrawingColorPickerActive(){
+  drawingColorPickerActiveUntil=0;
+}
+function drawingColorPickerActive(){
+  const active=document.activeElement;
+  return Date.now()<drawingColorPickerActiveUntil || !!(active?.matches&&active.matches('.drawing-custom-color input[type="color"]'));
+}
+window.keepDrawingColorPickerOpen=function(){
+  markDrawingColorPickerActive();
+};
+function updateDrawingColorPickerDom(kind,hex){
+  const selector=kind==="background"?'.drawing-background-color':'.drawing-custom-color:not(.drawing-background-color)';
+  const input=document.querySelector(`${selector} input[type="color"]`);
+  const preview=document.querySelector(`${selector} .drawing-custom-color-preview`);
+  if(input)input.value=hex;
+  if(preview)preview.style.background=hex;
 }
 function drawingStrokesToObject(strokes){
   if(Array.isArray(strokes)){
@@ -7869,8 +8147,7 @@ function drawingPrepareCanvas(canvas){
 }
 
 function drawingBrushColor(){
-  if(drawingToolMode==="eraser") return normalizeDrawingColor(gameState?.drawing?.bgColor)||"#ffffff";
-  return drawingToolColor;
+  return drawingToolMode==="eraser"?"#ffffff":drawingToolColor;
 }
 function drawingBrushWidth(){
   return drawingToolMode==="eraser"?drawingEraserWidth:drawingToolWidth;
@@ -7881,13 +8158,12 @@ function drawingCanvasPoint(p,width,height){
 function drawingDrawStroke(ctx,stroke,width,height){
   const pts=(stroke?.points||[]).filter(p=>p&&Number.isFinite(Number(p.x))&&Number.isFinite(Number(p.y)));
   if(!pts.length)return;
-  const currentBg=normalizeDrawingColor(gameState?.drawing?.bgColor)||"#ffffff";
-  const isEraser=stroke.tool==="eraser"||(String(stroke.color||"").toLowerCase()===currentBg&&safeNum(stroke.width)>=DRAWING_ERASER_WIDTH);
+  const isEraser=stroke.tool==="eraser"||(String(stroke.color||"").toLowerCase()==="#ffffff"&&safeNum(stroke.width)>=DRAWING_ERASER_WIDTH);
   ctx.save();
-  ctx.globalCompositeOperation="source-over";
+  ctx.globalCompositeOperation=isEraser?"destination-out":"source-over";
   ctx.lineCap="round";
   ctx.lineJoin="round";
-  ctx.strokeStyle=isEraser?(normalizeDrawingColor(stroke.color)||currentBg):(stroke.color||"#343a40");
+  ctx.strokeStyle=isEraser?"rgba(0,0,0,1)":(stroke.color||"#343a40");
   ctx.lineWidth=Math.max(1,Number(stroke.width)||4);
   ctx.beginPath();
   const first=drawingCanvasPoint(pts[0],width,height);
@@ -7917,9 +8193,10 @@ function drawingDrawCanvas(canvas,strokes){
   const {ctx,width,height}=drawingPrepareCanvas(canvas);
   const view=drawingClampView();
   drawingView=view;
+  const bg=normalizeDrawingBackground(gameState?.drawing?.backgroundColor);
+  canvas.style.backgroundColor=bg;
   ctx.clearRect(0,0,width,height);
-  const bgColor=normalizeDrawingColor(gameState?.drawing?.bgColor)||"#ffffff";
-  ctx.fillStyle=bgColor;
+  ctx.fillStyle=bg;
   ctx.fillRect(0,0,width,height);
   ctx.save();
   ctx.translate(-(view.x/1000)*width*view.zoom,-(view.y/1000)*height*view.zoom);
@@ -7928,40 +8205,34 @@ function drawingDrawCanvas(canvas,strokes){
   if(drawingActiveStroke) drawingDrawStroke(ctx,drawingActiveStroke,width,height);
   ctx.restore();
 }
+function setDrawingCanvasFullscreen(active){
+  drawingCanvasFullscreen=!!active;
+  document.body?.classList.toggle("drawing-canvas-fullscreen-active",drawingCanvasFullscreen);
+}
+function drawingFullscreenIconHtml(active=false){
+  return active
+    ? `<svg class="drawing-fullscreen-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 4v5H4M4 9l5-5M15 4v5h5M20 9l-5-5M9 20v-5H4M4 15l5 5M15 20v-5h5M20 15l-5 5"/></svg>`
+    : `<svg class="drawing-fullscreen-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 4H4v6M4 4l6 6M14 4h6v6M20 4l-6 6M4 14v6h6M4 20l6-6M20 14v6h-6M20 20l-6-6"/></svg>`;
+}
 function drawingToolsHtml(){
   const view=drawingClampView();
   const customColor=normalizeDrawingColor(drawingToolColor)||"#343a40";
-  const bgCustomColor=normalizeDrawingColor(gameState?.drawing?.bgColor)||"#ffffff";
   const activeWidth=drawingToolMode==="eraser"?drawingEraserWidth:drawingToolWidth;
   const widthMin=drawingToolMode==="eraser"?DRAWING_MIN_ERASER_WIDTH:DRAWING_MIN_WIDTH;
   const widthMax=drawingToolMode==="eraser"?DRAWING_MAX_ERASER_WIDTH:DRAWING_MAX_WIDTH;
   const widthLabel=drawingToolMode==="eraser"?"Radierer":"Dicke";
-  const bgColors=[
-    {hex:"#ffffff", label:"Weiß"},
-    {hex:"#1f2937", label:"Schwarz"},
-    {hex:"#dbeafe", label:"Hellblau"},
-    {hex:"#fef3c7", label:"Hellgelb"},
-    {hex:"#dcfce7", label:"Hellgrün"},
-    {hex:"#ffe4e6", label:"Rosa"}
-  ];
   return `<div class="drawing-tool-panel">
-    <div class="drawing-tool-title">Stift-Farbe</div>
-    <div class="drawing-tool-row" aria-label="Stift-Farbe">
-      <label class="drawing-custom-color ${!drawingViewMode&&drawingToolMode==="pen"?"active":""}" title="Stift-Farbe wählen" aria-label="Stift-Farbe wählen">
-        <input type="color" value="${customColor}" onchange="window.pickDrawingColor(this.value)"/>
+    <div class="drawing-tool-title">Werkzeuge</div>
+    <div class="drawing-tool-row" aria-label="Farbe">
+      <label class="drawing-custom-color ${!drawingViewMode&&drawingToolMode==="pen"?"active":""}" title="Stiftfarbe wählen" aria-label="Stiftfarbe wählen">
+        <input type="color" value="${customColor}" onfocus="window.keepDrawingColorPickerOpen()" onclick="window.keepDrawingColorPickerOpen()" onpointerdown="window.keepDrawingColorPickerOpen()" onchange="window.pickDrawingColor(this.value)"/>
         <span class="drawing-custom-color-preview" style="background:${customColor}">🖌️</span>
       </label>
-      ${DRAWING_COLORS.map(c=>`<button type="button" class="drawing-color-btn ${!drawingViewMode&&drawingToolMode==="pen"&&normalizeDrawingColor(drawingToolColor)===normalizeDrawingColor(c.hex)?"active":""}" style="background:${c.hex}" title="${c.name}" onclick="window.pickDrawingColor('${c.hex}')"></button>`).join("")}
-    </div>
-    <div class="drawing-tool-title">Hintergrundfarbe</div>
-    <div class="drawing-tool-row" aria-label="Hintergrundfarbe">
-      <label class="drawing-custom-color active" title="Hintergrund-Farbe wählen" aria-label="Hintergrund-Farbe wählen">
-        <input type="color" value="${bgCustomColor}" onchange="window.setDrawingBgColor(this.value)"/>
-        <span class="drawing-custom-color-preview" style="background:${bgCustomColor}">🖼️</span>
+      <label class="drawing-custom-color drawing-background-color" title="Hintergrundfarbe wählen" aria-label="Hintergrundfarbe wählen">
+        <input type="color" value="${normalizeDrawingBackground(gameState?.drawing?.backgroundColor)}" onfocus="window.keepDrawingColorPickerOpen()" onclick="window.keepDrawingColorPickerOpen()" onpointerdown="window.keepDrawingColorPickerOpen()" onchange="window.pickDrawingBackgroundColor(this.value)"/>
+        <span class="drawing-custom-color-preview drawing-background-color-preview" style="background:${normalizeDrawingBackground(gameState?.drawing?.backgroundColor)}"><svg class="drawing-bg-bucket-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.5 13.5 12 6l6.5 6.5-7.5 7.5a2 2 0 0 1-2.8 0l-3.7-3.7a2 2 0 0 1 0-2.8Z"/><path d="M10.5 7.5 7 4"/><path d="M5 14h13"/><path d="M19 14c1.2 1.4 1.8 2.5 1.8 3.4a1.8 1.8 0 0 1-3.6 0c0-.9.6-2 1.8-3.4Z"/></svg></span>
       </label>
-      ${bgColors.map(c=>`<button type="button" class="drawing-color-btn ${normalizeDrawingColor(bgCustomColor)===normalizeDrawingColor(c.hex)?"active":""}" style="background:${c.hex}; border: 1px solid rgba(0,0,0,0.15);" title="${c.label}" onclick="window.setDrawingBgColor('${c.hex}')"></button>`).join("")}
     </div>
-    <div class="drawing-tool-title">Werkzeuge</div>
     <div class="drawing-tool-row drawing-width-row" aria-label="Stiftdicke">
       <label class="drawing-width-control ${drawingToolMode==="eraser"?"eraser":""}">
         <span>${widthLabel}</span>
@@ -7974,42 +8245,47 @@ function drawingToolsHtml(){
     </div>
     <div class="drawing-tool-title">Ansicht</div>
     <div class="drawing-tool-row drawing-zoom-row" aria-label="Zoom">
-      <button type="button" class="drawing-tool-btn" onclick="window.zoomDrawingCanvas('out')">−</button>
-      <button type="button" class="drawing-tool-btn" onclick="window.resetDrawingCanvasView()">${Math.round(view.zoom*100)}%</button>
-      <button type="button" class="drawing-tool-btn" onclick="window.zoomDrawingCanvas('in')">+</button>
+      <button type="button" class="drawing-tool-btn" onclick="window.zoomDrawingCanvas('out')" title="Ansicht herauszoomen" aria-label="Ansicht herauszoomen">−</button>
+      <button type="button" class="drawing-tool-btn" onclick="window.resetDrawingCanvasView()" title="Ansicht zurücksetzen" aria-label="Ansicht zurücksetzen">${Math.round(view.zoom*100)}%</button>
+      <button type="button" class="drawing-tool-btn" onclick="window.zoomDrawingCanvas('in')" title="Ansicht hineinzoomen" aria-label="Ansicht hineinzoomen">+</button>
+      <button type="button" class="drawing-tool-btn drawing-fullscreen-btn ${drawingCanvasFullscreen?"active":""}" onclick="window.toggleDrawingCanvasFullscreen()" title="${drawingCanvasFullscreen?"Vollbild verlassen":"Zeichenfläche als Vollbild"}" aria-label="${drawingCanvasFullscreen?"Vollbild verlassen":"Zeichenfläche als Vollbild"}">${drawingFullscreenIconHtml(drawingCanvasFullscreen)}</button>
       <button type="button" class="drawing-tool-btn ${drawingViewMode?"active":""}" onclick="window.toggleDrawingViewMode()">Ansicht</button>
     </div>
   </div>`;
 }
-window.setDrawingBgColor = async function(hex){
-  hex = normalizeDrawingColor(hex);
-  if(!hex) return;
-  if(!gameState || gameState.gameType!=="drawing") return;
-  const d = gameState.drawing || {};
-  if(isHost || d.drawer===myId){
-    setConnStatus("sync");
-    try {
-      await update(roomRef(),{"drawing/bgColor": hex});
-      setConnStatus("ok");
-    } catch(e) {
-      setConnStatus("err");
-    }
-  }
-};
 window.pickDrawingColor=function(hex){
   hex=normalizeDrawingColor(hex);
   if(!hex)return;
+  clearDrawingColorPickerActive();
   drawingToolColor=hex;
   drawingToolMode="pen";
   drawingViewMode=false;
   localStorage.setItem("drawing_color",hex);
-  renderPlaying();
+  updateDrawingColorPickerDom("pen",hex);
+  redrawCurrentDrawingCanvas();
+};
+window.pickDrawingBackgroundColor=async function(hex){
+  hex=normalizeDrawingBackground(hex);
+  clearDrawingColorPickerActive();
+  if(!gameState||gameState.gameType!=="drawing"||gameState.phase!=="playing")return;
+  const d=gameState.drawing||{};
+  if(d.drawer!==myId)return;
+  if(!gameState.drawing)gameState.drawing={};
+  gameState.drawing.backgroundColor=hex;
+  redrawCurrentDrawingCanvas();
+  updateDrawingColorPickerDom("background",hex);
+  setConnStatus("sync");
+  try{
+    await update(roomRef(),{"drawing/backgroundColor":hex});
+    setConnStatus("ok");
+  }catch(e){setConnStatus("err");}
 };
 function updateDrawingWidthControlLabel(value){
   const label=document.querySelector(".drawing-width-control strong");
   if(label)label.textContent=String(value);
 }
 window.pickDrawingWidth=function(width){
+  clearDrawingColorPickerActive();
   width=normalizeDrawingWidth(width);
   drawingToolWidth=width;
   drawingToolMode="pen";
@@ -8019,6 +8295,7 @@ window.pickDrawingWidth=function(width){
   updateDrawingWidthControlLabel(width);
 };
 window.pickDrawingEraserWidth=function(width){
+  clearDrawingColorPickerActive();
   width=normalizeDrawingEraserWidth(width);
   drawingEraserWidth=width;
   drawingToolMode="eraser";
@@ -8032,11 +8309,13 @@ window.pickDrawingActiveWidth=function(width){
   else window.pickDrawingWidth(width);
 };
 window.toggleDrawingEraser=function(){
+  clearDrawingColorPickerActive();
   drawingViewMode=false;
   drawingToolMode=drawingToolMode==="eraser"?"pen":"eraser";
   renderPlaying();
 };
 window.toggleDrawingViewMode=function(){
+  clearDrawingColorPickerActive();
   drawingViewMode=!drawingViewMode;
   drawingPointers.clear();
   drawingGesture=null;
@@ -8044,11 +8323,18 @@ window.toggleDrawingViewMode=function(){
   renderPlaying();
 };
 window.zoomDrawingCanvas=function(dir){
+  clearDrawingColorPickerActive();
   drawingZoomView(dir==="out"?1/DRAWING_ZOOM_STEP:DRAWING_ZOOM_STEP);
   renderPlaying();
 };
 window.resetDrawingCanvasView=function(){
+  clearDrawingColorPickerActive();
   drawingResetView(false);
+  renderPlaying();
+};
+window.toggleDrawingCanvasFullscreen=function(){
+  clearDrawingColorPickerActive();
+  setDrawingCanvasFullscreen(!drawingCanvasFullscreen);
   renderPlaying();
 };
 function scheduleDrawingStrokeSync(){
@@ -8215,14 +8501,32 @@ function updateDrawingTimerDom(remaining,timerPct){
 function restoreDrawingGuessFocus(value,selectionStart=null,selectionEnd=null){
   const input=document.getElementById("drawing-guess-input");
   if(!input)return;
+  const scrollSnapshot=drawingScrollSnapshot();
   input.value=value||"";
-  input.focus({preventScroll:true});
+  try{ input.focus({preventScroll:true}); }
+  catch(e){ input.focus(); }
   try{
     const posStart=selectionStart==null?input.value.length:selectionStart;
     const posEnd=selectionEnd==null?posStart:selectionEnd;
     input.setSelectionRange(posStart,posEnd);
   }catch(e){}
+  restoreDrawingScrollSnapshot(scrollSnapshot);
 }
+function markDrawingGuessFocused(ms=3500){
+  drawingGuessFocusUntil=Date.now()+ms;
+}
+function drawingGuessInputActive(){
+  return document.activeElement?.id==="drawing-guess-input"||Date.now()<drawingGuessFocusUntil;
+}
+function rememberDrawingGuessInputInternal(input=document.getElementById("drawing-guess-input")){
+  if(!input)return;
+  drawingGuessDraft=input.value||"";
+  drawingGuessSelectionStart=input.selectionStart??drawingGuessDraft.length;
+  drawingGuessSelectionEnd=input.selectionEnd??drawingGuessSelectionStart;
+  markDrawingGuessFocused();
+}
+window.markDrawingGuessInputActive=function(){ markDrawingGuessFocused(); };
+window.rememberDrawingGuessInput=function(input){ rememberDrawingGuessInputInternal(input); };
 function scheduleDrawingTick(remaining){
   if(drawingTickTimer)clearTimeout(drawingTickTimer);
   if(remaining>0&&gameState?.gameType==="drawing"&&gameState.phase==="playing"){
@@ -8241,6 +8545,7 @@ function scheduleDrawingTick(remaining){
   }
 }
 window.clearDrawingCanvas=async function(){
+  clearDrawingColorPickerActive();
   if(!gameState||gameState.gameType!=="drawing"||gameState.phase!=="playing")return;
   const d=gameState.drawing||{};
   if(d.drawer!==myId)return;
@@ -8255,6 +8560,7 @@ window.clearDrawingCanvas=async function(){
   }catch(e){setConnStatus("err");}
 };
 window.undoDrawingStroke=async function(){
+  clearDrawingColorPickerActive();
   if(!gameState||gameState.gameType!=="drawing"||gameState.phase!=="playing")return;
   const d=gameState.drawing||{};
   if(d.drawer!==myId)return;
@@ -8298,6 +8604,10 @@ window.submitDrawingGuess=async function(){
   const guess=(input?.value||"").trim();
   if(!guess)return;
   if(input) input.value="";
+  drawingGuessDraft="";
+  drawingGuessSelectionStart=0;
+  drawingGuessSelectionEnd=0;
+  markDrawingGuessFocused();
   const guessKey=`${myId}_${Date.now()}_${Math.floor(Math.random()*10000)}`;
   setConnStatus("sync");
   try{
@@ -8369,9 +8679,19 @@ function renderDrawingPlaying(){
   const tiEl=document.getElementById("typing-indicators-area"); if(tiEl) tiEl.innerHTML="";
   const bEl=document.getElementById("buzzer-container"); if(bEl) bEl.innerHTML="";
   const cEl=document.getElementById("playing-content"); if(!cEl)return;
+  const preserveScroll=!!cEl.querySelector(".drawing-game");
+  const scrollSnapshot=preserveScroll?drawingScrollSnapshot():null;
   const d=gameState?.drawing||initialDrawingState();
   const drawer=d.drawer||drawingFirstDrawer(drawingOrder(gameState));
   const isDrawer=drawer===myId;
+  if(!isDrawer){
+    drawingViewMode=false;
+    drawingPointers.clear();
+    drawingGesture=null;
+    drawingActivePointerId=null;
+    const view=drawingClampView();
+    if(view.zoom!==1||view.x!==0||view.y!==0) drawingResetView(false);
+  }
   const drawerName=drawingPlayerName(drawer);
   const elapsed=Math.max(0,Math.floor((Date.now()-(d.roundStartTs||Date.now()))/1000));
   const duration=Math.max(1,safeNum(d.roundDuration||DRAWING_DEFAULT_DURATION));
@@ -8382,81 +8702,82 @@ function renderDrawingPlaying(){
     window.endDrawingRoundTimeout();
   }
   const guessed=!!d.guessed?.[myId];
-  const wasGuessFocused=document.activeElement?.id==="drawing-guess-input";
-  const guessInputBefore=wasGuessFocused?document.getElementById("drawing-guess-input"):null;
-  const guessValueBefore=guessInputBefore?.value||"";
-  const guessSelectionStart=guessInputBefore?.selectionStart??null;
-  const guessSelectionEnd=guessInputBefore?.selectionEnd??null;
+  const guessInputBefore=document.getElementById("drawing-guess-input");
+  const guessInputHadFocus=!!(guessInputBefore&&document.activeElement===guessInputBefore);
+  const wasGuessFocused=guessInputHadFocus||drawingGuessInputActive();
+  if(guessInputHadFocus) rememberDrawingGuessInputInternal(guessInputBefore);
+  const guessValueBefore=guessInputBefore?.value??drawingGuessDraft;
+  const guessSelectionStart=guessInputBefore?.selectionStart??drawingGuessSelectionStart;
+  const guessSelectionEnd=guessInputBefore?.selectionEnd??drawingGuessSelectionEnd;
   const existingCanvas=document.getElementById("drawing-canvas");
-  const drawingToolFocused = existingCanvas && isDrawer && document.activeElement && (
-    document.querySelector(".drawing-tool-panel")?.contains(document.activeElement) ||
-    document.activeElement.type === "color" ||
-    document.activeElement.type === "range"
-  );
-  if(drawingToolFocused){
-    drawingDrawCanvas(existingCanvas,d.strokes||{});
-    updateDrawingTimerDom(remaining,timerPct);
-    scheduleDrawingTick(remaining);
-    return;
-  }
-  const guessInputFocused = existingCanvas && !isDrawer && document.activeElement?.id === "drawing-guess-input";
-  if(guessInputFocused){
-    drawingDrawCanvas(existingCanvas,d.strokes||{});
-    updateDrawingTimerDom(remaining,timerPct);
+  const existingGame=cEl.querySelector(".drawing-game");
+  const drawingStructureKey=drawingPlayingStructureKey(d,drawer,isDrawer,guessed,word);
+  const drawingRenderKey=drawingPlayingRenderKey(d,drawer,isDrawer,guessed,word);
+  const sameDrawingStructure=existingGame?.dataset?.drawingStructureKey===drawingStructureKey;
+  const sameDrawingRender=existingGame?.dataset?.drawingRenderKey===drawingRenderKey;
+  const keepDrawingDom=!!(existingCanvas&&existingGame&&sameDrawingStructure&&(
+    sameDrawingRender ||
+    drawingColorPickerActive() ||
+    (wasGuessFocused&&!isDrawer&&!guessed) ||
+    drawingActiveStroke
+  ));
+  if(keepDrawingDom){
+    updateDrawingPlayingDynamicDom(d,remaining,timerPct);
     scheduleDrawingTick(remaining);
     scheduleDrawingGuessFadeRender(d);
+    restoreDrawingScrollSnapshot(scrollSnapshot);
     return;
   }
-  if(wasGuessFocused&&existingCanvas&&!isDrawer&&!guessed){
-    drawingDrawCanvas(existingCanvas,d.strokes||{});
-    updateDrawingTimerDom(remaining,timerPct);
-    scheduleDrawingTick(remaining);
-    return;
-  }
-  if(drawingActiveStroke&&existingCanvas){ 
-    drawingDrawCanvas(existingCanvas,d.strokes||{});
-    scheduleDrawingTick(remaining);
-    return;
-  }
+  const drawingGuessesKey=drawingVisibleGuessesKey(d);
   cEl.innerHTML=`
-    <div class="drawing-game">
-      ${!drawingFullscreen?`<div class="drawing-panel" style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
-        <div>
-          <div class="drawing-title" style="font-size:1.1rem;margin-bottom:0">${isDrawer?"Du malst":`${escHtml(drawerName)} malt`}</div>
+    <div class="drawing-game ${drawingCanvasFullscreen?"drawing-fullscreen":""}" data-drawing-structure-key="${escHtml(drawingStructureKey)}" data-drawing-render-key="${escHtml(drawingRenderKey)}">
+      <div class="drawing-panel">
+        <div class="drawing-title">${isDrawer?"Du malst":`${escHtml(drawerName)} malt`}</div>
+        <div class="drawing-sub" id="drawing-round-status">Runde ${safeNum(d.round)||1} · ${remaining}s</div>
+        <div class="drawing-pill-row" style="margin-top:10px">
+          <span class="drawing-pill">${isDrawer?"Zeichner":"Rater"}</span>
+          <span class="drawing-pill" id="drawing-strokes-pill">${drawingStrokesArray(d.strokes).length} Striche</span>
+          ${guessed?`<span class="drawing-pill">Richtig geraten ✓</span>`:""}
         </div>
-        <div style="text-align:right">
-          <div class="drawing-sub" style="margin-top:0">Zeit</div>
-          <div style="font-size:1.4rem;font-weight:900;color:var(--ink);line-height:1;" id="drawing-time-left">${remaining}s</div>
+        <div class="drawing-timer">
+          <div class="drawing-timer-head"><span>Zeit</span><span id="drawing-time-left">${remaining}s</span></div>
+          <div class="drawing-timer-track"><div id="drawing-timer-fill" class="drawing-timer-fill ${remaining<=10?"urgent":""}" style="width:${timerPct}%"></div></div>
         </div>
       </div>
       <div class="drawing-word-card">
         <div class="drawing-sub">${isDrawer?"Dein Wort":"Geheimes Wort"}</div>
         <div class="drawing-word" id="${isDrawer?"":"drawing-secret-word-display"}">${isDrawer?escHtml(word||"?"):drawingSecretPlaceholderHtml(word,d)}</div>
-      </div>`:""}
-      <div class="drawing-canvas-wrap ${drawingFullscreen?"fullscreen":""}">
-        <canvas id="drawing-canvas" class="drawing-canvas ${isDrawer?"drawable":""}" aria-label="Montagsmaler Zeichenfläche"></canvas>
-        <button type="button" class="drawing-fullscreen-btn" onclick="window.toggleDrawingFullscreen()" title="${drawingFullscreen?"Vollbild beenden":"Vollbild"}" aria-label="Vollbild">${drawingFullscreen?"🗗":"⛶"}</button>
-        ${drawingFullscreen&&isDrawer?drawingToolsHtml():""}
       </div>
-      ${!drawingFullscreen?(isDrawer?`<div class="drawing-tools"><span class="drawing-sub">Mit Finger oder Maus zeichnen</span></div>${drawingToolsHtml()}`:``):""}
-      ${!drawingFullscreen?(!isDrawer?`<div class="drawing-panel">
+      <div class="drawing-canvas-wrap ${isDrawer?"":"scrollable"}">
+        <canvas id="drawing-canvas" class="drawing-canvas ${isDrawer?"drawable":"scrollable"}" aria-label="Montagsmaler Zeichenfläche"></canvas>
+      </div>
+      ${isDrawer?`<div class="drawing-tools"><span class="drawing-sub">Mit Finger oder Maus zeichnen</span></div>${drawingToolsHtml()}`:`<div class="drawing-tools"><span class="drawing-sub">Rate unten das geheime Wort.</span></div>`}
+      ${!isDrawer?`<div class="drawing-panel">
         <div class="drawing-title">Raten</div>
-        ${guessed?`<div class="drawing-sub">Du hast das Wort richtig geraten.</div>`:`<div class="drawing-guess-row">
-          <input type="text" id="drawing-guess-input" placeholder="Dein Tipp…" maxlength="40" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();window.submitDrawingGuess();}"/>
-          <button type="button" class="btn btn-sm" onclick="window.submitDrawingGuess()">Raten</button>
-        </div>`}
-        ${drawingRecentGuessesHtml(d,{transient:true})}
+        ${guessed?`<div class="drawing-sub">Du hast das Wort richtig geraten.</div>`:`<form class="drawing-guess-row" onsubmit="event.preventDefault();window.submitDrawingGuess();">
+          <input type="text" id="drawing-guess-input" placeholder="Dein Tipp…" maxlength="40" autocomplete="off" enterkeyhint="send" onfocus="window.markDrawingGuessInputActive&&window.markDrawingGuessInputActive()" oninput="window.rememberDrawingGuessInput&&window.rememberDrawingGuessInput(this)" onkeyup="window.rememberDrawingGuessInput&&window.rememberDrawingGuessInput(this)" onkeydown="window.rememberDrawingGuessInput&&window.rememberDrawingGuessInput(this);"/>
+          <button type="submit" class="btn btn-sm">Raten</button>
+        </form>`}
+        <div id="drawing-guesses-area" data-drawing-guesses-key="${escHtml(drawingGuessesKey)}">${drawingRecentGuessesHtml(d,{transient:true})}</div>
       </div>`:`<div class="drawing-panel">
         <div class="drawing-title">Rateversuche</div>
-        ${drawingRecentGuessesHtml(d,{transient:true})}
-      </div>`):""}
+        <div id="drawing-guesses-area" data-drawing-guesses-key="${escHtml(drawingGuessesKey)}">${drawingRecentGuessesHtml(d,{transient:true})}</div>
+      </div>`}
     </div>`;
+  const guessForm=cEl.querySelector("form.drawing-guess-row");
+  if(guessForm){
+    guessForm.addEventListener("submit",e=>{
+      e.preventDefault();
+      window.submitDrawingGuess();
+    });
+  }
   setupDrawingCanvas(d,isDrawer);
   scheduleDrawingTick(remaining);
   scheduleDrawingGuessFadeRender(d);
-  if(wasGuessFocused&&!isDrawer&&!guessed){
+  if(guessInputHadFocus&&!isDrawer&&!guessed){
     restoreDrawingGuessFocus(guessValueBefore,guessSelectionStart,guessSelectionEnd);
   }
+  restoreDrawingScrollSnapshot(scrollSnapshot);
 }
 function kniffelDiceSum(dice){
   return (dice||[]).reduce((sum,n)=>sum+safeNum(n),0);
@@ -9083,8 +9404,8 @@ function renderConnect4Playing(){
   cEl.innerHTML=`
     <div class="connect4-game">
       <div class="connect4-legend">
-        <div class="connect4-seat ${c4.turn==="red"&&!c4.winner?"active-turn":""}"><span class="connect4-seat-left"><span class="connect4-disc red"></span><span class="connect4-seat-name">${escHtml(redName)}</span></span></div>
-        <div class="connect4-seat ${c4.turn==="yellow"&&!c4.winner?"active-turn":""}"><span class="connect4-seat-left"><span class="connect4-disc yellow"></span><span class="connect4-seat-name">${escHtml(yellowName)}</span></span></div>
+        <div class="connect4-seat ${c4.turn==="red"&&!c4.winner?"active-turn":""}"><span class="connect4-seat-left"><span class="connect4-disc red"></span><span class="connect4-seat-name">${escHtml(redName)}</span></span><span class="connect4-seat-role">Rot</span></div>
+        <div class="connect4-seat ${c4.turn==="yellow"&&!c4.winner?"active-turn":""}"><span class="connect4-seat-left"><span class="connect4-disc yellow"></span><span class="connect4-seat-name">${escHtml(yellowName)}</span></span><span class="connect4-seat-role">Gelb</span></div>
       </div>
       <div class="connect4-board" aria-label="Vier gewinnt Spielbrett">
         ${board.map((cell,i)=>{
@@ -9939,6 +10260,11 @@ function renderMauMauResults(){
 function renderDrawingResults(){
   setResultsMode("");
   setResultLabels("Punkte","Auflösung");
+  drawingViewMode=false;
+  drawingPointers.clear();
+  drawingGesture=null;
+  drawingActivePointerId=null;
+  drawingResetView(false);
   const d=gameState.drawing||initialDrawingState();
   const correct=d.lastCorrect;
   const word=String(d.word||"?");
@@ -10035,8 +10361,8 @@ function renderTicTacToeResults(){
       :`<button type="button" class="btn btn-outline" disabled>Warte auf den Host…</button>`;
     goArea.innerHTML=`<div class="tictactoe-game tictactoe-result-stage">
       <div class="tictactoe-status done">${ttt.winner==="draw"?"Unentschieden":`🏆 ${escHtml(winnerName)} gewinnt!`}</div>
-      ${ticTacToeBoardHtml(ttt)}
       <div class="result-rematch">${rematchHtml}</div>
+      ${ticTacToeBoardHtml(ttt)}
     </div>`;
   }
   const banner=document.getElementById("validation-banner-area"); if(banner) banner.innerHTML="";
@@ -10078,7 +10404,7 @@ function renderConnect4Results(){
     const rematchHtml=isHost
       ?`<button type="button" class="btn" onclick="window.resetConnect4Game()">Nochmal spielen →</button>`
       :`<button type="button" class="btn btn-outline" disabled>Warte auf den Host…</button>`;
-    goArea.innerHTML=`<div class="connect4-result-stage">${boardHtml}<div class="result-rematch">${rematchHtml}</div></div>`;
+    goArea.innerHTML=`<div class="connect4-result-stage"><div class="result-rematch">${rematchHtml}</div>${boardHtml}</div>`;
   }
   const banner=document.getElementById("validation-banner-area"); if(banner) banner.innerHTML="";
   document.getElementById("scoreboard").innerHTML=[
@@ -10536,5 +10862,5 @@ function escHtml(s){
 }
 
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a20cf1f2e98a1e42',t:'MTc4NTAwMTE3OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
