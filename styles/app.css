@@ -1798,6 +1798,25 @@ body[data-theme="night"] .lobby-editor {
   transition: background 0.2s;
 }
 .settings-close:hover { background: var(--paper); }
+
+.settings-back-btn {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper-white);
+  color: var(--ink);
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 18px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.settings-back-btn:hover { background: var(--paper2); }
 .settings-section { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 11px;
   letter-spacing: 1.5px; text-transform: uppercase; color: var(--pencil);
   margin: 20px 0 10px; }
