@@ -292,13 +292,18 @@ let drawingToolWidth = normalizeDrawingWidth(localStorage.getItem("drawing_width
 let drawingEraserWidth = normalizeDrawingEraserWidth(localStorage.getItem("drawing_eraser_width"));
 let drawingToolMode = "pen";
 let drawingViewMode = false;
+let drawingCanvasFullscreen = false;
 let drawingView = {zoom:1,x:0,y:0};
 let drawingPointers = new Map();
 let drawingGesture = null;
 let drawingActivePointerId = null;
 let drawingColorPickerActiveUntil = 0;
+let drawingUserScrollTs = 0;
 let drawingActiveStrokeId=null, drawingActiveStroke=null, drawingPendingStrokes={}, drawingSyncTimer=null, drawingTickTimer=null, drawingGuessFadeTimer=null, drawingTimerInterval=null;
 let drawingGuessFocusUntil=0, drawingGuessDraft="", drawingGuessSelectionStart=null, drawingGuessSelectionEnd=null;
+function markDrawingUserScrollIntent(){drawingUserScrollTs=Date.now();}
+window.addEventListener("touchmove",markDrawingUserScrollIntent,{passive:true});
+window.addEventListener("wheel",markDrawingUserScrollIntent,{passive:true});
 let mauMauPendingWildIndex=null, mauMauLastAnimatedTopId=null;
 let syncedPhase=null; // tracks last rendered phase to detect real transitions
 let aiValidationRunningKey=null;
@@ -1465,7 +1470,7 @@ function drawingLobbyStateForPlayers(players={},previous={}){
   const state=initialDrawingState(Object.keys(players||{}));
   state.wordMode=drawingWordMode(previous?.wordMode||DRAWING_DEFAULT_WORD_MODE);
   state.revealLetters=!!previous?.revealLetters;
-  state.backgroundColor=normalizeDrawingBackground(previous?.backgroundColor);
+  state.backgroundColor=DRAWING_DEFAULT_BACKGROUND;
   state.usedWords=Array.isArray(previous?.usedWords)?previous.usedWords.slice(-drawingWordPool(state.wordMode).length):[];
   state.roundDuration=Math.max(30,Math.min(300,safeNum(previous?.roundDuration)||DRAWING_DEFAULT_DURATION));
   return state;
@@ -1562,7 +1567,7 @@ function drawingRoundState(order,round,drawer=null,previous={}){
     wordIndex:Math.max(0,DRAWING_WORDS.indexOf(picked.word)),
     wordMode,
     revealLetters:!!previous?.revealLetters,
-    backgroundColor:normalizeDrawingBackground(previous?.backgroundColor),
+    backgroundColor:DRAWING_DEFAULT_BACKGROUND,
     usedWords:picked.usedWords,
     roundDuration:duration,
     roundStartTs:Date.now(),
@@ -1602,6 +1607,54 @@ function scheduleDrawingGuessFadeRender(d){
     drawingGuessFadeTimer=null;
     if(gameState?.gameType==="drawing"&&gameState.phase==="playing") renderPlaying();
   },Math.max(250,Math.min(...remaining)+80));
+}
+function drawingVisibleGuessesKey(d){
+  const now=Date.now();
+  const guesses=drawingGuessesArray(d?.guesses)
+    .filter(g=>Math.max(0,now-safeNum(g.ts))<DRAWING_GUESS_TOTAL_MS)
+    .slice(-8);
+  if(!guesses.length)return"empty";
+  return guesses.map(g=>[
+    safeNum(g.ts),
+    g.player||"",
+    g.correct?1:0,
+    String(g.guess||"")
+  ].join("~")).join("|");
+}
+function drawingPlayingStructureKey(d,drawer,isDrawer,guessed,word){
+  return [
+    safeNum(d?.round)||1,
+    safeNum(d?.roundStartTs)||0,
+    safeNum(d?.roundDuration||DRAWING_DEFAULT_DURATION),
+    drawer||"",
+    isDrawer?"drawer":"rater",
+    guessed?"guessed":"open",
+    d?.revealLetters?"reveal":"plain",
+    word||""
+  ].join("|");
+}
+function drawingPlayingRenderKey(d,drawer,isDrawer,guessed,word){
+  const base=`${drawingPlayingStructureKey(d,drawer,isDrawer,guessed,word)}|fs:${drawingCanvasFullscreen?1:0}`;
+  if(!isDrawer)return base;
+  const view=drawingClampView();
+  return `${base}|tool:${drawingToolMode}|view:${drawingViewMode?1:0}|zoom:${Math.round(view.zoom*100)}|pen:${drawingToolWidth}|eraser:${drawingEraserWidth}|color:${normalizeDrawingColor(drawingToolColor)||""}|bg:${normalizeDrawingBackground(d?.backgroundColor)}`;
+}
+function updateDrawingPlayingDynamicDom(d,remaining,timerPct){
+  const canvas=document.getElementById("drawing-canvas");
+  if(canvas) drawingDrawCanvas(canvas,d?.strokes||{});
+  updateDrawingTimerDom(remaining,timerPct);
+  const roundEl=document.getElementById("drawing-round-status");
+  if(roundEl) roundEl.textContent=`Runde ${safeNum(d?.round)||1} · ${remaining}s`;
+  const strokesEl=document.getElementById("drawing-strokes-pill");
+  if(strokesEl) strokesEl.textContent=`${drawingStrokesArray(d?.strokes).length} Striche`;
+  const guessesEl=document.getElementById("drawing-guesses-area");
+  if(guessesEl){
+    const key=drawingVisibleGuessesKey(d);
+    if(guessesEl.dataset.drawingGuessesKey!==key){
+      guessesEl.innerHTML=drawingRecentGuessesHtml(d,{transient:true});
+      guessesEl.dataset.drawingGuessesKey=key;
+    }
+  }
 }
 function drawingEndTime(d){
   return safeNum(d?.roundStartTs)+safeNum(d?.roundDuration||DRAWING_DEFAULT_DURATION)*1000;
@@ -1648,6 +1701,7 @@ function reconcileDrawingStatePatch(state){
     if(d.drawer!=null) patch["drawing/drawer"]=null;
     if(d.word) patch["drawing/word"]="";
     if(d.roundStartTs!=null) patch["drawing/roundStartTs"]=null;
+    if(normalizeDrawingBackground(d.backgroundColor)!==DRAWING_DEFAULT_BACKGROUND) patch["drawing/backgroundColor"]=DRAWING_DEFAULT_BACKGROUND;
     if(d.strokes) patch["drawing/strokes"]=null;
     if(d.guesses) patch["drawing/guesses"]=null;
     if(d.guessed) patch["drawing/guessed"]=null;
@@ -2282,6 +2336,7 @@ function cleanupLocalRoomAfterRemoval(){
   drawingPointers.clear();
   drawingGesture=null;
   drawingViewMode=false;
+  setDrawingCanvasFullscreen(false);
   drawingView={zoom:1,x:0,y:0};
   mauMauPendingWildIndex=null;
   if(heartbeatInterval){clearInterval(heartbeatInterval);heartbeatInterval=null;}
@@ -2524,6 +2579,9 @@ async function processStateUpdate(newState){
     stopCollectingTimer();
     stopStoppingTimer();
   }
+  if(!((gameState.gameType||"slf")==="drawing"&&gameState.phase==="playing")){
+    setDrawingCanvasFullscreen(false);
+  }
   if(gameState.buzzer && gameState.buzzer!==prevBuzzer){
     prevBuzzerValue=gameState.buzzer;
     playSoundBuzzer();
@@ -2631,6 +2689,7 @@ function resetRoundData(){
   drawingGuessDraft="";
   drawingGuessSelectionStart=null;
   drawingGuessSelectionEnd=null;
+  setDrawingCanvasFullscreen(false);
   lobbyEditorOpen=false;
   battleshipLocalRound=null;
   battleshipPlacedShips=[];
@@ -4728,6 +4787,50 @@ function drawingResetView(redraw=true){
   drawingView={zoom:1,x:0,y:0};
   if(redraw) redrawCurrentDrawingCanvas();
 }
+function drawingScrollSnapshot(){
+  const full=document.querySelector(".drawing-game.drawing-fullscreen");
+  const doc=document.scrollingElement||document.documentElement;
+  return {
+    x:window.scrollX||doc?.scrollLeft||0,
+    y:window.scrollY||doc?.scrollTop||0,
+    fullTop:full?full.scrollTop:null,
+    fullLeft:full?full.scrollLeft:null
+  };
+}
+function instantWindowScrollTo(x,y){
+  const html=document.documentElement;
+  const doc=document.scrollingElement||html;
+  const prev=html?.style?.scrollBehavior||"";
+  if(html)html.style.scrollBehavior="auto";
+  if(typeof window.scrollTo==="function"){
+    try{window.scrollTo({left:x,top:y,behavior:"auto"});}
+    catch(e){try{window.scrollTo(x,y);}catch(_e){}}
+  }
+  if(doc){doc.scrollLeft=x;doc.scrollTop=y;}
+  if(html)html.style.scrollBehavior=prev;
+}
+function restoreDrawingScrollSnapshot(snapshot){
+  if(!snapshot)return;
+  const restore=()=>{
+    if(!gameState||gameState.gameType!=="drawing"||gameState.phase!=="playing")return;
+    if(Date.now()-drawingUserScrollTs<140)return;
+    const full=document.querySelector(".drawing-game.drawing-fullscreen");
+    if(full&&snapshot.fullTop!=null){
+      if(full.scrollTop<snapshot.fullTop-2) full.scrollTop=snapshot.fullTop;
+      if(Math.abs((full.scrollLeft||0)-(snapshot.fullLeft||0))>2) full.scrollLeft=snapshot.fullLeft||0;
+      return;
+    }
+    const currentY=window.scrollY||document.documentElement?.scrollTop||0;
+    const currentX=window.scrollX||document.documentElement?.scrollLeft||0;
+    if(currentY<snapshot.y-2||Math.abs(currentX-snapshot.x)>2){
+      instantWindowScrollTo(snapshot.x,snapshot.y);
+    }
+  };
+  restore();
+  if(typeof requestAnimationFrame==="function") requestAnimationFrame(restore);
+  else setTimeout(restore,0);
+  setTimeout(restore,80);
+}
 function redrawCurrentDrawingCanvas(){
   const canvas=document.getElementById("drawing-canvas");
   if(canvas&&gameState?.drawing) drawingDrawCanvas(canvas,gameState.drawing.strokes||{});
@@ -4872,6 +4975,15 @@ function drawingDrawCanvas(canvas,strokes){
   if(drawingActiveStroke) drawingDrawStroke(ctx,drawingActiveStroke,width,height);
   ctx.restore();
 }
+function setDrawingCanvasFullscreen(active){
+  drawingCanvasFullscreen=!!active;
+  document.body?.classList.toggle("drawing-canvas-fullscreen-active",drawingCanvasFullscreen);
+}
+function drawingFullscreenIconHtml(active=false){
+  return active
+    ? `<svg class="drawing-fullscreen-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 4v5H4M4 9l5-5M15 4v5h5M20 9l-5-5M9 20v-5H4M4 15l5 5M15 20v-5h5M20 15l-5 5"/></svg>`
+    : `<svg class="drawing-fullscreen-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 4H4v6M4 4l6 6M14 4h6v6M20 4l-6 6M4 14v6h6M4 20l6-6M20 14v6h-6M20 20l-6-6"/></svg>`;
+}
 function drawingToolsHtml(){
   const view=drawingClampView();
   const customColor=normalizeDrawingColor(drawingToolColor)||"#343a40";
@@ -4888,7 +5000,7 @@ function drawingToolsHtml(){
       </label>
       <label class="drawing-custom-color drawing-background-color" title="Hintergrundfarbe wählen" aria-label="Hintergrundfarbe wählen">
         <input type="color" value="${normalizeDrawingBackground(gameState?.drawing?.backgroundColor)}" onfocus="window.keepDrawingColorPickerOpen()" onclick="window.keepDrawingColorPickerOpen()" onpointerdown="window.keepDrawingColorPickerOpen()" onchange="window.pickDrawingBackgroundColor(this.value)"/>
-        <span class="drawing-custom-color-preview drawing-background-color-preview" style="background:${normalizeDrawingBackground(gameState?.drawing?.backgroundColor)}">□</span>
+        <span class="drawing-custom-color-preview drawing-background-color-preview" style="background:${normalizeDrawingBackground(gameState?.drawing?.backgroundColor)}"><svg class="drawing-bg-bucket-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.5 13.5 12 6l6.5 6.5-7.5 7.5a2 2 0 0 1-2.8 0l-3.7-3.7a2 2 0 0 1 0-2.8Z"/><path d="M10.5 7.5 7 4"/><path d="M5 14h13"/><path d="M19 14c1.2 1.4 1.8 2.5 1.8 3.4a1.8 1.8 0 0 1-3.6 0c0-.9.6-2 1.8-3.4Z"/></svg></span>
       </label>
     </div>
     <div class="drawing-tool-row drawing-width-row" aria-label="Stiftdicke">
@@ -4903,9 +5015,10 @@ function drawingToolsHtml(){
     </div>
     <div class="drawing-tool-title">Ansicht</div>
     <div class="drawing-tool-row drawing-zoom-row" aria-label="Zoom">
-      <button type="button" class="drawing-tool-btn" onclick="window.zoomDrawingCanvas('out')">−</button>
-      <button type="button" class="drawing-tool-btn" onclick="window.resetDrawingCanvasView()">${Math.round(view.zoom*100)}%</button>
-      <button type="button" class="drawing-tool-btn" onclick="window.zoomDrawingCanvas('in')">+</button>
+      <button type="button" class="drawing-tool-btn" onclick="window.zoomDrawingCanvas('out')" title="Ansicht herauszoomen" aria-label="Ansicht herauszoomen">−</button>
+      <button type="button" class="drawing-tool-btn" onclick="window.resetDrawingCanvasView()" title="Ansicht zurücksetzen" aria-label="Ansicht zurücksetzen">${Math.round(view.zoom*100)}%</button>
+      <button type="button" class="drawing-tool-btn" onclick="window.zoomDrawingCanvas('in')" title="Ansicht hineinzoomen" aria-label="Ansicht hineinzoomen">+</button>
+      <button type="button" class="drawing-tool-btn drawing-fullscreen-btn ${drawingCanvasFullscreen?"active":""}" onclick="window.toggleDrawingCanvasFullscreen()" title="${drawingCanvasFullscreen?"Vollbild verlassen":"Zeichenfläche als Vollbild"}" aria-label="${drawingCanvasFullscreen?"Vollbild verlassen":"Zeichenfläche als Vollbild"}">${drawingFullscreenIconHtml(drawingCanvasFullscreen)}</button>
       <button type="button" class="drawing-tool-btn ${drawingViewMode?"active":""}" onclick="window.toggleDrawingViewMode()">Ansicht</button>
     </div>
   </div>`;
@@ -4987,6 +5100,11 @@ window.zoomDrawingCanvas=function(dir){
 window.resetDrawingCanvasView=function(){
   clearDrawingColorPickerActive();
   drawingResetView(false);
+  renderPlaying();
+};
+window.toggleDrawingCanvasFullscreen=function(){
+  clearDrawingColorPickerActive();
+  setDrawingCanvasFullscreen(!drawingCanvasFullscreen);
   renderPlaying();
 };
 function scheduleDrawingStrokeSync(){
@@ -5153,13 +5271,16 @@ function updateDrawingTimerDom(remaining,timerPct){
 function restoreDrawingGuessFocus(value,selectionStart=null,selectionEnd=null){
   const input=document.getElementById("drawing-guess-input");
   if(!input)return;
+  const scrollSnapshot=drawingScrollSnapshot();
   input.value=value||"";
-  input.focus({preventScroll:true});
+  try{ input.focus({preventScroll:true}); }
+  catch(e){ input.focus(); }
   try{
     const posStart=selectionStart==null?input.value.length:selectionStart;
     const posEnd=selectionEnd==null?posStart:selectionEnd;
     input.setSelectionRange(posStart,posEnd);
   }catch(e){}
+  restoreDrawingScrollSnapshot(scrollSnapshot);
 }
 function markDrawingGuessFocused(ms=3500){
   drawingGuessFocusUntil=Date.now()+ms;
@@ -5328,9 +5449,19 @@ function renderDrawingPlaying(){
   const tiEl=document.getElementById("typing-indicators-area"); if(tiEl) tiEl.innerHTML="";
   const bEl=document.getElementById("buzzer-container"); if(bEl) bEl.innerHTML="";
   const cEl=document.getElementById("playing-content"); if(!cEl)return;
+  const preserveScroll=!!cEl.querySelector(".drawing-game");
+  const scrollSnapshot=preserveScroll?drawingScrollSnapshot():null;
   const d=gameState?.drawing||initialDrawingState();
   const drawer=d.drawer||drawingFirstDrawer(drawingOrder(gameState));
   const isDrawer=drawer===myId;
+  if(!isDrawer){
+    drawingViewMode=false;
+    drawingPointers.clear();
+    drawingGesture=null;
+    drawingActivePointerId=null;
+    const view=drawingClampView();
+    if(view.zoom!==1||view.x!==0||view.y!==0) drawingResetView(false);
+  }
   const drawerName=drawingPlayerName(drawer);
   const elapsed=Math.max(0,Math.floor((Date.now()-(d.roundStartTs||Date.now()))/1000));
   const duration=Math.max(1,safeNum(d.roundDuration||DRAWING_DEFAULT_DURATION));
@@ -5341,40 +5472,41 @@ function renderDrawingPlaying(){
     window.endDrawingRoundTimeout();
   }
   const guessed=!!d.guessed?.[myId];
-  const wasGuessFocused=drawingGuessInputActive();
   const guessInputBefore=document.getElementById("drawing-guess-input");
-  if(guessInputBefore&&document.activeElement===guessInputBefore) rememberDrawingGuessInputInternal(guessInputBefore);
+  const guessInputHadFocus=!!(guessInputBefore&&document.activeElement===guessInputBefore);
+  const wasGuessFocused=guessInputHadFocus||drawingGuessInputActive();
+  if(guessInputHadFocus) rememberDrawingGuessInputInternal(guessInputBefore);
   const guessValueBefore=guessInputBefore?.value??drawingGuessDraft;
   const guessSelectionStart=guessInputBefore?.selectionStart??drawingGuessSelectionStart;
   const guessSelectionEnd=guessInputBefore?.selectionEnd??drawingGuessSelectionEnd;
   const existingCanvas=document.getElementById("drawing-canvas");
-  if(drawingColorPickerActive()&&existingCanvas){
-    drawingDrawCanvas(existingCanvas,d.strokes||{});
-    updateDrawingTimerDom(remaining,timerPct);
+  const existingGame=cEl.querySelector(".drawing-game");
+  const drawingStructureKey=drawingPlayingStructureKey(d,drawer,isDrawer,guessed,word);
+  const drawingRenderKey=drawingPlayingRenderKey(d,drawer,isDrawer,guessed,word);
+  const sameDrawingStructure=existingGame?.dataset?.drawingStructureKey===drawingStructureKey;
+  const sameDrawingRender=existingGame?.dataset?.drawingRenderKey===drawingRenderKey;
+  const keepDrawingDom=!!(existingCanvas&&existingGame&&sameDrawingStructure&&(
+    sameDrawingRender ||
+    drawingColorPickerActive() ||
+    (wasGuessFocused&&!isDrawer&&!guessed) ||
+    drawingActiveStroke
+  ));
+  if(keepDrawingDom){
+    updateDrawingPlayingDynamicDom(d,remaining,timerPct);
     scheduleDrawingTick(remaining);
     scheduleDrawingGuessFadeRender(d);
+    restoreDrawingScrollSnapshot(scrollSnapshot);
     return;
   }
-  if(wasGuessFocused&&existingCanvas&&!isDrawer&&!guessed){
-    drawingDrawCanvas(existingCanvas,d.strokes||{});
-    updateDrawingTimerDom(remaining,timerPct);
-    scheduleDrawingTick(remaining);
-    scheduleDrawingGuessFadeRender(d);
-    return;
-  }
-  if(drawingActiveStroke&&existingCanvas){ 
-    drawingDrawCanvas(existingCanvas,d.strokes||{});
-    scheduleDrawingTick(remaining);
-    return;
-  }
+  const drawingGuessesKey=drawingVisibleGuessesKey(d);
   cEl.innerHTML=`
-    <div class="drawing-game">
+    <div class="drawing-game ${drawingCanvasFullscreen?"drawing-fullscreen":""}" data-drawing-structure-key="${escHtml(drawingStructureKey)}" data-drawing-render-key="${escHtml(drawingRenderKey)}">
       <div class="drawing-panel">
         <div class="drawing-title">${isDrawer?"Du malst":`${escHtml(drawerName)} malt`}</div>
-        <div class="drawing-sub">Runde ${safeNum(d.round)||1} · ${remaining}s</div>
+        <div class="drawing-sub" id="drawing-round-status">Runde ${safeNum(d.round)||1} · ${remaining}s</div>
         <div class="drawing-pill-row" style="margin-top:10px">
           <span class="drawing-pill">${isDrawer?"Zeichner":"Rater"}</span>
-          <span class="drawing-pill">${drawingStrokesArray(d.strokes).length} Striche</span>
+          <span class="drawing-pill" id="drawing-strokes-pill">${drawingStrokesArray(d.strokes).length} Striche</span>
           ${guessed?`<span class="drawing-pill">Richtig geraten ✓</span>`:""}
         </div>
         <div class="drawing-timer">
@@ -5386,8 +5518,8 @@ function renderDrawingPlaying(){
         <div class="drawing-sub">${isDrawer?"Dein Wort":"Geheimes Wort"}</div>
         <div class="drawing-word" id="${isDrawer?"":"drawing-secret-word-display"}">${isDrawer?escHtml(word||"?"):drawingSecretPlaceholderHtml(word,d)}</div>
       </div>
-      <div class="drawing-canvas-wrap">
-        <canvas id="drawing-canvas" class="drawing-canvas ${isDrawer?"drawable":""}" aria-label="Montagsmaler Zeichenfläche"></canvas>
+      <div class="drawing-canvas-wrap ${isDrawer?"":"scrollable"}">
+        <canvas id="drawing-canvas" class="drawing-canvas ${isDrawer?"drawable":"scrollable"}" aria-label="Montagsmaler Zeichenfläche"></canvas>
       </div>
       ${isDrawer?`<div class="drawing-tools"><span class="drawing-sub">Mit Finger oder Maus zeichnen</span></div>${drawingToolsHtml()}`:`<div class="drawing-tools"><span class="drawing-sub">Rate unten das geheime Wort.</span></div>`}
       ${!isDrawer?`<div class="drawing-panel">
@@ -5396,10 +5528,10 @@ function renderDrawingPlaying(){
           <input type="text" id="drawing-guess-input" placeholder="Dein Tipp…" maxlength="40" autocomplete="off" enterkeyhint="send" onfocus="window.markDrawingGuessInputActive&&window.markDrawingGuessInputActive()" oninput="window.rememberDrawingGuessInput&&window.rememberDrawingGuessInput(this)" onkeyup="window.rememberDrawingGuessInput&&window.rememberDrawingGuessInput(this)" onkeydown="window.rememberDrawingGuessInput&&window.rememberDrawingGuessInput(this);"/>
           <button type="submit" class="btn btn-sm">Raten</button>
         </form>`}
-        ${drawingRecentGuessesHtml(d,{transient:true})}
+        <div id="drawing-guesses-area" data-drawing-guesses-key="${escHtml(drawingGuessesKey)}">${drawingRecentGuessesHtml(d,{transient:true})}</div>
       </div>`:`<div class="drawing-panel">
         <div class="drawing-title">Rateversuche</div>
-        ${drawingRecentGuessesHtml(d,{transient:true})}
+        <div id="drawing-guesses-area" data-drawing-guesses-key="${escHtml(drawingGuessesKey)}">${drawingRecentGuessesHtml(d,{transient:true})}</div>
       </div>`}
     </div>`;
   const guessForm=cEl.querySelector("form.drawing-guess-row");
@@ -5412,9 +5544,10 @@ function renderDrawingPlaying(){
   setupDrawingCanvas(d,isDrawer);
   scheduleDrawingTick(remaining);
   scheduleDrawingGuessFadeRender(d);
-  if(wasGuessFocused&&!isDrawer&&!guessed){
+  if(guessInputHadFocus&&!isDrawer&&!guessed){
     restoreDrawingGuessFocus(guessValueBefore,guessSelectionStart,guessSelectionEnd);
   }
+  restoreDrawingScrollSnapshot(scrollSnapshot);
 }
 function kniffelDiceSum(dice){
   return (dice||[]).reduce((sum,n)=>sum+safeNum(n),0);
@@ -6897,6 +7030,11 @@ function renderMauMauResults(){
 function renderDrawingResults(){
   setResultsMode("");
   setResultLabels("Punkte","Auflösung");
+  drawingViewMode=false;
+  drawingPointers.clear();
+  drawingGesture=null;
+  drawingActivePointerId=null;
+  drawingResetView(false);
   const d=gameState.drawing||initialDrawingState();
   const correct=d.lastCorrect;
   const word=String(d.word||"?");
