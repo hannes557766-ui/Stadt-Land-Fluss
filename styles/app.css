@@ -2171,6 +2171,7 @@ input[type=range]::-moz-range-thumb {
   max-width: 560px;
   display: grid;
   gap: 16px;
+  overflow-anchor: none;
 }
 .drawing-panel {
   border: 1px solid var(--line);
@@ -2261,6 +2262,7 @@ input[type=range]::-moz-range-thumb {
   background: var(--paper-white);
   padding: 8px;
   touch-action: none;
+  overflow-anchor: none;
 }
 .drawing-canvas {
   width: 100%;
@@ -2271,9 +2273,60 @@ input[type=range]::-moz-range-thumb {
   touch-action: none;
   cursor: default;
 }
+.drawing-canvas-wrap.scrollable,
+.drawing-canvas.scrollable {
+  touch-action: pan-y;
+}
+.drawing-canvas.scrollable {
+  cursor: default;
+}
 .drawing-canvas.drawable { cursor: crosshair; }
 .drawing-canvas.view-mode { cursor: grab; }
 .drawing-canvas.view-mode:active { cursor: grabbing; }
+body.drawing-canvas-fullscreen-active {
+  overflow: hidden;
+}
+.drawing-game.drawing-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  width: auto;
+  max-width: none;
+  min-height: 100dvh;
+  max-height: 100dvh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  background: var(--paper);
+  align-content: start;
+}
+.drawing-game.drawing-fullscreen .drawing-canvas-wrap {
+  border-radius: 20px;
+  padding: 8px;
+}
+.drawing-game.drawing-fullscreen .drawing-canvas {
+  aspect-ratio: auto;
+  height: min(68dvh, calc(100dvh - 250px));
+  min-height: 330px;
+}
+.drawing-fullscreen-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+.drawing-fullscreen-icon path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.15;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.drawing-fullscreen-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 46px;
+}
 .drawing-tools {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -2396,6 +2449,18 @@ input[type=range]::-moz-range-thumb {
   font-size: 16px;
   font-weight: 900;
 }
+.drawing-bg-bucket-icon {
+  width: 19px;
+  height: 19px;
+  display: block;
+}
+.drawing-bg-bucket-icon path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .drawing-tool-btn {
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -2426,6 +2491,12 @@ input[type=range]::-moz-range-thumb {
   margin-top: 0;
   height: 48px;
   padding: 0 16px;
+  flex: 0 0 auto;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.drawing-guess-row .btn:hover,
+.drawing-guess-row .btn:active {
+  transform: none;
 }
 .drawing-guesses {
   display: grid;
@@ -2477,6 +2548,10 @@ input[type=range]::-moz-range-thumb {
 @media (max-width: 430px) {
   .drawing-panel, .drawing-word-card { padding: 14px; }
   .drawing-canvas-wrap { padding: 6px; border-radius: 16px; }
+  .drawing-game.drawing-fullscreen .drawing-canvas {
+    height: min(62dvh, calc(100dvh - 235px));
+    min-height: 270px;
+  }
   .drawing-tools { grid-template-columns: 1fr; }
   .drawing-tool-panel {
     max-height: min(42vh, 360px);
@@ -2833,4 +2908,148 @@ input[type=range]::-moz-range-thumb {
   .kniffel-die.held::before { top: 4px; right: 5px; width: 16px; height: 16px; line-height: 16px; font-size: 11px; }
   .kniffel-sheet { min-width: 500px; font-size: 12px; }
   .kniffel-sheet th, .kniffel-sheet td { padding: 8px 9px; }
+}
+
+/* Einheitliche Buttons: keine Leucht-/Glow-Effekte */
+.btn,
+.buzzer-btn,
+.timer-preset,
+.round-preset,
+.validation-preset,
+.vote-btn,
+.gear-btn,
+.game-card-btn,
+.settings-back-btn,
+.leave-btn,
+.theme-chip,
+.color-swatch,
+.drawing-color-btn,
+.drawing-custom-color,
+.drawing-tool-btn,
+.drawing-fullscreen-btn,
+.kniffel-score-btn,
+.maumau-card-btn,
+.maumau-color-btn,
+.player-kick-btn {
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+}
+.btn:hover,
+.btn:active,
+.btn:focus,
+.btn:focus-visible,
+.buzzer-btn:hover,
+.buzzer-btn:active,
+.buzzer-btn:focus,
+.buzzer-btn:focus-visible,
+.timer-preset:hover,
+.timer-preset:active,
+.timer-preset:focus,
+.timer-preset:focus-visible,
+.round-preset:hover,
+.round-preset:active,
+.round-preset:focus,
+.round-preset:focus-visible,
+.validation-preset:hover,
+.validation-preset:active,
+.validation-preset:focus,
+.validation-preset:focus-visible,
+.vote-btn:hover,
+.vote-btn:active,
+.vote-btn:focus,
+.vote-btn:focus-visible,
+.gear-btn:hover,
+.gear-btn:active,
+.gear-btn:focus,
+.gear-btn:focus-visible,
+.game-card-btn:hover,
+.game-card-btn:active,
+.game-card-btn:focus,
+.game-card-btn:focus-visible,
+.settings-back-btn:hover,
+.settings-back-btn:active,
+.settings-back-btn:focus,
+.settings-back-btn:focus-visible,
+.leave-btn:hover,
+.leave-btn:active,
+.leave-btn:focus,
+.leave-btn:focus-visible,
+.theme-chip:hover,
+.theme-chip:active,
+.theme-chip:focus,
+.theme-chip:focus-visible,
+.color-swatch:hover,
+.color-swatch:active,
+.color-swatch:focus,
+.color-swatch:focus-visible,
+.drawing-color-btn:hover,
+.drawing-color-btn:active,
+.drawing-color-btn:focus,
+.drawing-color-btn:focus-visible,
+.drawing-custom-color:hover,
+.drawing-custom-color:active,
+.drawing-custom-color:focus,
+.drawing-custom-color:focus-visible,
+.drawing-tool-btn:hover,
+.drawing-tool-btn:active,
+.drawing-tool-btn:focus,
+.drawing-tool-btn:focus-visible,
+.drawing-fullscreen-btn:hover,
+.drawing-fullscreen-btn:active,
+.drawing-fullscreen-btn:focus,
+.drawing-fullscreen-btn:focus-visible,
+.kniffel-score-btn:hover,
+.kniffel-score-btn:active,
+.kniffel-score-btn:focus,
+.kniffel-score-btn:focus-visible,
+.maumau-card-btn:hover,
+.maumau-card-btn:active,
+.maumau-card-btn:focus,
+.maumau-card-btn:focus-visible,
+.maumau-color-btn:hover,
+.maumau-color-btn:active,
+.maumau-color-btn:focus,
+.maumau-color-btn:focus-visible,
+.player-kick-btn:hover,
+.player-kick-btn:active,
+.player-kick-btn:focus,
+.player-kick-btn:focus-visible {
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+  outline: none;
+}
+.btn:focus-visible,
+.buzzer-btn:focus-visible,
+.timer-preset:focus-visible,
+.round-preset:focus-visible,
+.validation-preset:focus-visible,
+.vote-btn:focus-visible,
+.gear-btn:focus-visible,
+.game-card-btn:focus-visible,
+.settings-back-btn:focus-visible,
+.leave-btn:focus-visible,
+.theme-chip:focus-visible,
+.color-swatch:focus-visible,
+.drawing-color-btn:focus-visible,
+.drawing-custom-color:focus-visible,
+.drawing-tool-btn:focus-visible,
+.drawing-fullscreen-btn:focus-visible,
+.kniffel-score-btn:focus-visible,
+.maumau-card-btn:focus-visible,
+.maumau-color-btn:focus-visible,
+.player-kick-btn:focus-visible {
+  outline: 2px solid var(--line);
+  outline-offset: 2px;
+}
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus {
+  outline: none;
+}
+button:focus-visible {
+  outline: 2px solid var(--line);
+  outline-offset: 2px;
 }
