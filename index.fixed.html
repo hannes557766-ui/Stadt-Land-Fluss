@@ -3529,6 +3529,10 @@ let drawingGesture = null;
 let drawingActivePointerId = null;
 let drawingColorPickerActiveUntil = 0;
 let drawingUserScrollTs = 0;
+let drawingDeletedStrokeIds = new Set();
+let drawingLocalClearTs = 0;
+let drawingLocalRoundKey = "";
+let drawingLocalStrokes = {};
 let drawingActiveStrokeId=null, drawingActiveStroke=null, drawingPendingStrokes={}, drawingSyncTimer=null, drawingTickTimer=null, drawingGuessFadeTimer=null, drawingTimerInterval=null;
 let drawingGuessFocusUntil=0, drawingGuessDraft="", drawingGuessSelectionStart=null, drawingGuessSelectionEnd=null;
 function markDrawingUserScrollIntent(){drawingUserScrollTs=Date.now();}
@@ -4871,7 +4875,7 @@ function drawingPlayingRenderKey(d,drawer,isDrawer,guessed,word){
 }
 function updateDrawingPlayingDynamicDom(d,remaining,timerPct){
   const canvas=document.getElementById("drawing-canvas");
-  if(canvas) drawingDrawCanvas(canvas,d?.strokes||{});
+  if(canvas&&!drawingActiveStroke) drawingDrawCanvas(canvas,drawingCurrentStrokes());
   updateDrawingTimerDom(remaining,timerPct);
   const roundEl=document.getElementById("drawing-round-status");
   if(roundEl) roundEl.textContent=`Runde ${safeNum(d?.round)||1} · ${remaining}s`;
@@ -5562,7 +5566,8 @@ function cleanupLocalRoomAfterRemoval(){
   drawingActiveStrokeId=null;
   drawingActivePointerId=null;
   drawingActiveStroke=null;
-  drawingPendingStrokes={};
+  resetDrawingLocalStrokeCache();
+  drawingLocalRoundKey="";
   drawingPointers.clear();
   drawingGesture=null;
   drawingViewMode=false;
@@ -5940,8 +5945,10 @@ function resetRoundData(){
     stopDrawingTimer();
   stopDrawingGuessFadeTimer();
   drawingActiveStrokeId=null;
+  drawingActivePointerId=null;
   drawingActiveStroke=null;
-  drawingPendingStrokes={};
+  resetDrawingLocalStrokeCache();
+  drawingLocalRoundKey="";
   visibleSuggestions=[];
 }
 
@@ -7985,20 +7992,120 @@ function renderMauMauPlaying(){
     </div>`;
   if(topCardKey) mauMauLastAnimatedTopId=topCardKey;
 }
-function drawingHasStrokeId(strokes,id){
-  if(!id||!strokes)return false;
-  if(Array.isArray(strokes))return !!strokes[Number(id)];
-  return typeof strokes==="object"&&!!strokes[id];
+function drawingRoundIdentity(state=gameState){
+  const d=state?.drawing||{};
+  return `${state?.gameType||""}|${safeNum(d.round)}|${safeNum(d.roundStartTs)}|${d.word||""}`;
+}
+function resetDrawingLocalStrokeCache(){
+  drawingDeletedStrokeIds.clear();
+  drawingLocalClearTs=0;
+  drawingPendingStrokes={};
+  drawingLocalStrokes={};
+}
+function ensureDrawingLocalRound(state=gameState){
+  if((state?.gameType||"")!=="drawing")return;
+  const key=drawingRoundIdentity(state);
+  if(key!==drawingLocalRoundKey){
+    drawingLocalRoundKey=key;
+    resetDrawingLocalStrokeCache();
+  }
+}
+function drawingStrokePointCount(stroke){
+  return Array.isArray(stroke?.points)?stroke.points.length:0;
+}
+function drawingStrokeHiddenLocally(id,stroke){
+  if(id&&drawingDeletedStrokeIds.has(String(id)))return true;
+  if(drawingLocalClearTs&&safeNum(stroke?.ts)<=drawingLocalClearTs)return true;
+  return false;
+}
+function drawingRemoteVisibleStrokes(strokes=gameState?.drawing?.strokes||{}){
+  const raw=drawingStrokesToObject(strokes||{});
+  const visible={};
+  Object.entries(raw).forEach(([id,stroke])=>{
+    if(!stroke)return;
+    id=String(id);
+    if(id===String(drawingActiveStrokeId||""))return;
+    if(drawingStrokeHiddenLocally(id,stroke))return;
+    visible[id]=stroke;
+  });
+  return visible;
+}
+function mergeDrawingLocalStrokes(remote,replace=false){
+  const next=replace?{}:{...drawingLocalStrokes};
+  Object.entries(next).forEach(([id,stroke])=>{
+    if(!stroke||drawingStrokeHiddenLocally(id,stroke)) delete next[id];
+  });
+  Object.entries(remote||{}).forEach(([id,stroke])=>{
+    if(!stroke||drawingStrokeHiddenLocally(id,stroke))return;
+    id=String(id);
+    const current=next[id];
+    if(!current||drawingStrokePointCount(stroke)>=drawingStrokePointCount(current)||safeNum(stroke.ts)!==safeNum(current.ts)){
+      next[id]=stroke;
+    }
+  });
+  drawingLocalStrokes=next;
+  return drawingLocalStrokes;
+}
+function drawingCurrentStrokes(strokes=gameState?.drawing?.strokes||{}){
+  ensureDrawingLocalRound(gameState);
+  const raw=drawingStrokesToObject(strokes||{});
+  const remote=drawingRemoteVisibleStrokes(strokes||{});
+  const hasPending=Object.keys(drawingPendingStrokes||{}).length>0;
+  const isCurrentDrawer=gameState?.phase==="playing"&&gameState?.drawing?.drawer===myId;
+  const replace=!isCurrentDrawer&&!drawingActiveStroke&&!hasPending;
+  const base=mergeDrawingLocalStrokes(remote,replace);
+  const visible={...base};
+  Object.entries(drawingPendingStrokes||{}).forEach(([id,pending])=>{
+    id=String(id);
+    if(!pending||drawingStrokeHiddenLocally(id,pending)){
+      delete drawingPendingStrokes[id];
+      delete visible[id];
+      return;
+    }
+    const remoteStroke=raw[id];
+    const remoteReady=remoteStroke&&!drawingStrokeHiddenLocally(id,remoteStroke)&&drawingStrokePointCount(remoteStroke)>=drawingStrokePointCount(pending);
+    if(remoteReady){
+      delete drawingPendingStrokes[id];
+      if(id!==String(drawingActiveStrokeId||"")){
+        visible[id]=remoteStroke;
+        drawingLocalStrokes[id]=remoteStroke;
+      }
+    }else if(id!==String(drawingActiveStrokeId||"")){
+      visible[id]=pending;
+      drawingLocalStrokes[id]=pending;
+    }
+  });
+  return visible;
 }
 function drawingStrokesArray(strokes){
-  let arr=[];
-  if(Array.isArray(strokes)) arr=strokes.filter(Boolean);
-  else if(strokes&&typeof strokes==="object") arr=Object.values(strokes).filter(Boolean);
-  Object.keys(drawingPendingStrokes||{}).forEach(id=>{
-    if(drawingHasStrokeId(strokes,id)) delete drawingPendingStrokes[id];
-    else if(drawingPendingStrokes[id]) arr.push(drawingPendingStrokes[id]);
-  });
-  return arr.sort((a,b)=>safeNum(a.ts)-safeNum(b.ts));
+  return Object.values(drawingCurrentStrokes(strokes||{})).filter(Boolean).sort((a,b)=>safeNum(a.ts)-safeNum(b.ts));
+}
+function markDrawingStrokeDeleted(id){
+  if(!id)return;
+  id=String(id);
+  drawingDeletedStrokeIds.add(id);
+  delete drawingPendingStrokes[id];
+  delete drawingLocalStrokes[id];
+  removeLocalDrawingStroke(id);
+}
+function markDrawingCanvasLocallyCleared(){
+  ensureDrawingLocalRound(gameState);
+  drawingLocalClearTs=Date.now();
+  Object.keys(drawingStrokesToObject(gameState?.drawing?.strokes||{})).forEach(id=>drawingDeletedStrokeIds.add(String(id)));
+  Object.keys(drawingPendingStrokes||{}).forEach(id=>drawingDeletedStrokeIds.add(String(id)));
+  Object.keys(drawingLocalStrokes||{}).forEach(id=>drawingDeletedStrokeIds.add(String(id)));
+  if(drawingActiveStrokeId)drawingDeletedStrokeIds.add(String(drawingActiveStrokeId));
+  drawingPendingStrokes={};
+  drawingLocalStrokes={};
+}
+function scheduleDrawingDeletePatch(patch,delay=350){
+  const room=myRoom;
+  const key=drawingLocalRoundKey;
+  if(!room||!patch||!Object.keys(patch).length)return;
+  setTimeout(()=>{
+    if(myRoom!==room||!gameState||gameState.gameType!=="drawing"||drawingLocalRoundKey!==key)return;
+    update(roomRef(),patch).catch(()=>{});
+  },delay);
 }
 function drawingClampView(view=drawingView){
   const zoom=Math.max(DRAWING_MIN_ZOOM,Math.min(DRAWING_MAX_ZOOM,Number(view?.zoom)||1));
@@ -8063,7 +8170,7 @@ function restoreDrawingScrollSnapshot(snapshot){
 }
 function redrawCurrentDrawingCanvas(){
   const canvas=document.getElementById("drawing-canvas");
-  if(canvas&&gameState?.drawing) drawingDrawCanvas(canvas,gameState.drawing.strokes||{});
+  if(canvas&&gameState?.drawing) drawingDrawCanvas(canvas,drawingCurrentStrokes());
 }
 function markDrawingColorPickerActive(ms=60000){
   drawingColorPickerActiveUntil=Date.now()+ms;
@@ -8094,12 +8201,15 @@ function drawingStrokesToObject(strokes){
 function setLocalDrawingStrokes(strokes){
   if(!gameState?.drawing)return;
   gameState.drawing.strokes=strokes||{};
+  drawingLocalStrokes=drawingRemoteVisibleStrokes(strokes||{});
 }
 function removeLocalDrawingStroke(id){
   if(!id||!gameState?.drawing)return;
+  id=String(id);
   const strokes=drawingStrokesToObject(gameState.drawing.strokes||{});
-  delete strokes[String(id)];
+  delete strokes[id];
   gameState.drawing.strokes=strokes;
+  delete drawingLocalStrokes[id];
 }
 function latestPendingDrawingStrokeEntry(){
   return Object.entries(drawingPendingStrokes||{})
@@ -8346,15 +8456,27 @@ function scheduleDrawingStrokeSync(){
 }
 async function syncDrawingActiveStroke(final=false){
   if(!drawingActiveStrokeId||!drawingActiveStroke||!myRoom)return;
-  const id=drawingActiveStrokeId;
+  const id=String(drawingActiveStrokeId);
   const stroke={...drawingActiveStroke,points:(drawingActiveStroke.points||[]).slice(0,DRAWING_MAX_POINTS_PER_STROKE)};
+  if(drawingStrokeHiddenLocally(id,stroke)){
+    if(final&&drawingActiveStrokeId===id){
+      drawingActiveStrokeId=null;
+      drawingActiveStroke=null;
+      redrawCurrentDrawingCanvas();
+    }
+    return;
+  }
   if(final) drawingPendingStrokes[id]=stroke;
   try{
     await update(roomRef(),{[`drawing/strokes/${id}`]:stroke});
   }catch(e){ setConnStatus("err"); }
+  if(drawingDeletedStrokeIds.has(id)){
+    scheduleDrawingDeletePatch({[`drawing/strokes/${id}`]:null},0);
+  }
   if(final&&drawingActiveStrokeId===id){
     drawingActiveStrokeId=null;
     drawingActiveStroke=null;
+    redrawCurrentDrawingCanvas();
   }
 }
 function drawingPointerList(){ return Array.from(drawingPointers.values()); }
@@ -8427,7 +8549,7 @@ function setupDrawingCanvas(d,isDrawer){
   const canvas=document.getElementById("drawing-canvas");
   if(!canvas)return;
   canvas.classList.toggle("view-mode",!!drawingViewMode);
-  drawingDrawCanvas(canvas,d.strokes||{});
+  drawingDrawCanvas(canvas,drawingCurrentStrokes());
   drawingPointers.clear();
   drawingGesture=null;
   drawingActivePointerId=null;
@@ -8448,7 +8570,7 @@ function setupDrawingCanvas(d,isDrawer){
     drawingActivePointerId=e.pointerId;
     drawingActiveStrokeId=`${myId}_${Date.now()}_${Math.floor(Math.random()*10000)}`;
     drawingActiveStroke={by:myId,ts:Date.now(),color:drawingBrushColor(),width:drawingBrushWidth(),tool:drawingToolMode,points:[p]};
-    drawingDrawCanvas(canvas,d.strokes||{});
+    drawingDrawCanvas(canvas,drawingCurrentStrokes());
     scheduleDrawingStrokeSync();
   };
   canvas.onpointermove=e=>{
@@ -8465,7 +8587,7 @@ function setupDrawingCanvas(d,isDrawer){
       changed=drawingAddPointToActiveStroke(canvas,evt)||changed;
     });
     if(!changed)return;
-    drawingDrawCanvas(canvas,d.strokes||{});
+    drawingDrawCanvas(canvas,drawingCurrentStrokes());
     scheduleDrawingStrokeSync();
   };
   const end=e=>{
@@ -8549,13 +8671,21 @@ window.clearDrawingCanvas=async function(){
   if(!gameState||gameState.gameType!=="drawing"||gameState.phase!=="playing")return;
   const d=gameState.drawing||{};
   if(d.drawer!==myId)return;
+  const deleteIds=new Set([
+    ...Object.keys(drawingStrokesToObject(gameState?.drawing?.strokes||{})),
+    ...Object.keys(drawingPendingStrokes||{})
+  ]);
+  if(drawingActiveStrokeId)deleteIds.add(String(drawingActiveStrokeId));
+  const delayedDeletePatch=Object.fromEntries([...deleteIds].map(id=>[`drawing/strokes/${id}`,null]));
   setConnStatus("sync");
+  markDrawingCanvasLocallyCleared();
   cancelDrawingActiveStroke();
-  drawingPendingStrokes={};
   setLocalDrawingStrokes({});
   redrawCurrentDrawingCanvas();
   try{
     await update(roomRef(),{"drawing/strokes":null});
+    scheduleDrawingDeletePatch(delayedDeletePatch,260);
+    scheduleDrawingDeletePatch(delayedDeletePatch,900);
     setConnStatus("ok");
   }catch(e){setConnStatus("err");}
 };
@@ -8565,35 +8695,46 @@ window.undoDrawingStroke=async function(){
   const d=gameState.drawing||{};
   if(d.drawer!==myId)return;
   if(drawingActiveStroke){
+    const id=drawingActiveStrokeId?String(drawingActiveStrokeId):"";
+    if(id)markDrawingStrokeDeleted(id);
     cancelDrawingActiveStroke();
     redrawCurrentDrawingCanvas();
+    if(id){
+      const patch={[`drawing/strokes/${id}`]:null};
+      setConnStatus("sync");
+      try{await update(roomRef(),patch);scheduleDrawingDeletePatch(patch,350);setConnStatus("ok");}
+      catch(e){setConnStatus("err");}
+    }
     return;
   }
   const pending=latestPendingDrawingStrokeEntry();
   if(pending){
     const [id]=pending;
-    delete drawingPendingStrokes[id];
-    removeLocalDrawingStroke(id);
+    markDrawingStrokeDeleted(id);
     redrawCurrentDrawingCanvas();
+    const patch={[`drawing/strokes/${id}`]:null};
     setConnStatus("sync");
     try{
-      await update(roomRef(),{[`drawing/strokes/${id}`]:null});
+      await update(roomRef(),patch);
+      scheduleDrawingDeletePatch(patch,350);
       setConnStatus("ok");
     }catch(e){setConnStatus("err");}
     return;
   }
-  const strokes=drawingStrokesToObject(d.strokes||{});
+  const strokes=drawingCurrentStrokes();
   const own=Object.entries(strokes)
     .filter(([,stroke])=>stroke&&(!stroke.by||stroke.by===myId))
     .sort((a,b)=>safeNum(a[1]?.ts)-safeNum(b[1]?.ts));
   const last=own[own.length-1];
   if(!last)return;
   const [id]=last;
-  removeLocalDrawingStroke(id);
+  markDrawingStrokeDeleted(id);
   redrawCurrentDrawingCanvas();
+  const patch={[`drawing/strokes/${id}`]:null};
   setConnStatus("sync");
   try{
-    await update(roomRef(),{[`drawing/strokes/${id}`]:null});
+    await update(roomRef(),patch);
+    scheduleDrawingDeletePatch(patch,350);
     setConnStatus("ok");
   }catch(e){setConnStatus("err");}
 };
@@ -10862,5 +11003,5 @@ function escHtml(s){
 }
 
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a20cf1f2e98a1e42',t:'MTc4NTAwMTE3OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
